@@ -262,6 +262,10 @@ router.delete('/:id', protect, async (req, res) => {
 // ── POST /api/exams/:id/download ─────────────────────────
 router.post('/:id/download', protect, async (req, res) => {
   try {
+    // Re-fetch full user document so isPremium() instance method is available
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(401).json({ error: 'User not found.' });
+
     if (!user.isPremium()) {
       return res.status(403).json({
         error: 'PDF download requires a Premium subscription.',

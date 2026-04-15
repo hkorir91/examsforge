@@ -93,7 +93,7 @@ userSchema.methods.isPremium = function () {
 
 userSchema.methods.canGenerate = function () {
   if (this.isPremium()) return true;
-  return this.freeGenerationsUsed < 10; // free tier: 10 exams
+  return this.freeGenerationsUsed < 3; // free tier: 3 exams
 };
 
 userSchema.methods.toPublicJSON = function () {
@@ -106,7 +106,7 @@ userSchema.methods.toPublicJSON = function () {
     tier: this.tier,
     isPremium: this.isPremium(),
     freeGenerationsUsed: this.freeGenerationsUsed,
-    freeGenerationsLeft: Math.max(0, 10 - this.freeGenerationsUsed),
+    freeGenerationsLeft: Math.max(0, 3 - this.freeGenerationsUsed),
     totalExamsGenerated: this.totalExamsGenerated,
     subscriptionExpiresAt: this.subscriptionExpiresAt,
     createdAt: this.createdAt,
