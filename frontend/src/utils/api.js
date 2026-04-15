@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
-  timeout: 30000,
+  import.meta.env.VITE_API_URL || 'https://examsforge.onrender.com/api',
+  timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 })
 
