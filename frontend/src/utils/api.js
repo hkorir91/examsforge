@@ -1,8 +1,12 @@
 import axios from 'axios'
 
+// In production (Vercel), add VITE_API_URL as an Environment Variable in your
+// Vercel project settings pointing to your backend, e.g.:
+//   VITE_API_URL=https://examsforge-api.onrender.com/api
+// In local dev, Vite proxies /api to localhost:5000 via vite.config.js
 const api = axios.create({
-  import.meta.env.VITE_API_URL || 'https://examsforge.onrender.com/api',
-  timeout: 60000,
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
 })
 
