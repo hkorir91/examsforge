@@ -27,8 +27,8 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
   }
   try {
     const filename = generateExamPDF(exam, meta)
-    toast.success(Downloaded: ${filename})
-    if (examId) api.post(/exams/${examId}/download).catch(() => {})
+    toast.success(`Downloaded: ${filename}`)
+if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
   } catch (err) {
     toast.error('PDF generation failed. Please try again.')
   }
