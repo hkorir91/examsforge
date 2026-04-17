@@ -126,7 +126,7 @@ export function generateExamPDF(exam, meta) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.setTextColor(...colors.white)
-    doc.text(`SECTION A — MULTIPLE CHOICE  (${exam.sectionA.marks} marks)`, margin + 5, y + 5.5)
+    doc.text(`SECTION A — SHORT ANSWER  (${exam.sectionA.marks} marks)`, margin + 5, y + 5.5)
     y += 12
 
     doc.setFont('helvetica', 'italic')
