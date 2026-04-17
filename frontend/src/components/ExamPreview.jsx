@@ -21,18 +21,18 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
   if (!exam) return null
 
   const handleDownloadPDF = () => {
-    {user?.isPremium === true ? (
-      toast.error('PDF download requires Premium. Upgrade now!')
-      return
-    }
-    try {
-      const filename = generateExamPDF(exam, meta)
-      toast.success(`Downloaded: ${filename}`)
-      if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
-    } catch (err) {
-      toast.error('PDF generation failed. Please try again.')
-    }
+    if (user?.isPremium !== true) {
+    toast.error('PDF download requires Premium. Upgrade now!')
+    return
   }
+  try {
+    const filename = generateExamPDF(exam, meta)
+    toast.success(Downloaded: ${filename})
+    if (examId) api.post(/exams/${examId}/download).catch(() => {})
+  } catch (err) {
+    toast.error('PDF generation failed. Please try again.')
+  }
+}
 
   const startEdit = (section, qNum, currentText) => {
     setEditingQ({ section, qNum })
