@@ -21,7 +21,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
   if (!exam) return null
 
   const handleDownloadPDF = () => {
-    if (!user?.isPremium) {
+    {user?.isPremium === true ? (
       toast.error('PDF download requires Premium. Upgrade now!')
       return
     }
