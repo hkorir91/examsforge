@@ -262,6 +262,7 @@ router.delete('/:id', protect, async (req, res) => {
 // ── POST /api/exams/:id/download ─────────────────────────
 router.post('/:id/download', protect, async (req, res) => {
   try {
+    const user = await User.findById(req.user._id);
     if (!user.isPremium()) {
       return res.status(403).json({
         error: 'PDF download requires a Premium subscription.',
