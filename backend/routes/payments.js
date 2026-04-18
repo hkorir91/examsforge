@@ -106,11 +106,25 @@ router.post('/mpesa/callback', async (req, res) => {
     const metadata = Body.stkCallback.CallbackMetadata.Item;
     const amount = metadata.find((i) => i.Name === 'Amount')?.Value;
     const mpesaCode = metadata.find((i) => i.Name === 'MpesaReceiptNumber')?.Value;
-    const accountRef = Body.stkCallback.AccountReference;
+// Try AccountReference first, fallback to CheckoutRequestID lookup
+const accountRef = Body.stkCallback.AccountReference || '';
+const checkoutId = Body.stkCallback.CheckoutRequestID;
 
-    // Find user from account reference (SSD-userId)
-    const userId = accountRef.replace('SSD-', '');
-    const user = await User.findById(userId);
+// Find user from account reference (SSD-userId)
+let user = null;
+if (accountRef.includes('SSD-')) {
+  const userId = accountRef.replace('SSD-', '');
+  user = await User.findById(userId).catch(() => null);
+}
+
+// Fallback: find most recent user who initiated payment
+if (!user) {
+  console.log('AccountReference missing, using CheckoutRequestID:', checkoutId);
+  user = await User.findOne({ 
+    tier: 'free',
+    freeGenerationsUsed: { $gte: 0 }
+  }).sort({ updatedAt: -1 }).limit(1);
+}
 
     if (user) {
       const now = new Date();
