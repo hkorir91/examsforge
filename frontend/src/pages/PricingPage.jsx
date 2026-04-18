@@ -1,8 +1,8 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../context/authStore'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom'
 
 const FEATURES = [
   'Grade 10, 11 & 12 CBC supported',
@@ -27,7 +27,7 @@ const PREMIUM_FEATURES = [
 ]
 
 export default function PricingPage() {
-  const { user, token } = useAuthStore()
+  const { user, token, refreshUser } = useAuthStore()
   const [phone, setPhone] = useState('')
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [paying, setPaying] = useState(false)
@@ -39,33 +39,22 @@ export default function PricingPage() {
 
     setPaying(true)
     try {
-const { data } = await api.post('/payments/initiate', { phone, plan })
-toast.success(data.message)
-setSelectedPlan(null)
-setPhone('')
+      const { data } = await api.post('/payments/initiate', { phone, plan })
+      toast.success(data.message)
+      setSelectedPlan(null)
+      setPhone('')
 
-const interval = setInterval(async () => {
-  const res = await api.get('/auth/me')
-  if (res.data.user.isPremium === true || res.data.user.tier === 'monthly' || res.data.user.tier === 'annual') {
-    await refreshUser()
-    clearInterval(interval)
-    toast.success('🎉 Premium activated! Welcome!')
-    navigate('/generate')
-  }
-}, 5000)
-setTimeout(() => clearInterval(interval), 120000)
+      const interval = setInterval(async () => {
+        const res = await api.get('/auth/me')
+        if (res.data.user.isPremium === true || res.data.user.tier === 'monthly' || res.data.user.tier === 'annual') {
+          await refreshUser()
+          clearInterval(interval)
+          toast.success('🎉 Premium activated! Welcome!')
+          navigate('/generate')
+        }
+      }, 5000)
+      setTimeout(() => clearInterval(interval), 120000)
 
-// Poll every 5 seconds for premium upgrade
-const interval = setInterval(async () => {
-  const res = await api.get('/auth/me')
-  if (res.data.user.isPremium) {
-    await refreshUser()
-    clearInterval(interval)
-    toast.success('🎉 Premium activated! Welcome!')
-    navigate('/generate')  // redirect after upgrade
-  }
-}, 5000)
-setTimeout(() => clearInterval(interval), 120000)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Payment failed. Try again.')
     } finally {
@@ -241,3 +230,4 @@ setTimeout(() => clearInterval(interval), 120000)
     </div>
   )
 }
+
