@@ -46,7 +46,7 @@ setPhone('')
 
 const interval = setInterval(async () => {
   const res = await api.get('/auth/me')
-  if (res.data.user.isPremium) {
+  if (res.data.user.isPremium === true || res.data.user.tier === 'monthly' || res.data.user.tier === 'annual') {
     await refreshUser()
     clearInterval(interval)
     toast.success('🎉 Premium activated! Welcome!')
