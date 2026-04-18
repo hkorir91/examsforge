@@ -43,9 +43,15 @@ toast.success(data.message)
 setSelectedPlan(null)
 setPhone('')
 
-// Auto-refresh user every 5 seconds for 2 minutes
+// Poll every 5 seconds for premium upgrade
 const interval = setInterval(async () => {
-  await refreshUser()
+  const res = await api.get('/auth/me')
+  if (res.data.user.isPremium) {
+    await refreshUser()
+    clearInterval(interval)
+    toast.success('🎉 Premium activated! Welcome!')
+    navigate('/generate')  // redirect after upgrade
+  }
 }, 5000)
 setTimeout(() => clearInterval(interval), 120000)
     } catch (err) {
