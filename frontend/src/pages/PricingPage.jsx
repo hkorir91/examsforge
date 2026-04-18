@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../context/authStore'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
@@ -31,6 +31,7 @@ export default function PricingPage() {
   const [phone, setPhone] = useState('')
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [paying, setPaying] = useState(false)
+  const navigate = useNavigate()
 
   const initiatePay = async (plan) => {
     if (!token) { toast.error('Please login first'); return }
@@ -42,6 +43,17 @@ const { data } = await api.post('/payments/initiate', { phone, plan })
 toast.success(data.message)
 setSelectedPlan(null)
 setPhone('')
+
+const interval = setInterval(async () => {
+  const res = await api.get('/auth/me')
+  if (res.data.user.isPremium) {
+    await refreshUser()
+    clearInterval(interval)
+    toast.success('🎉 Premium activated! Welcome!')
+    navigate('/generate')
+  }
+}, 5000)
+setTimeout(() => clearInterval(interval), 120000)
 
 // Poll every 5 seconds for premium upgrade
 const interval = setInterval(async () => {
