@@ -38,10 +38,16 @@ export default function PricingPage() {
 
     setPaying(true)
     try {
-      const { data } = await api.post('/payments/initiate', { phone, plan })
-      toast.success(data.message)
-      setSelectedPlan(null)
-      setPhone('')
+const { data } = await api.post('/payments/initiate', { phone, plan })
+toast.success(data.message)
+setSelectedPlan(null)
+setPhone('')
+
+// Auto-refresh user every 5 seconds for 2 minutes
+const interval = setInterval(async () => {
+  await refreshUser()
+}, 5000)
+setTimeout(() => clearInterval(interval), 120000)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Payment failed. Try again.')
     } finally {
