@@ -49,6 +49,11 @@ export function LoginPage() {
               <input className="input" type="password" placeholder="Your password" value={form.password} onChange={set('password')} required />
             </div>
             <button type="submit" disabled={loading} className="w-full btn-primary justify-center py-3 text-sm">
+              <div className="text-right -mt-2 mb-2">
+  <Link to="/forgot-password" className="text-xs text-brand-blue hover:underline">
+    Forgot Password?
+  </Link>
+</div>
               {loading ? (
                 <><svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Signing in...</>
               ) : 'Sign In'}
