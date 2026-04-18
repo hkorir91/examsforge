@@ -1,4 +1,7 @@
 const express = require('express');
+const crypto = require('crypto');
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
@@ -142,6 +145,78 @@ router.patch('/password', protect, async (req, res) => {
     res.json({ message: 'Password updated successfully.' });
   } catch (err) {
     res.status(500).json({ error: 'Could not update password.' });
+  }
+});
+
+// ── POST /api/auth/forgot-password ───────────────────
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.json({ message: 'If that email exists, a reset link has been sent.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetExpires = new Date(Date.now() + 30 * 60 * 1000);
+    await user.save({ validateBeforeSave: false });
+
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    await resend.emails.send({
+      from: 'ExamsForge <onboarding@resend.dev>',
+      to: user.email,
+      subject: 'Reset Your ExamsForge Password',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #1e3a5f;">Reset Your Password</h2>
+          <p>Hi ${user.name},</p>
+          <p>You requested a password reset for your ExamsForge account.</p>
+          <p>Click the button below. This link expires in <strong>30 minutes</strong>.</p>
+          <a href="${resetURL}" style="display:inline-block; background:#1e3a5f; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; margin: 16px 0;">
+            Reset Password
+          </a>
+          <p style="color:#999; font-size:12px;">If you didn't request this, ignore this email.</p>
+        </div>
+      `,
+    });
+
+    res.json({ message: 'If that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Could not send reset email. Try again.' });
+  }
+});
+
+// ── POST /api/auth/reset-password/:token ─────────────
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Reset link is invalid or has expired.' });
+    }
+
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful! You can now login.' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Could not reset password. Try again.' });
   }
 });
 
