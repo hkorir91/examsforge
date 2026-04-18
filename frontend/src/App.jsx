@@ -12,6 +12,8 @@ import MyExamsPage from './pages/MyExamsPage'
 import ExamViewPage from './pages/ExamViewPage'
 import PricingPage from './pages/PricingPage'
 import DashboardPage from './pages/DashboardPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function PrivateRoute({ children }) {
   const { token } = useAuthStore()
@@ -46,6 +48,8 @@ export default function App() {
         <Route path="/pricing" element={<><Navbar /><PricingPage /></>} />
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+<Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
         {/* Protected */}
         <Route path="/generate" element={<PrivateRoute><><Navbar /><GeneratorPage /></></PrivateRoute>} />
