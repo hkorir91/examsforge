@@ -1,1 +1,1 @@
-export { DashboardPage as default } from './ExamViewPage'
+export { default } from './ProfilePage'
