@@ -50,7 +50,7 @@ export function LoginPage() {
             </div>
             <button type="submit" disabled={loading} className="w-full btn-primary justify-center py-3 text-sm">
               <div className="text-right -mt-2 mb-2">
-  <Link to="/forgot-password" className="text-xs text-brand-blue hover:underline">
+  <Link to="/forgot-password" className="text-sm text-white/80 hover:text-white font-semibold hover:underline">
     Forgot Password?
   </Link>
 </div>
