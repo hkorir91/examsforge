@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
+const adminRoutes = require('./routes/admin');
+// after other routes:
+app.use('/api/admin', adminRoutes);
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
