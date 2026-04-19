@@ -1,47 +1,49 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
-const adminRoutes = require('./routes/admin');
-// after other routes:
-app.use('/api/admin', adminRoutes);
-require('dotenv').config();
 
+// ── Route imports ────────────────────────────────────
 const authRoutes = require('./routes/auth');
 const examRoutes = require('./routes/exams');
 const paymentRoutes = require('./routes/payments');
 const analyticsRoutes = require('./routes/analytics');
+const adminRoutes = require('./routes/admin');
 
+// ── App init ─────────────────────────────────────────
 const app = express();
 app.set('trust proxy', 1);
 
 // ── Security Middleware ──────────────────────────────
 app.use(helmet());
+
 const allowedOrigins = [
   'http://localhost:5173',
   'https://examsforge.vercel.app',
   process.env.FRONTEND_URL,
-].filter(Boolean)
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
 }));
+
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ── Global Rate Limiter ──────────────────────────────
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 200,
   message: { error: 'Too many requests. Please try again later.' },
 });
@@ -52,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ── Health Check ─────────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -80,9 +83,8 @@ app.use((err, req, res, next) => {
 
 // ── Database + Server Start ──────────────────────────
 const PORT = process.env.PORT || 5000;
-
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGO_URI || process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
     app.listen(PORT, () => {
