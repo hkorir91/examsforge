@@ -88,7 +88,6 @@ export const CBC_CURRICULUM = {
   'The New Testament',
   'Church in Action',
   'Christian Living Today',
-],
       ],
       'Business Studies': [
         'Business Concepts and Environment',
