@@ -265,6 +265,774 @@ const seedQuestions = [
     answerGuide: '(a) Long-term alteration in global temperatures and weather patterns, mainly caused by human activities since the mid-20th century — 2 marks. (b) Any 3: burning fossil fuels releasing CO₂; deforestation reducing carbon sinks; industrial emissions; agricultural practices (methane from livestock); urbanisation — 1 mark each. (c) Any 5: reduced rainfall affecting crop production; prolonged droughts affecting water supply; flooding in low-lying areas; melting of Mt Kenya glaciers; loss of biodiversity; sea level rise affecting coastal areas; disruption to tourism; increased disease vectors — 1 mark each.',
     tags: ['climate change', 'environment', 'Kenya', 'sustainability'], learningObjective: 'Analyse the causes and effects of climate change on Kenya',
   },
+
+
+  // ── GRADE 10 — CRE ─────────────────────────────────────────────────────
+
+// SUB-STRAND: The Holy Bible
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 2,
+  questionText: 'What does the word "inspired" mean in the biblical context?',
+  answerGuide: 'Inspired means "God-breathed" (2 Timothy 3:16). God guided human authors so that what they wrote was exactly what God wanted, without error. (2 marks)',
+  tags: ['bible', 'inspiration', 'word of God'], learningObjective: 'Explain the meaning of biblical inspiration',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR reasons why the Bible is referred to as the inspired Word of God. (4 marks)\n(b) Explain how God used the Holy Spirit in the writing of the Bible. (2 marks)',
+  answerGuide: '(a) Any 4: It claims to be inspired (2 Tim 3:16); contains fulfilled prophecies; unity and consistency despite 40+ authors over 1,500 years; changes lives; has power to convict people of sin — 1 mark each. (b) The Holy Spirit moved upon human authors, guiding their minds and memories so they recorded God\'s message without error while still using their own personalities and writing styles — 2 marks.',
+  tags: ['bible', 'inspiration', 'Holy Spirit'], learningObjective: 'Explain why the Bible is the inspired Word of God',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) How many books are in the Old Testament and into how many categories are they divided? (2 marks)\n(b) Name the FIVE books of the Law (Pentateuch). (5 marks)\n(c) Name the FIVE Major Prophets of the Old Testament. (5 marks)',
+  answerGuide: '(a) 39 books divided into 4 categories: Law, History, Poetry/Wisdom, Prophecy — 1 mark each. (b) Genesis, Exodus, Leviticus, Numbers, Deuteronomy — 1 mark each. (c) Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel — 1 mark each. (Total: award max 8 marks)',
+  tags: ['Old Testament', 'books of the Bible', 'categories'], learningObjective: 'Identify the books and categories of the Old Testament',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 5,
+  questionText: 'State and explain FIVE methods used to study the Holy Bible.',
+  answerGuide: 'Any 5 from: Inductive method (observation, interpretation, application); Devotional method (personal spiritual growth); Biographical method (studying a person\'s life); Topical method (gathering verses on a theme); Word study method (tracing a key word). 1 mark for naming, 1 mark for explanation each — max 5 marks.',
+  tags: ['bible study', 'methods', 'inductive'], learningObjective: 'Describe methods of studying the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'long_answer', difficulty: 'medium', marks: 8,
+  questionText: 'State and explain EIGHT benefits of studying the Holy Bible.',
+  answerGuide: 'Any 8 from: Spiritual growth (1 Peter 2:2); Wisdom for salvation (2 Tim 3:15); Guidance (Psalm 119:105); Freedom from sin; Faith (Romans 10:17); Hope and comfort (Romans 15:4); Equipping for good works (2 Tim 3:16-17); Victory over temptation; Deepens relationship with God; Renews the mind (Romans 12:2). 1 mark each — max 8.',
+  tags: ['bible', 'benefits', 'spiritual growth'], learningObjective: 'Explain the benefits of studying the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define integrity as used in CRE and give ONE Bible reference. (2 marks)\n(b) State and explain FOUR ways of applying integrity in daily life. (4 marks)',
+  answerGuide: '(a) Integrity: being honest, consistent in values, and morally upright. Bible reference: Proverbs 11:3 — 2 marks. (b) Any 4 from: being honest in exams; returning extra change; keeping promises; admitting mistakes; not cheating or lying — 1 mark each.',
+  tags: ['integrity', 'values', 'ethics'], learningObjective: 'Apply the virtue of integrity in daily life',
+},
+
+// SUB-STRAND: The Exodus
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the call of Moses at the burning bush (Exodus 3:1-22). (5 marks)\n(b) State THREE signs God gave to Moses to reassure him (Exodus 4:1-17). (3 marks)',
+  answerGuide: '(a) Moses was tending flocks at Horeb; God appeared in burning bush not consumed; God told Moses to remove sandals on holy ground; identified Himself as the God of Abraham, Isaac, and Jacob; Moses hid his face; God said He heard Israel\'s cry in Egypt; commanded Moses to lead Israel out — 1 mark each for any 5 points. (b) Staff turned into snake; hand became leprous then healed; water from Nile turned to blood — 1 mark each.',
+  tags: ['Moses', 'burning bush', 'call of Moses', 'Exodus'], learningObjective: 'Describe the call of Moses and events of the Exodus',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Name and describe ALL TEN plagues of Egypt in order, giving the Bible reference for each. (10 marks)',
+  answerGuide: '1 mark each: 1-Water to blood (Ex 7:20); 2-Frogs (Ex 8:2); 3-Gnats/lice (Ex 8:16); 4-Flies (Ex 8:21); 5-Livestock disease (Ex 9:3); 6-Boils (Ex 9:9); 7-Hail (Ex 9:18); 8-Locusts (Ex 10:4); 9-Darkness (Ex 10:21); 10-Death of firstborn (Ex 11:5). Award 1 mark per correctly named plague.',
+  tags: ['plagues', 'Egypt', 'Moses', 'Exodus'], learningObjective: 'Identify and describe the ten plagues of Egypt',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe what the Passover was and how it was observed (Exodus 12:1-31). (4 marks)\n(b) State TWO ways the Passover foreshadows Jesus Christ\'s atonement. (2 marks)',
+  answerGuide: '(a) God commanded Israel to take an unblemished lamb, slaughter it at twilight, put blood on doorframes; eat it with unleavened bread and bitter herbs; roast over fire; eat in haste; angel of death would pass over homes with blood — 1 mark for each 4 points. (b) Any 2: Jesus is the Passover Lamb (1 Cor 5:7); His blood protects from judgment; the lamb without defect represents Jesus\' sinlessness; the meal represents Holy Communion — 1 mark each.',
+  tags: ['Passover', 'atonement', 'Jesus', 'Exodus'], learningObjective: 'Explain the significance of the Passover',
+},
+
+// SUB-STRAND: The Sinai Covenant
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State the TEN Commandments as given to Moses at Mount Sinai. (5 marks)\n(b) Explain how Christians apply the Ten Commandments in their daily lives today. (3 marks)',
+  answerGuide: '(a) 1-No other gods; 2-No idols; 3-Do not misuse God\'s name; 4-Keep Sabbath; 5-Honour parents; 6-Do not murder; 7-Do not commit adultery; 8-Do not steal; 9-Do not give false testimony; 10-Do not covet — ½ mark each = 5 marks. (b) Any 3: worship only God; respect parents; avoid murder/abortion; be faithful in marriage; honest in work; avoid materialism/covetousness — 1 mark each.',
+  tags: ['Ten Commandments', 'Sinai', 'Moses', 'covenant'], learningObjective: 'State and apply the Ten Commandments',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how Israel broke the Sinai Covenant while Moses was on the mountain. (3 marks)\n(b) How was the covenant renewed? (3 marks)',
+  answerGuide: '(a) The people asked Aaron to make gods; Aaron collected gold earrings; made a golden calf; people worshipped it saying "These are your gods who brought you from Egypt" — 1 mark each for 3 points. (b) Moses interceded for Israel; God relented; Moses returned to the mountain; God wrote the commandments on new tablets; Moses\' face shone — 1 mark each for 3 points.',
+  tags: ['golden calf', 'covenant renewal', 'Sinai'], learningObjective: 'Describe the breaking and renewal of the Sinai Covenant',
+},
+
+// SUB-STRAND: Loyalty to God (Elijah)
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the contest on Mount Carmel between Elijah and the prophets of Baal (1 Kings 18). (5 marks)\n(b) State THREE lessons Christians learn from Elijah\'s contest on Mount Carmel. (3 marks)',
+  answerGuide: '(a) Elijah challenged 450 prophets of Baal; two bulls prepared on altars; each side to call their god; Baal prophets called all day — no answer; they cut themselves; Elijah repaired the altar using 12 stones; dug a trench; poured water on sacrifice three times; Elijah prayed; fire from God consumed the sacrifice, wood, stones, and water; people fell down saying "The Lord, He is God!" — 1 mark each for 5 points. (b) Any 3: God alone is powerful; prayer is powerful; idols are powerless; God answers those who trust Him; one faithful person can make a difference — 1 mark each.',
+  tags: ['Elijah', 'Mount Carmel', 'Baal', 'idolatry'], learningObjective: 'Describe Elijah\'s fight against Baalism and lessons learned',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the injustice of Naboth\'s vineyard (1 Kings 21) and how Elijah responded. (4 marks)\n(b) State TWO ways Christians should respond to injustice in society today. (2 marks)',
+  answerGuide: '(a) Ahab wanted Naboth\'s vineyard; Naboth refused as it was his inheritance; Jezebel arranged for false accusers; Naboth was stoned; Ahab took the vineyard; Elijah confronted Ahab with God\'s judgment — 1 mark each for 4 points. (b) Any 2: speak out against injustice; support the poor and vulnerable; report corruption; pray for justice; use legal means — 1 mark each.',
+  tags: ['Elijah', 'Naboth', 'injustice', 'Jezebel'], learningObjective: 'Describe Elijah\'s fight against injustice',
+},
+
+// SUB-STRAND: Old Testament Prophets and Prophet Amos
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the call of Prophet Amos and the background to his ministry. (4 marks)\n(b) State FOUR visions of Prophet Amos and their significance. (4 marks)',
+  answerGuide: '(a) Amos was a shepherd and fig farmer from Tekoa in Judah; not a trained prophet; called by God; ministered during reign of Jeroboam II of Israel; a time of prosperity but great social injustice — 1 mark each for 4 points. (b) Any 4 from: locusts (judgment stayed by intercession); fire (judgment stayed); plumb line (Israel measured and found crooked); summer fruit (end is near); God at the altar (no escape from judgment) — 1 mark each.',
+  tags: ['Amos', 'prophet', 'visions', 'social justice'], learningObjective: 'Describe the call and visions of Prophet Amos',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'State and explain EIGHT social evils and injustices condemned by Prophet Amos and explain their relevance to Christians in Kenya today.',
+  answerGuide: 'Any 8 from: selling the righteous for silver (human trafficking); trampling on the poor (exploitation); sexual immorality (cult prostitution); dishonest trade/false scales (business fraud); bribery in courts; luxury while poor suffer; oppression of women (cows of Bashan); insincere worship; religious hypocrisy; corruption by leaders — 1 mark for naming the evil + 1 mark for Kenyan relevance each. Max 10 marks.',
+  tags: ['Amos', 'social justice', 'injustice', 'Kenya'], learningObjective: 'Apply Amos\'s teachings on justice to contemporary Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define the "Day of the Lord" as taught by Amos and explain why Amos warned it would be darkness, not light. (3 marks)\n(b) State and explain FOUR values acquired from the teachings of Prophet Amos. (4 marks)',
+  answerGuide: '(a) Day of the Lord: a time of God\'s judgment and reckoning — 1 mark; Amos warned it would be darkness because Israel assumed it would bless them automatically but their sin made them liable to judgment rather than reward — 2 marks. (b) Any 4 from: Obedience (do what God commands); Integrity (honest in all dealings); Faithfulness (loyal to God); Hope (trust God\'s restoration); Fairness (treat all equally); Love (care for poor); Righteousness (do what is right); Courage (speak against injustice) — 1 mark each.',
+  tags: ['Day of the Lord', 'Amos', 'values', 'judgment'], learningObjective: 'Explain the Day of the Lord and values from Prophet Amos',
+},
+
+// ── GRADE 10 — CRE — STRAND 2: THE NEW TESTAMENT ─────────────
+
+// SUB-STRAND: New Testament Books
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'New Testament Books',
+  questionType: 'structured', difficulty: 'easy', marks: 6,
+  questionText: '(a) How many books are in the New Testament and into how many categories are they divided? (2 marks)\n(b) Name the FOUR Gospels. (4 marks)',
+  answerGuide: '(a) 27 books divided into 4 categories: Gospels, History (Acts), Epistles (Letters), Prophecy (Revelation) — 1 mark each. (b) Matthew, Mark, Luke, John — 1 mark each.',
+  tags: ['New Testament', 'Gospels', 'books'], learningObjective: 'Identify the books and categories of the New Testament',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'New Testament Books',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State EIGHT reasons why the Bible is referred to as a "library". (4 marks)\n(b) State FOUR ways in which Christians use the Bible to spread the gospel in Kenya today. (4 marks)',
+  answerGuide: '(a) Any 8 halved for marks: Many books (66); many authors (~40); many genres; written over ~1,500 years; many languages (Hebrew, Aramaic, Greek); many topics; arranged in sections; used for reading, study, reference — ½ mark each, max 4. (b) Any 4: preaching; evangelism; Bible study groups; Scripture memorization; distribution of Bibles; radio and TV; social media; Bible translation — 1 mark each.',
+  tags: ['Bible as library', 'gospel', 'Kenya'], learningObjective: 'Explain why the Bible is a library and how it is used',
+},
+
+// SUB-STRAND: Infancy and Early Life of Jesus Christ
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain FOUR Messianic prophecies from the Old Testament that were fulfilled by Jesus Christ. (8 marks)',
+  answerGuide: 'Any 4 from: Isaiah 7:14 — born of a virgin, fulfilled Matthew 1:23 (2 marks); Micah 5:2 — born in Bethlehem, fulfilled Matthew 2:1 (2 marks); Isaiah 53 — suffering servant, fulfilled in crucifixion (2 marks); 2 Samuel 7:12-13 — descendant of David with everlasting kingdom (2 marks); Isaiah 61:1-3 — anointing to preach good news, fulfilled Luke 4:18-19 (2 marks). Award 2 marks per prophecy: 1 for the prophecy and its reference, 1 for the fulfillment.',
+  tags: ['Messianic prophecies', 'Jesus', 'Old Testament', 'fulfillment'], learningObjective: 'Identify Messianic prophecies and their fulfillment in Jesus',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the baptism of Jesus (Luke 3:21-22). (3 marks)\n(b) State THREE temptations of Jesus in the wilderness and how He overcame each. (3 marks)',
+  answerGuide: '(a) Jesus was baptized by John in the Jordan; Heaven opened; Holy Spirit descended like a dove; voice from heaven said "You are my Son, whom I love; with you I am well pleased" — 1 mark each for 3 points. (b) Turn stones to bread — Jesus quoted Scripture (Man shall not live by bread alone); throw yourself down — Jesus quoted Scripture (Do not test the Lord); worship Satan for all kingdoms — Jesus quoted Scripture (Worship the Lord your God only) — 1 mark each.',
+  tags: ['baptism', 'temptation', 'Jesus', 'wilderness'], learningObjective: 'Describe the baptism and temptations of Jesus',
+},
+
+// SUB-STRAND: Galilean Ministry
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe what happened when Jesus was rejected in Nazareth (Luke 4:14-30). (4 marks)\n(b) State FOUR lessons Christians learn from Jesus\' rejection in Nazareth. (4 marks)',
+  answerGuide: '(a) Jesus returned to Galilee in the power of the Spirit; went to synagogue in Nazareth; read Isaiah 61:1-2 and said it was fulfilled; people were amazed at His gracious words; then questioned "Is this not Joseph\'s son?"; Jesus referenced Elijah and Elisha serving Gentiles; they were furious and drove Him to the cliff edge; He walked through the crowd — 1 mark each for 4 points. (b) Any 4: prophets are not accepted in their hometown; God\'s blessings are not limited to one group; rejection is part of ministry; Jesus continued despite rejection; familiarity can breed contempt; God\'s plan cannot be stopped — 1 mark each.',
+  tags: ['Nazareth', 'rejection', 'Jesus', 'Galilean ministry'], learningObjective: 'Describe Jesus\' rejection at Nazareth and lessons learned',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FIVE teachings of Jesus from the Sermon on the Plain (Luke 6:17-49). (5 marks)\n(b) Identify THREE miracles of Jesus during the Galilean ministry and state what each reveals about Jesus. (3 marks)',
+  answerGuide: '(a) Any 5: Blessed are the poor; love your enemies; do to others as you would have them do to you; do not judge; by their fruit you will know them; build on the rock not sand; be merciful as God is merciful; give and it will be given to you — 1 mark each. (b) Any 3: Miraculous catch of fish (Jesus is Lord over creation); healing of leper (Jesus has compassion and power to heal); healing paralyzed man (Jesus has authority to forgive sins); raising widow\'s son at Nain (Jesus has power over death); calming the storm (Jesus is Lord over nature) — 1 mark each.',
+  tags: ['Sermon on the Plain', 'miracles', 'Galilean ministry', 'Jesus'], learningObjective: 'Describe Jesus\'s teachings and miracles in the Galilean ministry',
+},
+
+// SUB-STRAND: Paul's First Letter to the Corinthians
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FOUR causes of division in the church at Corinth as addressed by Paul. (4 marks)\n(b) State FOUR moral challenges facing youth today that Paul would address, and state Paul\'s teaching on each. (4 marks)',
+  answerGuide: '(a) Any 4: Following different leaders (Paul, Apollos, Peter, Christ); disagreements over food sacrificed to idols; spiritual gifts causing pride; sexual immorality tolerated; taking fellow believers to court; divisions at the Lord\'s Supper — 1 mark each. (b) Any 4 with teaching: sexual immorality — body is temple of Holy Spirit (1 Cor 6:19); peer pressure — bad company corrupts (1 Cor 15:33); drug use — flee and honor God; social media addiction — all things permissible but not beneficial — 1 mark each.',
+  tags: ['Corinthians', 'Paul', 'division', 'moral challenges'], learningObjective: 'Describe the challenges Paul addressed in Corinth and their relevance',
+},
+
+// ── GRADE 10 — CRE — STRAND 3: CHURCH IN ACTION ─────────────
+
+// SUB-STRAND: The Holy Spirit and Gifts of the Holy Spirit
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the events of the Day of Pentecost (Acts 2:1-13). (5 marks)\n(b) State THREE lessons learnt from the Day of Pentecost. (3 marks)',
+  answerGuide: '(a) Believers were all together in one place; a sound like violent wind filled the house; tongues of fire rested on each of them; all were filled with the Holy Spirit; they spoke in other languages; devout Jews from many nations heard in their own language; some were amazed, others mocked saying they were drunk — 1 mark each for 5 points. (b) Any 3: God keeps His promises; Holy Spirit gives courage to witness; Spirit enables cross-cultural communication; repentance is needed to receive the Spirit; Pentecost marks the birth of the church; obedience leads to blessing — 1 mark each.',
+  tags: ['Pentecost', 'Holy Spirit', 'tongues', 'church'], learningObjective: 'Describe the Day of Pentecost and its significance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Name and classify the NINE gifts of the Holy Spirit as listed in 1 Corinthians 12:8-11 into THREE categories. (6 marks)\n(b) State TWO ways of discerning true gifts of the Holy Spirit. (2 marks)',
+  answerGuide: '(a) Gifts of knowledge: message of wisdom, message of knowledge, distinguishing spirits — 2 marks. Gifts of power: faith, gifts of healing, miraculous powers — 2 marks. Gifts of utterance: prophecy, speaking in tongues, interpretation of tongues — 2 marks. (b) Any 2: confesses Jesus as Lord (1 Cor 12:3); bears good fruit (Gal 5:22-23); edifies the church not self; operates in order; aligns with Scripture; gift of discernment — 1 mark each.',
+  tags: ['gifts of the Spirit', 'Holy Spirit', 'Corinthians'], learningObjective: 'Identify and classify the gifts of the Holy Spirit',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: 'State and explain SIX roles of the Holy Spirit as taught by Jesus (John 14-16, Acts 1:6-8).',
+  answerGuide: 'Any 6: Reveals truth about God (John 14:26) — 1 mark; Comforts and counsels as Paraclete — 1 mark; Empowers proclamation of gospel (Acts 1:8) — 1 mark; Teaches and reminds of Jesus\' words (John 14:26) — 1 mark; Convicts of sin, righteousness and judgment (John 16:8-11) — 1 mark; Unites believers into one body — 1 mark; Glorifies Jesus (John 16:14) — 1 mark. Max 6.',
+  tags: ['Holy Spirit', 'roles', 'John', 'Acts'], learningObjective: 'Explain the roles of the Holy Spirit as taught by Jesus',
+},
+
+// SUB-STRAND: The Holy Trinity
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define the Holy Trinity. (2 marks)\n(b) Describe the role of each person of the Trinity in the life of a Christian. (6 marks)',
+  answerGuide: '(a) One God in three distinct persons: Father, Son, and Holy Spirit — co-equal, co-eternal, and co-essential — 2 marks. (b) God the Father: Creator, Provider, plans salvation, gives daily bread and protection — 2 marks. God the Son (Jesus): Redeemer and Saviour, accomplished salvation through death and resurrection, intercedes for believers — 2 marks. God the Holy Spirit: Helper and Comforter, applies salvation, lives in believers, teaches, convicts, and empowers for holy living — 2 marks.',
+  tags: ['Trinity', 'Father', 'Son', 'Holy Spirit'], learningObjective: 'Describe the Holy Trinity and the role of each person',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Give THREE Bible references that reveal the Father, Son and Holy Spirit together. (3 marks)\n(b) Explain how the Christian belief in monotheism (one God) is consistent with the doctrine of the Trinity. (3 marks)',
+  answerGuide: '(a) Matthew 3:16-17 (baptism of Jesus — all three present); Matthew 28:19 (baptize in the name of Father, Son, Holy Spirit); 2 Corinthians 13:14 (grace, love, fellowship) — 1 mark each. (b) Christianity holds that there is only one God (Deuteronomy 6:4); the Trinity does not mean three gods but one God revealed in three persons; each person is distinct but shares the same divine essence — 1 mark each for 3 points.',
+  tags: ['Trinity', 'monotheism', 'Bible references'], learningObjective: 'Support the doctrine of the Trinity with Bible references',
+},
+
+// SUB-STRAND: Sacraments
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define a sacrament and name the TWO most common sacraments in Christianity. (3 marks)\n(b) Explain FIVE ways in which baptism is important to Christians. (5 marks)',
+  answerGuide: '(a) A sacred rite instituted by Christ, using physical elements to convey spiritual grace — 1 mark; Baptism and Holy Communion/Lord\'s Table — 2 marks. (b) Any 5: obedience to Christ\'s command; public declaration of faith; union with Christ\'s death and resurrection; death of the old self; beginning of new life; entry into the Christian community; invitation for the Holy Spirit\'s work; symbol of forgiveness of sins — 1 mark each.',
+  tags: ['sacraments', 'baptism', 'Holy Communion'], learningObjective: 'Define sacraments and explain the importance of baptism',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how the Lord\'s Table (Holy Communion) is celebrated in church today. (4 marks)\n(b) State TWO things the bread and wine symbolize in the Lord\'s Table. (2 marks)',
+  answerGuide: '(a) The congregation prays and reads Scripture; pastor gives thanks and breaks bread; bread is shared representing Jesus\' body; cup (wine/juice) is shared representing His blood and the new covenant; believers partake in remembrance of Jesus; conducted with self-examination — 1 mark each for 4 points. (b) Bread = Jesus\' body broken for us — 1 mark; Wine = Jesus\' blood of the new covenant shed for forgiveness — 1 mark.',
+  tags: ['Holy Communion', 'Lord\'s Table', 'sacrament'], learningObjective: 'Describe the celebration and significance of Holy Communion',
+},
+
+// ── GRADE 10 — CRE — STRAND 4: CHRISTIAN LIVING TODAY ────────
+
+// SUB-STRAND: Christian Ethics
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define Christian ethics and state FOUR sources of Christian ethics. (5 marks)\n(b) State and explain THREE ethical values needed by youth today. (3 marks)',
+  answerGuide: '(a) Definition: the study of moral principles based on Christian teaching — 1 mark. Sources: the Bible; Holy Spirit\'s guidance; Church tradition; Christian community; conscience; reason; natural law — 1 mark each for any 4. (b) Any 3 with explanation: Courage (doing right despite fear); Honesty (no cheating/lying); Respect (honouring others); Chastity (sexual purity); Diligence (hard work); Obedience (following rules); Forgiveness; Humility — 1 mark each.',
+  tags: ['ethics', 'values', 'youth', 'Christian living'], learningObjective: 'Define Christian ethics and explain ethical values for youth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: 'State and explain SIX moral challenges facing youth in Kenya today and suggest a solution to EACH challenge.',
+  answerGuide: 'Any 6 from: Peer pressure — choose good friends; Drug and substance use — seek counselling/church support; Sexual immorality — abstain, set boundaries; Dishonesty — develop integrity; Social media addiction — limit screen time; Gambling — avoid betting; Mental health — seek help, pray. 1 mark for challenge + solution each = max 6.',
+  tags: ['moral challenges', 'youth', 'Kenya', 'solutions'], learningObjective: 'Identify moral challenges facing Kenyan youth and propose solutions',
+},
+
+// SUB-STRAND: Human Rights and GBV
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define gender-based violence (GBV) and state SIX types of GBV in Kenya. (4 marks)\n(b) State FOUR causes of gender-based violence in Kenya. (4 marks)',
+  answerGuide: '(a) Harmful acts directed at a person based on gender — 1 mark. Types (any 5 for 3 marks): physical; sexual; emotional/psychological; economic; harmful traditional practices (FGM, early marriage); online GBV — ½ mark each, max 3. (b) Any 4: traditional beliefs promoting male dominance; poverty and economic dependence; lack of education; alcohol and drug abuse; weak legal enforcement; harmful cultural practices; political instability; exposure to violence as a child; gender inequality — 1 mark each.',
+  tags: ['GBV', 'gender-based violence', 'types', 'causes'], learningObjective: 'Define GBV, identify types and causes in Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FOUR effects of gender-based violence on individuals and families. (4 marks)\n(b) State FOUR support services available for GBV victims in Kenya and explain each. (4 marks)',
+  answerGuide: '(a) Any 4: physical injuries; STIs including HIV; mental health (depression, PTSD); stigma and shame; family breakdown; children traumatized; economic hardship; cycles of violence continue — 1 mark each. (b) Any 4: Trauma counselling (professional therapy); Psychosocial support (group support); Safe houses/shelters; Legal aid (free lawyers); Medical care at hospitals; GBV Hotline 1195; Faith-based counselling — 1 mark each.',
+  tags: ['GBV', 'effects', 'support services', 'Kenya'], learningObjective: 'Describe effects of GBV and support services in Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Genesis 1:26-28 teach about gender equality and GBV? (2 marks)\n(b) What does Galatians 3:28 teach about equality in Christ? (2 marks)\n(c) State TWO values needed to avoid gender-based violence. (2 marks)',
+  answerGuide: '(a) Both male and female are made in the image of God; both have equal dignity and worth; violence against another is an attack on God\'s image — 2 marks. (b) "There is neither Jew nor Gentile, neither slave nor free, nor is there male and female, for you are all one in Christ Jesus" — all are equal before God — 2 marks. (c) Any 2: Love; Respect; Equality; Integrity; Courage; Accountability; Compassion; Justice; Self-discipline — 1 mark each.',
+  tags: ['equality', 'GBV', 'Genesis', 'Galatians'], learningObjective: 'Apply biblical teachings on equality to the issue of GBV',
+},
+
+// SUB-STRAND: Human Sexuality
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define human sexuality and state what Genesis 1:27 teaches about it. (3 marks)\n(b) Distinguish between dating and courtship using FOUR differences. (4 marks)\n(c) State ONE Christian value that helps young people maintain sexual purity. (1 mark)',
+  answerGuide: '(a) Human sexuality is the God-given dimension of being male or female, including physical, emotional, and relational aspects — 1 mark; Genesis 1:27 teaches that God created humankind male and female in His image — 2 marks. (b) Dating is casual while courtship is serious; dating has no commitment while courtship intends marriage; dating is often physical while courtship sets guarded boundaries; dating is private while courtship involves family/church — 1 mark each. (c) Any 1: abstinence; self-discipline; chastity; respect; courage to say no — 1 mark.',
+  tags: ['human sexuality', 'dating', 'courtship', 'purity'], learningObjective: 'Explain human sexuality and distinguish between dating and courtship',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define irresponsible sexual behaviour and state FOUR types. (3 marks)\n(b) State and explain FOUR effects of irresponsible sexual behaviour. (4 marks)\n(c) State ONE way of avoiding irresponsible sexual behaviour. (1 mark)',
+  answerGuide: '(a) Sexual activity outside God\'s design — 1 mark. Types (any 4): incest; rape; prostitution; adultery; fornication; bestiality; pornography; sex with a minor — ½ mark each for any 4 = 2 marks. (b) Any 4: unplanned pregnancies; STIs including HIV/AIDS; emotional trauma (guilt, shame); abortion; school dropout; damaged reputation; broken trust; infertility — 1 mark each. (c) Any 1: abstain until marriage; avoid tempting situations; set physical boundaries; pray; avoid pornography; be accountable — 1 mark.',
+  tags: ['sexual behaviour', 'effects', 'values', 'purity'], learningObjective: 'Identify irresponsible sexual behaviour and its effects',
+},
+
+// SUB-STRAND: Marriage and Family
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain FOUR Christian teachings on marriage using Bible references. (8 marks)',
+  answerGuide: 'Any 4 from: One man, one woman (Genesis 2:24) — 2 marks; Marriage is for companionship (Genesis 2:18) — 2 marks; Marriage is for procreation (Genesis 1:28) — 2 marks; Marriage is permanent (Matthew 19:6) — 2 marks; Husbands love wives as Christ loved the church (Ephesians 5:25) — 2 marks; Wives respect husbands (Ephesians 5:33) — 2 marks. Award 1 mark for teaching + 1 mark for Bible reference each. Max 8 marks.',
+  tags: ['marriage', 'family', 'Bible', 'Christian teachings'], learningObjective: 'State Christian teachings on marriage and family',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR challenges facing marriage and family life in Kenya today. (4 marks)\n(b) State TWO roles of the church in preparing young people for marriage. (2 marks)',
+  answerGuide: '(a) Any 4: financial pressure; infidelity; communication breakdown; interference from in-laws; childlessness; substance abuse; domestic violence; work-life imbalance; social media distraction; parenting disagreements; divorce culture — 1 mark each. (b) Any 2: teaching biblical sexuality; offering premarital counselling; mentoring engaged couples; providing youth groups; supporting married couples through family ministries — 1 mark each.',
+  tags: ['marriage challenges', 'family', 'church', 'Kenya'], learningObjective: 'Identify challenges facing families and the church\'s role in supporting them',
+},
+
+// SUB-STRAND: Christian Response to Medicine and Technology
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define euthanasia and state THREE forms in which it can be carried out. (4 marks)\n(b) State FOUR Christian views on euthanasia. (4 marks)',
+  answerGuide: '(a) Euthanasia is the deliberate ending of a person\'s life to relieve suffering (mercy killing) — 1 mark. Forms: Active euthanasia (giving a lethal injection); Passive euthanasia (withdrawing life support); Assisted suicide (providing means to kill self) — 1 mark each. (b) Any 4: it is a form of murder (Exodus 20:13); life is sacred, only God can take it; deprives relatives of showing love; Jesus has power over sickness and death; suffering does not justify killing; God\'s timing should be respected; palliative care is the Christian alternative — 1 mark each.',
+  tags: ['euthanasia', 'right to life', 'Christian ethics'], learningObjective: 'Explain Christian views on euthanasia and the right to life',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR ways in which technology has contributed to the spread of the Gospel. (4 marks)\n(b) State TWO Christian teachings on cosmetic plastic surgery. (2 marks)',
+  answerGuide: '(a) Any 4: social media (Facebook, YouTube, TikTok); live broadcasting of church services; digital books and online Bible courses; Christian films and animations; printing press (Bibles, tracts); radio and TV ministries; church websites and apps — 1 mark each. (b) Any 2: God looks at the heart not appearance (1 Samuel 16:7); true beauty comes from inner character (1 Peter 3:3-4); body is temple of the Holy Spirit (1 Corinthians 6:19-20); we are fearfully and wonderfully made (Psalm 139:14); excessive focus on appearance is vanity — 1 mark each.',
+  tags: ['technology', 'gospel', 'cosmetic surgery', 'Christian views'], learningObjective: 'Evaluate technology\'s role in spreading the gospel and Christian views on cosmetic surgery',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain SIX lessons Christians learn from Daniel and King Solomon\'s aptitude and wisdom. (6 marks)',
+  answerGuide: 'Any 6: True wisdom comes from God — not human skill; Daniel gave credit to God not himself — humility; Solomon prayed for wisdom not wealth — seek God first; those faithful to God receive knowledge and discernment — faithfulness; godly wisdom enables just leadership; wisdom brings favour before rulers; wisdom leads to positions of influence; studying honours God; wisdom protects from deception; wise people plan for the future — 1 mark each.',
+  tags: ['Daniel', 'Solomon', 'wisdom', 'aptitude'], learningObjective: 'Apply lessons from Daniel and Solomon\'s wisdom to Christian life',
+},
+
+  // ── GRADE 10 — CRE (Additional Questions) ──────────────────────────────
+
+// ── STRAND 1: THE OLD TESTAMENT — Additional Questions ───────
+
+// The Holy Bible — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe NINE literary forms used in writing the Bible, giving the Bible book associated with each. (6 marks)',
+  answerGuide: 'Any 6 for max marks: Legislative texts (Leviticus); Wise sayings (Proverbs); Prophetic speeches (Isaiah); Prayers (Psalms); Love songs (Song of Solomon); Philosophical essays (Job); Religious epics (Exodus); Epistles (Romans); Gospels (Matthew) — 1 mark each for naming the form with the correct Bible book.',
+  tags: ['literary forms', 'Bible', 'genres'], learningObjective: 'Identify literary forms used in writing the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) Describe the inductive method of Bible study and state its THREE main steps. (4 marks)',
+  answerGuide: 'Inductive method: careful, systematic reading of Scripture — 1 mark. Three steps: Observation (what does it say? — noting who, what, when, where, why, how) — 1 mark; Interpretation (what does it mean? — original meaning to first audience) — 1 mark; Application (how do I respond? — acting on the truth) — 1 mark.',
+  tags: ['inductive method', 'Bible study', 'observation'], learningObjective: 'Describe the inductive method of Bible study',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 3,
+  questionText: 'State THREE difficulties Christians in Kenya face when reading the Bible.',
+  answerGuide: 'Any 3: Lack of time; Difficulty understanding; Boredom; Lack of discipline; Distractions (phones, TV); Discouragement from sin; No personal application seen; Negative church experiences; Spiritual attack — 1 mark each.',
+  tags: ['Bible reading', 'challenges', 'Kenya'], learningObjective: 'Identify challenges Christians face in reading the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) Define chastity as a virtue and give the relevant Bible reference. (2 marks)\n(b) State FOUR ways of applying chastity in daily life. (2 marks)',
+  answerGuide: '(a) Chastity: sexual purity; refraining from sex outside marriage — 1 mark; 1 Corinthians 6:18-20 — 1 mark. (b) Any 4: avoiding pornography; dressing modestly; fleeing sexual temptation; setting boundaries in dating; honouring marriage; memorizing scripture — ½ mark each, max 2 marks.',
+  tags: ['chastity', 'integrity', 'values'], learningObjective: 'Apply the virtue of chastity in daily life',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the biographical method of Bible study using the book of Jonah. (3 marks)\n(b) State THREE lessons a Christian can learn from the life of Jonah. (3 marks)',
+  answerGuide: '(a) The biographical method involves studying a person\'s life in Scripture — 1 mark; Jonah ran from God (disobedience) — 1 mark; prayed from the fish (repentance) and finally went to Nineveh (obedience) — 1 mark. (b) Any 3: God is patient and persistent; disobedience has consequences; repentance restores relationship with God; God\'s mercy extends to all nations; one person\'s obedience can save thousands; God can use suffering to correct us — 1 mark each.',
+  tags: ['Jonah', 'biographical method', 'obedience', 'repentance'], learningObjective: 'Apply the biographical method using the book of Jonah',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR ways in which the Bible is used in Kenya today.',
+  answerGuide: 'Any 4: In churches for worship and preaching; in schools for CRE lessons; in courts for swearing oaths; in homes for devotions; in hospitals for chaplaincy; in prisons for rehabilitation; on radio and TV broadcasts; on online platforms — 1 mark each.',
+  tags: ['Bible', 'Kenya', 'uses'], learningObjective: 'Identify ways the Bible is used in Kenya',
+},
+
+// The Exodus — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR attributes of God revealed through the ten plagues of Egypt. (4 marks)\n(b) State TWO purposes of the ten plagues. (2 marks)',
+  answerGuide: '(a) Any 4: God is all-powerful (omnipotent); God is just — punishes sin; God is merciful — warned before each plague; God is faithful — kept His promise to Moses; God is sovereign — controls nature; God protects His people; God is holy — cannot tolerate injustice — 1 mark each. (b) Any 2: to demonstrate God\'s power to Egypt and Israel; to judge Egypt for enslaving Israel; to compel Pharaoh to release Israel; to show the powerlessness of Egyptian gods; to build Israel\'s faith — 1 mark each.',
+  tags: ['plagues', 'attributes of God', 'Exodus'], learningObjective: 'Identify attributes of God revealed through the plagues',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the challenges the Israelites faced in the desert after leaving Egypt and how God cared for them. (6 marks)',
+  answerGuide: 'Any 6: Lack of water at Marah — God sweetened bitter water — 1 mark; hunger — God provided manna and quail — 1 mark; thirst at Rephidim — Moses struck rock and water came out — 1 mark; attack by Amalekites — God gave victory when Moses raised his hands — 1 mark; fear and discouragement — God\'s presence in pillar of cloud and fire — 1 mark; complaints and rebellion — God responded with patience and provision — 1 mark.',
+  tags: ['Exodus', 'desert', 'God\'s provision', 'challenges'], learningObjective: 'Describe challenges in the desert and how God cared for Israel',
+},
+
+// The Sinai Covenant — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how the Sinai Covenant was made (Exodus 19-24). (4 marks)\n(b) State TWO ways Christians today express their covenant with God. (2 marks)',
+  answerGuide: '(a) God called Moses to Mount Sinai; told Israel to consecrate themselves; God descended in fire, thunder and smoke; Moses presented the Ten Commandments and laws to the people; people agreed "We will do everything the Lord says"; Moses sprinkled blood on the people saying "This is the blood of the covenant" — 1 mark each for 4 points. (b) Any 2: baptism; Holy Communion; church membership commitment; daily prayer and Bible study; tithing; Christian marriage vows — 1 mark each.',
+  tags: ['Sinai Covenant', 'making the covenant', 'Moses'], learningObjective: 'Describe the making of the Sinai Covenant and its relevance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe worship in the wilderness as outlined in the Old Testament. (3 marks)\n(b) State THREE ways in which Christians worship God today. (3 marks)',
+  answerGuide: '(a) God commanded Israel to build the Tabernacle as His dwelling place; priests offered daily sacrifices; the Ark of the Covenant was placed in the Most Holy Place; the Sabbath was observed as a day of rest and worship; festivals like Passover and Pentecost were celebrated — 1 mark each for 3 points. (b) Any 3: singing hymns and praise; reading the Bible; prayer; Holy Communion; giving offerings; baptism; fellowship with other believers; preaching and listening to sermons — 1 mark each.',
+  tags: ['worship', 'wilderness', 'Tabernacle', 'Christian worship'], learningObjective: 'Describe worship in the wilderness and how Christians worship today',
+},
+
+// Loyalty to God (Elijah) — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Elijah\'s flight to Mount Horeb and what happened there (1 Kings 19). (4 marks)\n(b) State TWO lessons Christians learn from Elijah\'s experience at Horeb. (2 marks)',
+  answerGuide: '(a) After defeating Baal prophets, Elijah feared Jezebel and fled to the desert; an angel fed him twice for the journey; he travelled 40 days to Horeb; hid in a cave; God asked "What are you doing here Elijah?"; Elijah complained he was the only one left; God appeared not in wind, earthquake or fire but in a still small voice; God gave Elijah new instructions and told him 7,000 had not bowed to Baal — 1 mark each for 4 points. (b) Any 2: God meets us in our exhaustion; God speaks in a still small voice; we are never alone in serving God; God provides rest and food before giving new assignments; self-pity is overcome by God\'s perspective — 1 mark each.',
+  tags: ['Elijah', 'Horeb', 'still small voice', 'burnout'], learningObjective: 'Describe Elijah\'s experience at Horeb and lessons for Christians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR forms of idol worship and religious extremism that exist in Kenya today.',
+  answerGuide: 'Any 4: Worshipping traditional spirits/ancestors; seeking help from witchdoctors; putting money/career/family above God; joining cults; believing in charms and amulets; worshipping celebrities or political leaders; superstition; occult practices — 1 mark each.',
+  tags: ['idol worship', 'Kenya', 'religious extremism', 'Elijah'], learningObjective: 'Identify forms of idol worship in contemporary Kenya',
+},
+
+// Old Testament Prophets and Prophet Amos — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Distinguish between TRUE and FALSE prophets using FOUR characteristics each. (4 marks)\n(b) State TWO ways of identifying a false prophet in Kenya today. (2 marks)',
+  answerGuide: '(a) True prophets: speaks in God\'s name; prophecy is fulfilled; leads people to God; willing to suffer for the truth — 1 mark each. False prophets: speaks what people want to hear; prophecy fails; leads people away from God; motivated by money — 1 mark each. (b) Any 2: their predictions fail; they demand money before praying; they lead people away from the Bible; they perform miracles but promote sin; they use fear and manipulation — 1 mark each.',
+  tags: ['true prophets', 'false prophets', 'Amos', 'Kenya'], learningObjective: 'Distinguish between true and false prophets',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Amos 5:21-24 teach about God\'s rejection of insincere worship? (3 marks)\n(b) What does this passage teach Christians in Kenya about worship and social responsibility? (3 marks)',
+  answerGuide: '(a) God says "I hate, I despise your religious festivals; I cannot stand your assemblies" — 1 mark; God rejects their burnt offerings, grain offerings, and fellowship offerings — 1 mark; God wants justice to roll like a river and righteousness like a never-failing stream — 1 mark. (b) Any 3: worship that is not accompanied by justice is worthless; Christians cannot separate Sunday worship from Monday ethics; churches should champion justice for the poor; corruption cannot coexist with true worship; caring for the needy is part of worship — 1 mark each.',
+  tags: ['Amos', 'worship', 'justice', 'hypocrisy'], learningObjective: 'Apply Amos\'s teaching on genuine worship to Kenyan Christians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain FOUR characteristics of cults and ungodly groups in Kenya today. (4 marks)\n(b) State TWO ways of avoiding joining a cult. (2 marks)',
+  answerGuide: '(a) Any 4: distort Scripture; use fear and guilt to control members; discourage association with family; demand absolute loyalty to a leader; claim exclusive revelation; demand money or property; deny core Christian doctrines (Trinity, deity of Christ) — 1 mark each. (b) Any 2: know Scripture well; pray for discernment; check group\'s beliefs against the Bible; avoid groups that isolate members; stay accountable to a local church; be wary of pressure tactics; ask questions before committing — 1 mark each.',
+  tags: ['cults', 'false religion', 'Kenya', 'Amos'], learningObjective: 'Identify characteristics of cults and how to avoid them',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'short_answer', difficulty: 'medium', marks: 4,
+  questionText: 'State and explain FOUR of God\'s promises of restoration to Israel as found in Amos 9:8-15.',
+  answerGuide: 'Any 4: Rebuild the fallen tabernacle of David — restore true worship; Restore fortunes — return from exile; Bless the land with abundant harvest — reaper overtakes ploughman; Plant them securely in their land — never to be uprooted again — 1 mark each.',
+  tags: ['Amos', 'restoration', 'remnant', 'promises'], learningObjective: 'Describe God\'s promises of restoration from Amos',
+},
+
+// ── STRAND 2: THE NEW TESTAMENT — Additional Questions ────────
+
+// Messianic Prophecies — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Isaiah\'s prophecy about the Suffering Servant (Isaiah 53). State SIX characteristics. (6 marks)',
+  answerGuide: 'Any 6: Despised and rejected by men — 1 mark; Man of sorrows, acquainted with grief — 1 mark; He bore our infirmities — 1 mark; Pierced for our transgressions, crushed for our iniquities — 1 mark; By His wounds we are healed — 1 mark; Led like a lamb to the slaughter — 1 mark; Cut off from the land of the living — 1 mark; Buried with the rich in His death — 1 mark; He bore the sin of many — 1 mark. Max 6.',
+  tags: ['Isaiah 53', 'Suffering Servant', 'Messianic prophecy'], learningObjective: 'Describe Isaiah\'s prophecy of the Suffering Servant',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the annunciation of Jesus\' birth to Mary (Luke 1:26-38). (4 marks)\n(b) State TWO ways the birth of Jesus fulfilled Old Testament prophecy. (2 marks)',
+  answerGuide: '(a) Angel Gabriel was sent to Nazareth to a virgin named Mary, pledged to be married to Joseph; greeted her "Highly favoured"; told her she would conceive and give birth to a Son named Jesus; He would be called Son of the Most High; His kingdom would never end; Mary asked "How can this be since I am a virgin?"; Gabriel said Holy Spirit would come upon her; nothing is impossible with God; Mary said "I am the Lord\'s servant" — 1 mark each for 4 points. (b) Any 2: born of a virgin as Isaiah 7:14 predicted; born in Bethlehem as Micah 5:2 predicted; called Son of God as 2 Samuel 7:14 foretold; born of the line of David — 1 mark each.',
+  tags: ['annunciation', 'Mary', 'Gabriel', 'Jesus'], learningObjective: 'Describe the annunciation of Jesus\' birth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) State the role of John the Baptist in preparing the way for Jesus. (4 marks)',
+  answerGuide: 'Any 4: Called people to repentance; baptized in the Jordan for forgiveness of sins; proclaimed the coming of the Messiah; fulfilled Isaiah\'s prophecy (a voice crying in the wilderness); told people Jesus was greater than himself; pointed to Jesus as the Lamb of God; lived a simple life as a model of dedication — 1 mark each.',
+  tags: ['John the Baptist', 'repentance', 'baptism', 'prophecy'], learningObjective: 'Describe the role of John the Baptist',
+},
+
+// Galilean Ministry — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the miraculous catch of fish (Luke 5:1-11). (3 marks)\n(b) State THREE lessons Christians learn from this miracle. (3 marks)',
+  answerGuide: '(a) Jesus was teaching by Lake Gennesaret; got into Simon\'s boat; asked him to push out; after teaching, told Simon to let down nets in deep water; Simon said they had worked all night and caught nothing but obeyed; they caught so many fish the nets began to break; both boats filled and began to sink; Simon fell at Jesus\' feet saying "Go away, I am a sinful man"; Jesus said "Don\'t be afraid, from now on you will catch men" — 1 mark each for 3 points. (b) Any 3: obedience to Jesus leads to blessing; Jesus is Lord even over nature; humility and acknowledgment of sin leads to a call; Jesus calls ordinary people; discipleship means leaving everything; success in ministry comes from Jesus\' power not our ability — 1 mark each.',
+  tags: ['miraculous catch', 'Simon Peter', 'discipleship', 'Luke 5'], learningObjective: 'Describe the miraculous catch and lessons for discipleship',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State THREE parables Jesus told during His Galilean ministry and the main lesson of each. (6 marks)',
+  answerGuide: 'Any 3 parables at 2 marks each: Parable of the Sower (Luke 8) — responses to God\'s word depend on the condition of the heart; Parable of the Good Samaritan (Luke 10) — love your neighbour regardless of background; Parable of the Prodigal Son (Luke 15) — God welcomes repentant sinners; Parable of the Lost Sheep — God seeks one lost person; Parable of the Lost Coin — God rejoices over one repentant sinner; Parable of the Wise and Foolish Builders — obey Jesus\' words for a stable life. 1 mark for naming, 1 mark for lesson.',
+  tags: ['parables', 'Galilean ministry', 'Jesus\' teachings'], learningObjective: 'Describe parables told during the Galilean ministry',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the Transfiguration of Jesus (Luke 9:28-36). (4 marks)\n(b) State TWO lessons Christians learn from the Transfiguration. (2 marks)',
+  answerGuide: '(a) Jesus took Peter, James, and John up a mountain to pray; His appearance changed — face shone, clothes became dazzling white; Moses and Elijah appeared and talked with Jesus about His departure (death) in Jerusalem; Peter offered to make three shelters; a cloud enveloped them; voice from the cloud said "This is my Son whom I have chosen; listen to Him"; when voice had spoken, they saw only Jesus — 1 mark each for 4 points. (b) Any 2: Jesus is the fulfilment of the Law (Moses) and Prophets (Elijah); Jesus is the Son of God confirmed by the Father; believers must listen to Jesus above all; Jesus\' glory was revealed before His suffering; prayer leads to spiritual revelation — 1 mark each.',
+  tags: ['Transfiguration', 'Jesus', 'Peter', 'Moses', 'Elijah'], learningObjective: 'Describe the Transfiguration and its significance',
+},
+
+// Paul's First Letter to the Corinthians — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What did Paul teach about the body as a temple of the Holy Spirit (1 Corinthians 6:19-20)? (3 marks)\n(b) How should Kenyan youth apply this teaching in their daily lives? (3 marks)',
+  answerGuide: '(a) "Do you not know that your bodies are temples of the Holy Spirit who is in you?" — 1 mark; "You are not your own; you were bought at a price" (Jesus\' blood) — 1 mark; "Therefore honour God with your bodies" — 1 mark. (b) Any 3: avoid drug and substance abuse; dress modestly; abstain from premarital sex; avoid tattoos that dishonour God; exercise and eat well; avoid pornography; reject peer pressure to sin — 1 mark each.',
+  tags: ['body as temple', 'Holy Spirit', 'Paul', 'Corinthians'], learningObjective: 'Apply Paul\'s teaching on the body as a temple',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how Paul addressed sexual immorality in the church at Corinth (1 Corinthians 5-6). (4 marks)\n(b) State TWO ways the church in Kenya should address immorality today. (2 marks)',
+  answerGuide: '(a) Paul condemned a man sleeping with his father\'s wife — 1 mark; told the church to expel the immoral person — 1 mark; warned that a little yeast (sin) leavens the whole batch — 1 mark; declared that the sexually immoral will not inherit the kingdom of God (1 Cor 6:9) — 1 mark. (b) Any 2: preach consistently on sexual purity; provide counselling for those struggling; discipline members in love; teach that the body is a temple; mentor youth on godly relationships — 1 mark each.',
+  tags: ['immorality', 'Corinth', 'Paul', 'church discipline'], learningObjective: 'Describe how Paul addressed immorality and apply it to Kenyan church',
+},
+
+// ── STRAND 3: CHURCH IN ACTION — Additional Questions ─────────
+
+// Holy Spirit — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Peter\'s message on the Day of Pentecost (Acts 2:14-41). (4 marks)\n(b) State TWO results of Peter\'s message that day. (2 marks)',
+  answerGuide: '(a) Peter stood and addressed the crowd; denied they were drunk (only 9am); quoted Joel\'s prophecy about the Spirit being poured on all people — 1 mark; declared Jesus of Nazareth was accredited by God through miracles — 1 mark; stated Jesus was crucified but God raised Him from the dead — 1 mark; declared God has made Jesus both Lord and Messiah — 1 mark. (b) Any 2: the crowd was cut to the heart; they asked "What shall we do?"; about 3,000 were baptized; the church began to grow rapidly; the disciples were accepted as genuine witnesses — 1 mark each.',
+  tags: ['Peter', 'Pentecost', 'sermon', 'Acts 2'], learningObjective: 'Describe Peter\'s Pentecost sermon and its results',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR ways in which the gifts of the Holy Spirit promote unity in the church today.',
+  answerGuide: 'Any 4: Each gift serves others so no member is unnecessary; different gifts complement each other; gifts are given for the common good not personal benefit; those with gifts of wisdom resolve conflicts; gifts of healing and mercy show love; prophecy and teaching build shared understanding; no single gift is superior so pride is avoided — 1 mark each.',
+  tags: ['gifts of the Spirit', 'unity', 'church'], learningObjective: 'Explain how spiritual gifts promote unity in the church',
+},
+
+// Holy Trinity — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Explain how Matthew 3:16-17 (the baptism of Jesus) reveals the Holy Trinity. (3 marks)\n(b) Explain how Matthew 28:19 (the Great Commission) supports the doctrine of the Trinity. (3 marks)',
+  answerGuide: '(a) Jesus was baptized — the Son present in bodily form — 1 mark; the Holy Spirit descended like a dove — the Spirit present visibly — 1 mark; a voice from heaven said "You are my Son" — the Father speaking from heaven — 1 mark. (b) Jesus commanded baptism "in the name (singular) of the Father, Son and Holy Spirit" — 1 mark; the use of one "name" for three shows they share one divine essence — 1 mark; all three persons are equally honoured in the Christian initiation rite — 1 mark.',
+  tags: ['Trinity', 'baptism', 'Matthew', 'Great Commission'], learningObjective: 'Identify biblical evidence for the Holy Trinity',
+},
+
+// Sacraments — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Romans 6:3-4 teach about baptism and its connection to Jesus\' death and resurrection? (3 marks)\n(b) State THREE ways in which baptism differs across different Christian denominations in Kenya. (3 marks)',
+  answerGuide: '(a) "We were baptized into Christ\'s death" — believers are united with Christ\'s death through baptism — 1 mark; "buried with Him through baptism into death" — the act of going under water symbolizes burial — 1 mark; "just as Christ was raised, we too may live a new life" — coming out of water symbolizes resurrection to new life — 1 mark. (b) Any 3: mode (immersion vs. sprinkling vs. pouring); age (infant vs. believer\'s baptism); formula (Trinitarian name vs. Jesus\' name only); setting (river, pool, or font); necessity for salvation (some see it as essential, others as symbolic) — 1 mark each.',
+  tags: ['baptism', 'Romans 6', 'denominations', 'Kenya'], learningObjective: 'Explain the meaning of baptism from Romans 6',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State SIX ways in which the Lord\'s Table (Holy Communion) is significant to a Christian. (6 marks)',
+  answerGuide: 'Any 6: Reminds of Jesus\' death and resurrection; unites believers as they wait for the second coming; opportunity to seek forgiveness; renews faith; strengthens fellowship; proclaims the Lord\'s death until He comes; deepens gratitude for salvation; fulfils Jesus\' command "Do this in remembrance of me"; provides spiritual nourishment; celebrates the new covenant — 1 mark each.',
+  tags: ['Holy Communion', 'Lord\'s Table', 'significance'], learningObjective: 'Explain the significance of the Lord\'s Table to Christians',
+},
+
+// ── STRAND 4: CHRISTIAN LIVING TODAY — Additional Questions ───
+
+// Christian Ethics — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe THREE ethical issues facing Kenyan youth in the area of cyber security. (3 marks)\n(b) State THREE Christian guidelines for responsible use of the internet and social media. (3 marks)',
+  answerGuide: '(a) Any 3: cyberbullying — using social media to harass or intimidate others; sexting — sending nude images; online fraud/scamming; pornography access and addiction; identity theft; spreading fake news (misinformation); online gambling — 1 mark each. (b) Any 3: use social media to glorify God not shame others; avoid accessing pornographic sites (body is a temple); be truthful online (no fake news or gossip); do not bully or harass others; practice the golden rule online; respect privacy; limit screen time — 1 mark each.',
+  tags: ['cyber security', 'social media', 'ethics', 'youth'], learningObjective: 'Apply Christian ethics to cyber security and social media use',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State and explain FOUR road safety ethics that Kenyan Christians should practice.',
+  answerGuide: 'Any 4: Obey traffic rules (Romans 13:1-2 — submit to governing authorities); do not drink and drive (do not be drunk with wine — Ephesians 5:18); use seatbelts (value life — body is temple); do not use mobile phone while driving; be patient and avoid road rage; respect pedestrians; do not overload vehicles — 1 mark each.',
+  tags: ['road ethics', 'safety', 'Kenya', 'Christian living'], learningObjective: 'Apply Christian ethics to road safety in Kenya',
+},
+
+// Human Rights and GBV — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does the Bible teach about human rights using Genesis 1:26-27 and Galatians 3:28? (4 marks)\n(b) State TWO ways Christians can help victims of gender-based violence in their communities. (2 marks)',
+  answerGuide: '(a) Genesis 1:26-27: all humans are made in God\'s image (Imago Dei) — 1 mark; therefore every person has inherent dignity and worth — 1 mark; violence against a person is an attack on God\'s image — 1 mark; Galatians 3:28: all are equal in Christ — no discrimination based on gender, ethnicity, or social status — 1 mark. (b) Any 2: provide shelter and safety; report abuse to authorities; offer prayer and counselling; accompany victims to seek legal aid; support financially; offer emotional support — 1 mark each.',
+  tags: ['human rights', 'Imago Dei', 'GBV', 'Christian response'], learningObjective: 'Apply biblical teachings on human rights to address GBV',
+},
+
+// Human Sexuality — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain FOUR Christian teachings on male-female relationships using Bible references. (4 marks)\n(b) State TWO values that help young people maintain healthy relationships. (2 marks)',
+  answerGuide: '(a) Any 4: Both created in God\'s image (Genesis 1:27) — treat each other with dignity — 1 mark; marriage is between one man and one woman (Genesis 2:24) — 1 mark; homosexual acts are forbidden (Leviticus 18:22; Romans 1:26-27) — 1 mark; the sexually immoral will not inherit the kingdom of God (1 Corinthians 6:9) — 1 mark; Sodom and Gomorrah punished for sexual immorality (Jude 1:7) — 1 mark. (b) Any 2: respect — honour one another\'s boundaries; love — seek each other\'s good; honesty — be truthful about intentions; self-discipline — control desires; accountability — involve trusted adults — 1 mark each.',
+  tags: ['sexuality', 'relationships', 'Bible', 'values'], learningObjective: 'State Christian teachings on male-female relationships',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define celibacy and explain TWO Bible references that present it as an alternative to marriage. (4 marks)\n(b) State TWO reasons some Christians choose celibacy. (2 marks)',
+  answerGuide: '(a) Celibacy: remaining unmarried and sexually abstinent — 1 mark; Matthew 19:10-12: some are eunuchs for the kingdom of heaven; not everyone can accept this but those who can should — 1 mark plus explanation — 1 mark; 1 Corinthians 7:7-9: Paul presents celibacy as a gift, wishes all were celibate but says if they cannot control themselves they should marry — 1 mark. (b) Any 2: to devote themselves fully to God\'s service; as a calling from God; to avoid distractions of marriage; as a missionary calling; to live as a sign of the kingdom of heaven — 1 mark each.',
+  tags: ['celibacy', 'marriage', 'Paul', 'Matthew'], learningObjective: 'Explain celibacy as a Christian alternative to marriage',
+},
+
+// Marriage and Family — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain SIX values that contribute to a stable Christian family. (6 marks)\n(b) State TWO Christian solutions to families facing financial pressure. (2 marks)',
+  answerGuide: '(a) Any 6: Love (selfless care for each member); Respect (valuing each person\'s dignity); Trust (relying on each other\'s word); Responsibility (each person doing their part); Communication (honest and open sharing); Commitment (staying together through hardship); Patience (not rushing or losing temper); Forgiveness (releasing offenses); Teamwork (working together for shared goals) — 1 mark each. (b) Any 2: budget together and plan finances; tithe and trust God\'s provision; seek financial counselling; avoid debt; both partners work together; pray about finances; cut unnecessary expenses — 1 mark each.',
+  tags: ['family values', 'stability', 'marriage', 'finances'], learningObjective: 'Identify values that contribute to stable Christian families',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Ephesians 5:25 teach about the husband\'s role in marriage? (2 marks)\n(b) What does Colossians 3:18-21 teach about harmonious family relationships? (4 marks)',
+  answerGuide: '(a) "Husbands, love your wives, just as Christ loved the church and gave himself up for her" — 1 mark; husbands must love sacrificially, putting wives\' interests first as Christ did for the church — 1 mark. (b) Wives submit to husbands as is fitting in the Lord — 1 mark; husbands love wives and do not be harsh with them — 1 mark; children obey parents in everything for this pleases the Lord — 1 mark; fathers do not embitter/provoke children or they will become discouraged — 1 mark.',
+  tags: ['Ephesians 5', 'Colossians 3', 'marriage', 'family roles'], learningObjective: 'Apply Paul\'s teachings on family roles from Ephesians and Colossians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR roles of the church in supporting married couples in Kenya today.',
+  answerGuide: 'Any 4: Offering premarital counselling; providing marriage enrichment seminars; counselling during marital crises; organizing couples\' fellowships; teaching biblical principles of marriage; supporting families in financial difficulty; hosting family retreats; mentoring young married couples — 1 mark each.',
+  tags: ['church', 'marriage support', 'Kenya'], learningObjective: 'Describe the church\'s role in supporting married couples',
+},
+
+// Christian Response to Medicine and Technology — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State SIX reasons why Christians say the right to life must be defended according to God\'s Word. (6 marks)',
+  answerGuide: 'Any 6: God commands "Do not murder" (Exodus 20:13); life is made in God\'s image (Genesis 1:26-27); God is the giver of life (Acts 17:25); only God has authority over death (Deuteronomy 32:39); Jesus values every person (Matthew 10:31); we are stewards not owners of our bodies; human life has inherent dignity; abortion violates the right to life of the unborn — 1 mark each.',
+  tags: ['right to life', 'euthanasia', 'Bible', 'ethics'], learningObjective: 'Defend the right to life using biblical arguments',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the creative skills mentioned in Exodus 31:1-6 and Exodus 35:30-35. (4 marks)\n(b) State TWO lessons Christians learn about creative skills from these passages. (2 marks)',
+  answerGuide: '(a) Exodus 31:1-6: Bezalel was filled with the Spirit of God with wisdom, understanding, knowledge, and all kinds of skills — 1 mark; skilled to make artistic designs in gold, silver, and bronze; cut and set stones; carve wood — 1 mark; Exodus 35:30-35: skills of engraving, designing and embroidering with blue, purple, and scarlet yarn — 1 mark; also skilled to teach others — 1 mark. (b) Any 2: creative skills are gifts from God; the Holy Spirit can fill people with artistic skill; skill must be used for God\'s glory; God values excellence and craftsmanship; skills should be shared and taught to others — 1 mark each.',
+  tags: ['creative skills', 'Bezalel', 'Exodus', 'gifts'], learningObjective: 'Identify creative skills in the Bible and their significance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Psalm 139:14 teach Christians about God\'s creation of the human body? (2 marks)\n(b) Using 1 Samuel 16:7 and 1 Peter 3:3-4, explain what TRUE beauty means for a Christian. (4 marks)',
+  answerGuide: '(a) "I praise you because I am fearfully and wonderfully made" — 1 mark; God made every human body perfectly; cosmetic surgery driven by dissatisfaction denies this truth — 1 mark. (b) 1 Samuel 16:7: "The Lord looks at the heart" not outward appearance — 1 mark; God\'s standard of beauty is internal character and integrity — 1 mark; 1 Peter 3:3-4: true beauty should not come from outward adornment (braided hair, gold jewellery, fine clothes) — 1 mark; but from the unfading beauty of a gentle and quiet spirit which is of great worth to God — 1 mark.',
+  tags: ['beauty', 'cosmetic surgery', 'Psalm 139', 'inner character'], learningObjective: 'Apply biblical teaching on true beauty to the issue of cosmetic surgery',
+},
+
+// Mixed/Comprehensive Questions covering multiple strands
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Describe the second coming of Christ as taught in the New Testament. State FIVE signs of the second coming, FOUR ways Christians should prepare, and explain why the second coming gives hope to suffering Christians. (10 marks)',
+  answerGuide: 'Signs (any 5, ½ mark each = 2.5 marks): signs in sun/moon/stars; nations in anguish; roaring seas; people fainting with fear; wars and rumours of wars; gospel preached to all nations; great tribulation; false prophets; love of many growing cold. Preparation (any 4, 1 mark each = 4 marks): repent of sin; live holy lives; share the gospel; stay watchful in prayer; study Scripture; love one another; be faithful stewards; do not love the world. Hope (3.5 marks): Jesus promised to return for His people; suffering is temporary; final judgment will vindicate the righteous; reunion with loved ones who died in Christ; eternity with God in the new creation. Award marks for quality of reasoning.',
+  tags: ['second coming', 'Christ', 'signs', 'hope', 'preparation'], learningObjective: 'Explain the second coming and how Christians should prepare',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Imagine you are a CRE teacher giving a talk to Form 1 students on living a Christian life in the modern world. Using what you have learned in Grade 10 CRE, write a speech addressing: (a) ONE challenge facing youth today, (b) TWO relevant Bible teachings, (c) FOUR practical ways of overcoming the challenge, and (d) TWO values the youth need.',
+  answerGuide: '(a) Any valid challenge (peer pressure, sexual immorality, drugs, cyberbullying, etc.) — 1 mark. (b) Two relevant Bible verses correctly applied — 2 marks. (c) Four practical, realistic solutions — 4 marks. (d) Two clearly explained values — 2 marks. Award 1 mark for quality of speech structure/introduction/conclusion. Max 10 marks.',
+  tags: ['applied CRE', 'youth', 'Christian living', 'speech'], learningObjective: 'Apply CRE knowledge to address challenges facing Kenyan youth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'hard', marks: 9,
+  questionText: '(a) State and explain how the following THREE gifts of the Holy Spirit are manifested in the church today: prophecy, healing, and wisdom. (6 marks)\n(b) Explain how 1 Corinthians 12:4-7 teaches that all gifts are given for the common good. (3 marks)',
+  answerGuide: '(a) Prophecy (2 marks): manifests through preaching God\'s word; speaking encouragement, warning, or direction to the church. Healing (2 marks): prayer for the sick with recovery; healing services; medical missions by Christians. Wisdom (2 marks): godly counsel for church leadership decisions; conflict resolution with divine insight; strategic vision for ministry. (b) "There are different kinds of gifts but the same Spirit" — diversity of gifts — 1 mark; "To each one the manifestation of the Spirit is given for the common good" — no gift is for self-benefit — 1 mark; unity in diversity because all gifts come from the same Spirit who distributes as He wills — 1 mark.',
+  tags: ['spiritual gifts', 'prophecy', 'healing', 'wisdom', '1 Corinthians 12'], learningObjective: 'Describe manifestations of spiritual gifts and their purpose',
+},
+
 ];
 
 async function seed() {
