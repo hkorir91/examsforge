@@ -14,6 +14,7 @@ import PricingPage from './pages/PricingPage'
 import DashboardPage from './pages/DashboardPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import AdminPage from './pages/AdminPage'
 
 function PrivateRoute({ children }) {
   const { token } = useAuthStore()
@@ -49,13 +50,14 @@ export default function App() {
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
         <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-<Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+        <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
 
         {/* Protected */}
         <Route path="/generate" element={<PrivateRoute><><Navbar /><GeneratorPage /></></PrivateRoute>} />
         <Route path="/my-exams" element={<PrivateRoute><><Navbar /><MyExamsPage /></></PrivateRoute>} />
         <Route path="/exams/:id" element={<PrivateRoute><><Navbar /><ExamViewPage /></></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><><Navbar /><DashboardPage /></></PrivateRoute>} />
+        <Route path="/admin" element={<PrivateRoute><><Navbar /><AdminPage /></></PrivateRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
