@@ -441,6 +441,12 @@ export const SUBSTRANDS = {
   'Animal Production': ['Livestock Selection', 'Animal Nutrition', 'Animal Health', 'Livestock Records'],
   'Soil and Water Management': ['Soil Formation and Types', 'Soil Fertility', 'Irrigation Methods', 'Drainage and Conservation'],
   'Agricultural Economics': ['Farm Planning', 'Costs and Returns', 'Agricultural Marketing', 'Credit and Finance'],
+
+  // CRE
+  'The Old Testament': ['The Holy Bible', 'The Exodus', 'The Sinai Covenant', 'Loyalty to God (Elijah)', 'Old Testament Prophets and Prophet Amos'],
+  'The New Testament': ['New Testament Books', 'Infancy and Early Life of Jesus Christ', 'Galilean Ministry', "Paul's First Letter to the Corinthians"],
+  'Church in Action': ['The Holy Spirit and Gifts of the Holy Spirit', 'The Holy Trinity', 'Sacraments'],
+  'Christian Living Today': ['Christian Ethics', 'Human Rights and Gender-Based Violence', 'Human Sexuality', 'Marriage and Family', 'Christian Response to Medicine and Technology'],
 }
 
 export const EXAM_TYPES = ['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock']
