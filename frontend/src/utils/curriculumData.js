@@ -84,11 +84,12 @@ export const CBC_CURRICULUM = {
         'Map Work and Fieldwork',
       ],
       'CRE': [
-        'The Bible as a Source of Knowledge',
-        'Christian Morality and Ethics',
-        'Jesus Christ and His Mission',
-        'The Church',
-        'Family and Society',
+'CRE': [
+  'The Old Testament',
+  'The New Testament',
+  'Church in Action',
+  'Christian Living Today',
+],
       ],
       'Business Studies': [
         'Business Concepts and Environment',
