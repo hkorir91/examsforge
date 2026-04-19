@@ -83,7 +83,6 @@ export const CBC_CURRICULUM = {
         'Regional Geography',
         'Map Work and Fieldwork',
       ],
-      'CRE': [
 'CRE': [
   'The Old Testament',
   'The New Testament',
