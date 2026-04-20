@@ -1,0 +1,96 @@
+const mongoose = require('mongoose');
+
+const questionSchema = new mongoose.Schema({
+  num: Number,
+  text: String,
+  subParts: [
+    {
+      label: String,
+      text: String,
+      marks: Number,
+      answer: String,
+    }
+  ],
+  marks: Number,
+  answer: String,
+  questionType: {
+    type: String,
+    enum: ['short_answer', 'structured', 'long_answer', 'calculation', 'practical'],
+    default: 'structured',
+  },
+  sourceQuestionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'QuestionBank',
+    default: null,
+  },
+});
+
+const sectionSchema = new mongoose.Schema({
+  marks: Number,
+  instruction: String,
+  questions: [questionSchema],
+});
+
+const examSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
+
+    // ── Metadata ─────────────────────────────────────
+    title: { type: String, required: true },
+    school: { type: String, required: true },
+    grade: {
+      type: String,
+      required: true,
+      enum: ['Grade 10', 'Grade 11', 'Grade 12'],
+    },
+    subject: { type: String, required: true },
+
+    // Multi-strand support
+    strands: { type: [String], default: [] },
+    substrands: { type: [String], default: [] },
+
+    // Legacy single-strand fields (kept for backward compatibility)
+    strand: { type: String, default: '' },
+    substrand: { type: String, default: '' },
+
+    examType: {
+      type: String,
+      enum: ['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'],
+      required: true,
+    },
+    term: { type: String, required: true },
+    year: { type: String, required: true },
+    totalMarks: { type: Number, required: true },
+    totalQuestions: { type: Number, required: true },
+    duration: { type: String, required: true },
+
+    // ── Display Options ───────────────────────────────
+    showStrand: { type: Boolean, default: true },
+    sectionCount: { type: Number, default: 3, min: 1, max: 3 },
+
+    // ── Exam Content ──────────────────────────────────
+    instructions: [String],
+    sectionA: sectionSchema,
+    sectionB: sectionSchema,
+    sectionC: sectionSchema,
+
+    // ── Generation Metadata ──────────────────────────
+    isHybrid: { type: Boolean, default: true },
+    questionBankHits: { type: Number, default: 0 },
+    isPublic: { type: Boolean, default: false },
+    downloadCount: { type: Number, default: 0 },
+    aiModel: { type: String, default: 'claude-sonnet-4-20250514' },
+    generationTimeMs: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+
+examSchema.index({ user: 1, createdAt: -1 });
+examSchema.index({ grade: 1, subject: 1 });
+
+module.exports = mongoose.model('Exam', examSchema);
