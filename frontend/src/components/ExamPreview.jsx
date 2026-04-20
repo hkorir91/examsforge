@@ -9,6 +9,31 @@ const BADGE_STYLES = {
   'CAT': 'bg-blue-50 text-blue-700 border-blue-200',
   'Midterm': 'bg-amber-50 text-amber-700 border-amber-200',
   'End Term': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'Mock': 'bg-purple-50 text-purple-700 border-purple-200',
+  'Pre-Mock': 'bg-orange-50 text-orange-700 border-orange-200',
+}
+
+// Recalculates section marks from actual question/subpart marks.
+// Fixes the bug where the Machine returns 0 for section.marks.
+function getSectionMarks(section) {
+  if (!section?.questions?.length) return 0
+  return section.questions.reduce((sum, q) => {
+    if (Array.isArray(q.subParts) && q.subParts.length > 0) {
+      return sum + q.subParts.reduce((s, sp) => s + (Number(sp.marks) || 0), 0)
+    }
+    return sum + (Number(q.marks) || 0)
+  }, 0)
+}
+
+// Answer lines helper: scales with marks
+function AnswerLines({ count }) {
+  return (
+    <div className="mt-3 space-y-4">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="h-px bg-gray-200" />
+      ))}
+    </div>
+  )
 }
 
 export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
@@ -20,19 +45,31 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
 
   if (!exam) return null
 
+  // Resolve display options — default to showing everything for old exams
+  const showStrand = meta.showStrand !== false
+  const sectionCount = meta.sectionCount ?? 3
+
+  // Strand display strings (handles both old string and new array formats)
+  const strandsDisplay = Array.isArray(meta.strands)
+    ? meta.strands.join(', ')
+    : (meta.strand || '')
+  const substrandsDisplay = Array.isArray(meta.substrands)
+    ? meta.substrands.join(', ')
+    : (meta.substrand || '')
+
   const handleDownloadPDF = () => {
     if (!user?.isPremium) {
-    toast.error('PDF download requires Premium. Upgrade now!')
-    return
+      toast.error('PDF download requires Premium. Upgrade now!')
+      return
+    }
+    try {
+      const filename = generateExamPDF(exam, meta)
+      toast.success(`Downloaded: ${filename}`)
+      if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
+    } catch (err) {
+      toast.error('PDF generation failed. Please try again.')
+    }
   }
-  try {
-    const filename = generateExamPDF(exam, meta)
-    toast.success(`Downloaded: ${filename}`)
-if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
-  } catch (err) {
-    toast.error('PDF generation failed. Please try again.')
-  }
-}
 
   const startEdit = (section, qNum, currentText) => {
     setEditingQ({ section, qNum })
@@ -40,7 +77,6 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
   }
 
   const saveEdit = () => {
-    // In a real app this would update via API
     toast.success('Question updated')
     setEditingQ(null)
   }
@@ -58,8 +94,17 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
     }
   }
 
+  // Sections to render — limited by sectionCount
+  const ALL_SECTIONS = [
+    { key: 'sectionA', letter: 'A' },
+    { key: 'sectionB', letter: 'B' },
+    { key: 'sectionC', letter: 'C' },
+  ]
+  const sectionsToRender = ALL_SECTIONS.slice(0, sectionCount)
+
   return (
     <div className="h-full overflow-y-auto bg-gray-50">
+
       {/* Toolbar */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-5 py-3 flex items-center justify-between flex-wrap gap-3 no-print">
         <div className="flex items-center gap-3">
@@ -67,7 +112,11 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
             <p className="font-semibold text-gray-900 text-sm leading-tight">
               {meta.grade} {meta.subject}
             </p>
-            <p className="text-xs text-gray-400">{meta.strand}{meta.substrand ? ` — ${meta.substrand}` : ''}</p>
+            {showStrand && strandsDisplay && (
+              <p className="text-xs text-gray-400">
+                {strandsDisplay}{substrandsDisplay ? ` — ${substrandsDisplay}` : ''}
+              </p>
+            )}
           </div>
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${BADGE_STYLES[meta.examType] || BADGE_STYLES.CAT}`}>
             {meta.examType}
@@ -103,7 +152,7 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
 
           {/* Cover Page */}
           <div className="text-center pb-7 mb-7 border-b-2 border-gray-100">
-            {/* Kenya flag colours */}
+            {/* Kenya flag stripe */}
             <div className="flex justify-center mb-5">
               {['#006600','#cc0000','#000','#cc0000','#006600'].map((c, i) => (
                 <div key={i} style={{ background: c }} className="h-1.5 w-12" />
@@ -125,10 +174,12 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
               {[
                 ['Grade / Class', meta.grade],
                 ['Subject', meta.subject],
-                ['Duration', exam.time],
+                ['Duration', exam.duration || exam.time],
                 ['Total Marks', meta.totalMarks],
-                ['Strand', meta.strand],
-                ['Sub-Strand', meta.substrand || 'General'],
+                ...(showStrand && strandsDisplay ? [
+                  ['Strand', strandsDisplay],
+                  ['Sub-Strand', substrandsDisplay || 'General'],
+                ] : []),
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">{label}</p>
@@ -138,52 +189,65 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
             </div>
 
             {/* Instructions */}
-            <div className="text-left bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Instructions to Candidates</p>
-              <ol className="list-decimal list-inside space-y-1">
-                {(exam.instructions || []).map((inst, i) => (
-                  <li key={i} className="text-xs text-gray-700 leading-relaxed">{inst}</li>
-                ))}
-              </ol>
-            </div>
+            {exam.instructions?.length > 0 && (
+              <div className="text-left bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">
+                  Instructions to Candidates
+                </p>
+                <ol className="list-decimal list-inside space-y-1">
+                  {exam.instructions.map((inst, i) => (
+                    <li key={i} className="text-xs text-gray-700 leading-relaxed">{inst}</li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </div>
 
           {/* Sections */}
-          {[
-            { key: 'sectionA', label: 'Section A', sublabel: 'Multiple Choice', type: 'mc' },
-            { key: 'sectionB', label: 'Section B', sublabel: 'Short Answer', type: 'sa' },
-            { key: 'sectionC', label: 'Section C', sublabel: 'Structured Questions', type: 'sq' },
-          ].map(({ key, label, sublabel, type }) => {
+          {sectionsToRender.map(({ key, letter }) => {
             const section = exam[key]
             if (!section?.questions?.length) return null
+
+            const sectionMarks = getSectionMarks(section)
+
             return (
-              <div key={key} className="mb-8">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-serif text-lg text-brand-blue-dark">
-                      {label} — {sublabel}
-                    </h3>
-                    <p className="text-xs text-gray-400 italic mt-0.5">{section.instruction}</p>
-                  </div>
-                  <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
-                    {section.marks} marks
+              <div key={key} className="mb-10">
+                {/* Section header — clean label only, no description */}
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                  <h3 className="font-bold text-base text-brand-blue-dark uppercase tracking-widest">
+                    SECTION {letter}
+                  </h3>
+                  <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
+                    {sectionMarks} marks
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                {section.instruction && (
+                  <p className="text-xs text-gray-500 italic mb-4">{section.instruction}</p>
+                )}
+
+                <div className="space-y-4">
                   {section.questions.map((q) => {
                     const isEditing = editingQ?.section === key && editingQ?.qNum === q.num
+                    const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+                    const qMarks = hasSubParts
+                      ? q.subParts.reduce((s, sp) => s + (Number(sp.marks) || 0), 0)
+                      : (Number(q.marks) || 0)
+
                     return (
                       <div key={q.num} className="border border-gray-100 rounded-xl p-4 hover:border-gray-200 transition-all group">
                         <div className="flex items-start gap-3">
+                          {/* Question number */}
                           <div className="w-7 h-7 rounded-full bg-brand-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                             {q.num}
                           </div>
+
                           <div className="flex-1 min-w-0">
+                            {/* Question text */}
                             {isEditing ? (
                               <div>
                                 <textarea
-                                  className="input text-sm resize-none"
+                                  className="input text-sm resize-none w-full"
                                   rows={3}
                                   value={editText}
                                   onChange={e => setEditText(e.target.value)}
@@ -197,29 +261,44 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
                               <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">{q.text}</p>
                             )}
 
-                            {/* MC options */}
-                            {type === 'mc' && q.options && !isEditing && (
-                              <div className="grid grid-cols-2 gap-1 mt-2.5">
-                                {q.options.map((opt, oi) => (
-                                  <div key={oi} className="text-xs text-gray-600 py-0.5">{opt}</div>
+                            {/* Sub-parts */}
+                            {!isEditing && hasSubParts && (
+                              <div className="mt-3 space-y-4 ml-1">
+                                {q.subParts.map((sp, idx) => (
+                                  <div key={idx}>
+                                    <div className="flex items-start gap-2">
+                                      <span className="text-sm font-semibold text-gray-700 shrink-0 mt-0.5">
+                                        ({sp.label})
+                                      </span>
+                                      <div className="flex-1">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <p className="text-sm text-gray-800 leading-relaxed">{sp.text}</p>
+                                          <span className="text-xs text-gray-400 shrink-0 mt-0.5">
+                                            ({sp.marks} {Number(sp.marks) === 1 ? 'mark' : 'marks'})
+                                          </span>
+                                        </div>
+                                        {/* Answer lines scaled by marks */}
+                                        <AnswerLines count={Math.min(Math.max(Number(sp.marks) * 2, 2), 6)} />
+                                      </div>
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             )}
 
-                            {/* Answer lines */}
-                            {type === 'sa' && !isEditing && (
-                              <div className="mt-3 space-y-3">
-                                {[0,1,2].map(i => <div key={i} className="h-px bg-gray-200" />)}
-                              </div>
-                            )}
-                            {type === 'sq' && !isEditing && (
-                              <div className="mt-3 space-y-5">
-                                {[0,1,2,3,4].map(i => <div key={i} className="h-px bg-gray-200" />)}
-                              </div>
+                            {/* Answer lines for simple questions (no sub-parts) */}
+                            {!isEditing && !hasSubParts && (
+                              <AnswerLines count={Math.min(Math.max(qMarks * 2, 3), 8)} />
                             )}
                           </div>
+
+                          {/* Marks + Edit */}
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-xs text-gray-400">({q.marks}mk{q.marks > 1 ? 's' : ''})</span>
+                            {!hasSubParts && (
+                              <span className="text-xs text-gray-400">
+                                ({qMarks}{qMarks === 1 ? 'mk' : 'mks'})
+                              </span>
+                            )}
                             <button
                               onClick={() => startEdit(key, q.num, q.text)}
                               className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-gray-400 hover:text-brand-blue border border-gray-200 rounded-lg px-2 py-1 no-print"
@@ -253,31 +332,70 @@ if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
           {showScheme && (
             <div className="mt-3 bg-blue-50 border border-blue-200 rounded-xl p-5">
               <h3 className="font-serif text-lg text-brand-blue-dark mb-4">Marking Scheme</h3>
-              {['sectionA', 'sectionB', 'sectionC'].map((sec, si) => {
-                const section = exam[sec]
+
+              {sectionsToRender.map(({ key, letter }) => {
+                const section = exam[key]
                 if (!section?.questions?.length) return null
-                const labels = ['Section A — Short Answer', 'Section B — Short Answer', 'Section C — Structured']
+                const sectionMarks = getSectionMarks(section)
+
                 return (
-                  <div key={sec} className="mb-5">
-                    <p className="text-xs font-bold text-brand-blue uppercase tracking-wider mb-3">{labels[si]}</p>
-                    <div className="space-y-2">
-                      {section.questions.map(q => (
-                        <div key={q.num} className="bg-white rounded-xl p-3 border border-blue-100">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="bg-brand-blue text-white text-xs font-bold px-2 py-0.5 rounded-full">Q{q.num}</span>
-                            <span className="text-xs text-brand-blue font-semibold">{q.marks} mark{q.marks > 1 ? 's' : ''}</span>
+                  <div key={key} className="mb-6">
+                    <p className="text-xs font-bold text-brand-blue uppercase tracking-wider mb-3">
+                      SECTION {letter} — {sectionMarks} marks
+                    </p>
+                    <div className="space-y-3">
+                      {section.questions.map(q => {
+                        const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+                        const qMarks = hasSubParts
+                          ? q.subParts.reduce((s, sp) => s + (Number(sp.marks) || 0), 0)
+                          : (Number(q.marks) || 0)
+
+                        return (
+                          <div key={q.num} className="bg-white rounded-xl p-4 border border-blue-100">
+                            {/* Question header */}
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-brand-blue text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                Q{q.num}
+                              </span>
+                              <span className="text-xs text-brand-blue font-semibold">
+                                {qMarks} {qMarks === 1 ? 'mark' : 'marks'}
+                              </span>
+                            </div>
+
+                            {/* Sub-parts answers */}
+                            {hasSubParts ? (
+                              <div className="space-y-3">
+                                {q.subParts.map((sp, idx) => (
+                                  <div key={idx} className="flex gap-2">
+                                    <span className="text-xs font-bold text-brand-blue shrink-0 mt-0.5">
+                                      ({sp.label})
+                                    </span>
+                                    <div className="flex-1">
+                                      <p className="text-xs text-gray-500 mb-1">
+                                        {sp.marks} {Number(sp.marks) === 1 ? 'mark' : 'marks'}
+                                      </p>
+                                      <p className="text-sm text-gray-700 leading-relaxed border-l-2 border-blue-300 pl-3 whitespace-pre-line">
+                                        {sp.answer}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-700 leading-relaxed border-l-2 border-blue-300 pl-3 whitespace-pre-line">
+                                {q.answer}
+                              </p>
+                            )}
                           </div>
-                          <p className="text-sm text-gray-700 leading-relaxed border-l-2 border-blue-300 pl-3 whitespace-pre-line">
-                            {q.answer}
-                          </p>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )
               })}
             </div>
           )}
+
         </div>
       </div>
     </div>
