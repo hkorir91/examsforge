@@ -9,7 +9,7 @@ const GEN_STEPS = [
   'Analysing CBC Senior School curriculum...',
   'Retrieving from question bank...',
   'Selecting balanced question set...',
-  'AI transforming and rephrasing questions...',
+  'Machine transforming and rephrasing questions...',
   'Building structured question sections...',
   'Generating CBC marking scheme...',
   'Assembling cover page...',
@@ -22,7 +22,7 @@ export default function GeneratorPage() {
   const [exam, setExam] = useState(null)
   const [meta, setMeta] = useState(null)
   const [examId, setExamId] = useState(null)
-  const [mobileView, setMobileView] = useState('form') // 'form' | 'preview'
+  const [mobileView, setMobileView] = useState('form')
 
   const animateSteps = async () => {
     for (let i = 0; i < GEN_STEPS.length; i++) {
@@ -32,6 +32,12 @@ export default function GeneratorPage() {
   }
 
   const handleGenerate = async (form) => {
+    // Pre-flight check
+    if (!window.navigator.onLine) {
+      toast.error('No internet connection. Please check your network and try again.', { duration: 5000 })
+      return
+    }
+
     setLoading(true)
     setExam(null)
     setMeta(null)
@@ -52,6 +58,8 @@ export default function GeneratorPage() {
         totalMarks: parseInt(form.totalMarks),
         totalQuestions: parseInt(form.totalQuestions),
         school: form.school,
+        sectionCount: form.sectionCount,
+        showStrand: form.showStrand,
       })
 
       setExam(data.exam)
@@ -66,19 +74,40 @@ export default function GeneratorPage() {
         year: form.year,
         totalMarks: form.totalMarks,
         school: form.school,
+        sectionCount: form.sectionCount,
+        showStrand: form.showStrand,
       })
 
       await refreshUser()
-      toast.success('Exam generated successfully!')
+      toast.success(data.message || 'Exam generated successfully!')
+
     } catch (err) {
-      const error = err.response?.data?.error || 'Generation failed. Please try again.'
       const code = err.response?.data?.code
+      const status = err.response?.status
+      const serverMsg = err.response?.data?.error
 
       if (code === 'QUOTA_EXCEEDED') {
-        toast.error('Free limit reached. Please upgrade to Premium.')
+        toast.error('You have used all your free exams. Upgrade to Premium to continue.', { duration: 7000 })
+      } else if (code === 'TIMEOUT') {
+        toast.error('The Machine took too long to respond. Please try again.', { duration: 6000 })
+      } else if (code === 'PARSE_ERROR') {
+        toast.error('The Machine returned an unexpected response. Please try again.', { duration: 5000 })
+      } else if (code === 'SAVE_ERROR') {
+        toast.error('Exam generated but could not be saved. Please try again.', { duration: 6000 })
+      } else if (code === 'RATE_LIMIT' || status === 429) {
+        toast.error('Too many requests. Please wait a moment before trying again.', { duration: 5000 })
+      } else if (code === 'SERVICE_DOWN') {
+        toast.error('Machine service is temporarily unavailable. Please try again shortly.', { duration: 5000 })
+      } else if (code === 'AUTH_ERROR') {
+        toast.error('Machine service configuration error. Please contact support.', { duration: 7000 })
+      } else if (code === 'MISSING_FIELD' || status === 400) {
+        toast.error(serverMsg || 'Please check all fields are filled correctly.', { duration: 5000 })
+      } else if (!window.navigator.onLine) {
+        toast.error('Connection lost during generation. Please check your network.', { duration: 5000 })
       } else {
-        toast.error(error)
+        toast.error(serverMsg || 'Generation failed. Please try again.', { duration: 5000 })
       }
+
       setMobileView('form')
     } finally {
       setLoading(false)
@@ -103,7 +132,7 @@ export default function GeneratorPage() {
         </div>
         <div className="text-center">
           <p className="font-semibold text-gray-700 mb-1">Building your exam paper...</p>
-          <p className="text-sm text-gray-400">Hybrid AI is retrieving and transforming CBC questions</p>
+          <p className="text-sm text-gray-400">Machine is retrieving and transforming CBC questions</p>
         </div>
         <div className="space-y-2 w-full max-w-sm">
           {GEN_STEPS.map((step, i) => (
@@ -157,7 +186,7 @@ export default function GeneratorPage() {
           {[
             { step: '1', title: 'Select Grade & Subject', desc: 'Choose Grade 10, 11 or 12 and select your subject' },
             { step: '2', title: 'Pick Strand(s)', desc: 'Select one or more strands — multi-select supported' },
-            { step: '3', title: 'Generate & Download', desc: 'Click Generate — AI builds your unique CBC exam' },
+            { step: '3', title: 'Generate & Download', desc: 'Click Generate — the Machine builds your unique CBC exam' },
           ].map(({ step, title, desc }) => (
             <div key={step} className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
               <div className="text-xs font-bold text-brand-blue uppercase tracking-wider mb-2">Step {step}</div>
@@ -172,7 +201,7 @@ export default function GeneratorPage() {
 
   return (
     <>
-      {/* ── DESKTOP layout (md and above) ── */}
+      {/* Desktop */}
       <div className="hidden md:flex h-[calc(100vh-56px)] overflow-hidden">
         <div className="w-80 flex-shrink-0 h-full">
           <ExamForm onGenerate={handleGenerate} loading={loading} />
@@ -182,18 +211,14 @@ export default function GeneratorPage() {
         </div>
       </div>
 
-      {/* ── MOBILE layout (below md) ── */}
+      {/* Mobile */}
       <div className="md:hidden flex flex-col min-h-[calc(100vh-56px)]">
-
-        {/* Mobile tab switcher — only show when exam exists or loading */}
         {(exam || loading) && (
           <div className="flex border-b border-gray-200 bg-white sticky top-0 z-10">
             <button
               onClick={() => setMobileView('form')}
               className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                mobileView === 'form'
-                  ? 'text-brand-blue border-b-2 border-brand-blue'
-                  : 'text-gray-400'
+                mobileView === 'form' ? 'text-brand-blue border-b-2 border-brand-blue' : 'text-gray-400'
               }`}
             >
               Configure
@@ -201,25 +226,17 @@ export default function GeneratorPage() {
             <button
               onClick={() => setMobileView('preview')}
               className={`flex-1 py-3 text-sm font-semibold transition-colors ${
-                mobileView === 'preview'
-                  ? 'text-brand-blue border-b-2 border-brand-blue'
-                  : 'text-gray-400'
+                mobileView === 'preview' ? 'text-brand-blue border-b-2 border-brand-blue' : 'text-gray-400'
               }`}
             >
               {loading ? 'Generating...' : 'Exam Preview'}
             </button>
           </div>
         )}
-
-        {/* Mobile content */}
         {(!exam && !loading) || mobileView === 'form' ? (
-          <div className="flex-1">
-            <ExamForm onGenerate={handleGenerate} loading={loading} />
-          </div>
+          <div className="flex-1"><ExamForm onGenerate={handleGenerate} loading={loading} /></div>
         ) : (
-          <div className="flex-1">
-            {rightPanel()}
-          </div>
+          <div className="flex-1">{rightPanel()}</div>
         )}
       </div>
     </>
