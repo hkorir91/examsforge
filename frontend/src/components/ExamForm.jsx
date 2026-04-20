@@ -3,20 +3,29 @@ import { CBC_CURRICULUM, SUBSTRANDS, EXAM_TYPES, TERMS, MARKS_OPTIONS, QUESTIONS
 import { useAuthStore } from '../context/authStore'
 import { Link } from 'react-router-dom'
 
+// Returns the default number of sections for a given exam type
+const getDefaultSectionCount = (examType) => {
+  if (['End Term', 'Mock', 'Pre-Mock'].includes(examType)) return 3
+  if (examType === 'Midterm') return 2
+  return 1 // CAT
+}
+
 export default function ExamForm({ onGenerate, loading }) {
   const { user } = useAuthStore()
 
   const [form, setForm] = useState({
     grade: '',
     subject: '',
-    strands: [],        // multi-select
-    substrands: [],     // multi-select
+    strands: [],
+    substrands: [],
     examType: 'CAT',
     term: 'Term 1',
     year: new Date().getFullYear().toString(),
     totalMarks: 50,
     totalQuestions: 15,
     school: user?.school || '',
+    sectionCount: getDefaultSectionCount('CAT'),
+    showStrand: true,
   })
 
   const [subjects, setSubjects] = useState([])
@@ -52,6 +61,11 @@ export default function ExamForm({ onGenerate, loading }) {
       setAvailableSubstrands([])
     }
   }, [form.strands])
+
+  // Auto-update sectionCount when examType changes (teacher can still override)
+  useEffect(() => {
+    setForm(f => ({ ...f, sectionCount: getDefaultSectionCount(f.examType) }))
+  }, [form.examType])
 
   const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
 
@@ -94,6 +108,22 @@ export default function ExamForm({ onGenerate, loading }) {
       </div>
 
       <form onSubmit={handleSubmit} className="flex-1 p-5 space-y-4">
+
+        {/* School Name */}
+        <div>
+          <label className="label">School / Assessment Name</label>
+          <input
+            className="input"
+            type="text"
+            placeholder="e.g. Kaplamboi Secondary School"
+            value={form.school}
+            onChange={set('school')}
+            required
+          />
+        </div>
+
+        <div className="h-px bg-gray-100" />
+
         {/* Grade */}
         <div>
           <label className="label">Grade</label>
@@ -122,7 +152,7 @@ export default function ExamForm({ onGenerate, loading }) {
           </div>
         </div>
 
-        {/* Strands — multi-select */}
+        {/* Strands */}
         {availableStrands.length > 0 && (
           <div>
             <label className="label">
@@ -151,7 +181,7 @@ export default function ExamForm({ onGenerate, loading }) {
           </div>
         )}
 
-        {/* Sub-strands — multi-select, optional */}
+        {/* Sub-strands */}
         {availableSubstrands.length > 0 && (
           <div>
             <label className="label">
@@ -200,6 +230,35 @@ export default function ExamForm({ onGenerate, loading }) {
           </div>
         </div>
 
+        {/* Number of Sections */}
+        <div>
+          <label className="label">
+            Number of Sections
+            <span className="text-gray-400 font-normal ml-1 text-xs">— auto-set by exam type</span>
+          </label>
+          <div className="flex gap-2">
+            {[1, 2, 3].map(n => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setForm(f => ({ ...f, sectionCount: n }))}
+                className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl border-2 transition-all ${
+                  form.sectionCount === n
+                    ? 'bg-brand-blue border-brand-blue text-white'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-brand-blue hover:text-brand-blue'
+                }`}
+              >
+                {n} {n === 1 ? 'Section' : 'Sections'}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-1">
+            {form.sectionCount === 1 && 'Good for CATs and quick tests'}
+            {form.sectionCount === 2 && 'Good for Midterm exams'}
+            {form.sectionCount === 3 && 'Good for End Term, Mock, Pre-Mock'}
+          </p>
+        </div>
+
         {/* Marks + Questions */}
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -239,22 +298,30 @@ export default function ExamForm({ onGenerate, loading }) {
           </div>
         </div>
 
-        {/* School name */}
-        <div>
-          <label className="label">School Name</label>
-          <input
-            className="input"
-            type="text"
-            placeholder="e.g. Nairobi Senior School"
-            value={form.school}
-            onChange={set('school')}
-            required
-          />
+        <div className="h-px bg-gray-100" />
+
+        {/* Show Strand toggle */}
+        <div className="flex items-center justify-between py-1">
+          <div>
+            <p className="text-sm font-medium text-gray-700">Show Strand on exam header</p>
+            <p className="text-xs text-gray-400">Display strand & sub-strand on cover page</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm(f => ({ ...f, showStrand: !f.showStrand }))}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+              form.showStrand ? 'bg-brand-blue' : 'bg-gray-300'
+            }`}
+          >
+            <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
+              form.showStrand ? 'translate-x-5' : 'translate-x-0'
+            }`} />
+          </button>
         </div>
 
         <div className="h-px bg-gray-100" />
 
-        {/* Question type info */}
+        {/* Question format info */}
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
           <p className="text-xs font-semibold text-brand-blue mb-1">📝 Question Format</p>
           <p className="text-xs text-blue-600 leading-relaxed">
