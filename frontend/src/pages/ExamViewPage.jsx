@@ -19,11 +19,18 @@ export function ExamViewPage() {
   if (!exam) return <div className="text-center py-20 text-gray-400">Exam not found.</div>
 
   const meta = {
-    grade: exam.grade, subject: exam.subject,
-    strands: exam.strands || (exam.strand ? [exam.strand] : []),
-    substrands: exam.substrands || [],
-    examType: exam.examType, term: exam.term,
-    year: exam.year, totalMarks: exam.totalMarks, school: exam.school,
+    grade: exam.grade,
+    subject: exam.subject,
+    strands: exam.strands?.length ? exam.strands : (exam.strand ? [exam.strand] : []),
+    substrands: exam.substrands?.length ? exam.substrands : (exam.substrand ? [exam.substrand] : []),
+    examType: exam.examType,
+    term: exam.term,
+    year: exam.year,
+    totalMarks: exam.totalMarks,
+    school: exam.school,
+    // Display options — default to showing everything for old exams
+    showStrand: exam.showStrand !== undefined ? exam.showStrand : true,
+    sectionCount: exam.sectionCount || 3,
   }
 
   return (
@@ -33,7 +40,7 @@ export function ExamViewPage() {
   )
 }
 
-// DashboardPage.jsx — admin analytics
+// DashboardPage.jsx — analytics
 export function DashboardPage() {
   const [stats, setStats] = useState(null)
   const [myStats, setMyStats] = useState(null)
@@ -109,7 +116,7 @@ export function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="card p-5">
               <h3 className="font-semibold text-sm text-gray-700 mb-4">Top Subjects</h3>
-              {stats.charts.examsBySubject?.slice(0,5).map(({ _id, count }) => (
+              {stats.charts.examsBySubject?.slice(0, 5).map(({ _id, count }) => (
                 <div key={_id} className="flex items-center gap-3 mb-3">
                   <span className="text-xs text-gray-500 w-28 truncate">{_id}</span>
                   <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -121,7 +128,7 @@ export function DashboardPage() {
             </div>
             <div className="card p-5">
               <h3 className="font-semibold text-sm text-gray-700 mb-4">Top Grades</h3>
-              {stats.charts.examsByGrade?.slice(0,5).map(({ _id, count }) => (
+              {stats.charts.examsByGrade?.slice(0, 5).map(({ _id, count }) => (
                 <div key={_id} className="flex items-center gap-3 mb-3">
                   <span className="text-xs text-gray-500 w-16 truncate">{_id}</span>
                   <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -138,7 +145,7 @@ export function DashboardPage() {
   )
 }
 
-// Re-exports & missing imports
+// Re-exports & imports
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../utils/api'
