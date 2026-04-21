@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CBC_CURRICULUM, SUBSTRANDS, EXAM_TYPES, TERMS, MARKS_OPTIONS, QUESTIONS_OPTIONS } from '../utils/curriculumData'
+import { CBC_CURRICULUM, SUBSTRANDS, EXAM_TYPES, TERMS, MARKS_OPTIONS, QUESTIONS_OPTIONS, GRADE_STATUS } from '../utils/curriculumData'
 import { useAuthStore } from '../context/authStore'
 import { Link } from 'react-router-dom'
 
@@ -35,7 +35,7 @@ export default function ExamForm({ onGenerate, loading }) {
   // Update subjects when grade changes
   useEffect(() => {
     if (form.grade && CBC_CURRICULUM[form.grade]) {
-      setSubjects(CBC_CURRICULUM[form.grade].subjects)
+      setSubjects(CBC_CURRICULUM[form.grade].subjects || [])
       setAvailableStrands([])
       setAvailableSubstrands([])
       setForm(f => ({ ...f, subject: '', strands: [], substrands: [] }))
@@ -103,7 +103,7 @@ export default function ExamForm({ onGenerate, loading }) {
       <div className="p-5 border-b border-gray-100">
         <h2 className="font-serif text-xl text-gray-900 mb-1">Exam Generator</h2>
         <p className="text-xs text-gray-400 leading-relaxed">
-          Configure your CBC Senior School exam — Grade 10–12.
+          Configure your CBC Senior School exam — Grade 10 (2025/2026).
         </p>
       </div>
 
@@ -124,33 +124,55 @@ export default function ExamForm({ onGenerate, loading }) {
 
         <div className="h-px bg-gray-100" />
 
-        {/* Grade */}
+        {/* Grade — button selector with Coming Soon badges */}
         <div>
           <label className="label">Grade</label>
-          <div className="relative">
-            <select className="select pr-9" value={form.grade} onChange={set('grade')} required>
-              <option value="">— Select Grade —</option>
-              <optgroup label="CBC — Senior School">
-                {['Grade 10', 'Grade 11', 'Grade 12'].map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </optgroup>
-            </select>
-            <svg className="absolute right-3 top-3 text-gray-400 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <div className="space-y-2">
+            {Object.entries(GRADE_STATUS).map(([grade, status]) => (
+              <button
+                key={grade}
+                type="button"
+                disabled={!status.active}
+                onClick={() => {
+                  if (!status.active) return
+                  setForm(f => ({ ...f, grade, subject: '', strands: [], substrands: [] }))
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 text-sm font-semibold transition-all ${
+                  !status.active
+                    ? 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                    : form.grade === grade
+                    ? 'bg-brand-blue border-brand-blue text-white shadow-lg shadow-brand-blue/20'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-brand-blue hover:text-brand-blue'
+                }`}
+              >
+                <span>{status.label}</span>
+                <span className={`text-xs font-normal px-2 py-0.5 rounded-full ${
+                  !status.active
+                    ? 'bg-amber-100 text-amber-600'
+                    : form.grade === grade
+                    ? 'bg-white/20 text-white'
+                    : 'bg-green-50 text-green-600'
+                }`}>
+                  {status.note}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Subject */}
-        <div>
-          <label className="label">Subject</label>
-          <div className="relative">
-            <select className="select pr-9" value={form.subject} onChange={set('subject')} required disabled={!subjects.length}>
-              <option value="">— Select Subject —</option>
-              {subjects.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <svg className="absolute right-3 top-3 text-gray-400 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+        {subjects.length > 0 && (
+          <div>
+            <label className="label">Subject</label>
+            <div className="relative">
+              <select className="select pr-9" value={form.subject} onChange={set('subject')} required disabled={!subjects.length}>
+                <option value="">— Select Subject —</option>
+                {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <svg className="absolute right-3 top-3 text-gray-400 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Strands */}
         {availableStrands.length > 0 && (
@@ -332,7 +354,7 @@ export default function ExamForm({ onGenerate, loading }) {
         {/* Generate button */}
         <button
           type="submit"
-          disabled={loading || !canGenerate || form.strands.length === 0}
+          disabled={loading || !canGenerate || form.strands.length === 0 || !form.grade}
           className="w-full py-3.5 bg-gradient-to-r from-brand-blue to-brand-blue-dark text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm shadow-lg shadow-brand-blue/20"
         >
           {loading ? (
