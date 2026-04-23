@@ -1,7 +1,11 @@
 ```jsx
 import { useState, useEffect } from 'react'
 import {
-  CBC_CURRICULUM, SUBSTRANDS, EXAM_TYPES, TERMS, GRADE_STATUS
+  CBC_CURRICULUM,
+  SUBSTRANDS,
+  EXAM_TYPES,
+  TERMS,
+  GRADE_STATUS
 } from '../utils/curriculumData'
 import { useAuthStore } from '../context/authStore'
 import { Link } from 'react-router-dom'
@@ -25,9 +29,7 @@ export default function ExamForm({ onGenerate, loading }) {
   const [availableStrands, setAvailableStrands] = useState([])
   const [availableSubstrands, setAvailableSubstrands] = useState([])
 
-  // -------------------------------
-  // 📚 LOAD SUBJECTS
-  // -------------------------------
+  // Load subjects when grade changes
   useEffect(() => {
     if (form.grade && CBC_CURRICULUM[form.grade]) {
       setSubjects(CBC_CURRICULUM[form.grade].subjects || [])
@@ -37,9 +39,7 @@ export default function ExamForm({ onGenerate, loading }) {
     }
   }, [form.grade])
 
-  // -------------------------------
-  // 🧩 LOAD STRANDS
-  // -------------------------------
+  // Load strands when subject changes
   useEffect(() => {
     if (form.grade && form.subject && CBC_CURRICULUM[form.grade]?.strands?.[form.subject]) {
       setAvailableStrands(CBC_CURRICULUM[form.grade].strands[form.subject])
@@ -48,9 +48,7 @@ export default function ExamForm({ onGenerate, loading }) {
     }
   }, [form.subject, form.grade])
 
-  // -------------------------------
-  // 🔍 LOAD SUBSTRANDS
-  // -------------------------------
+  // Load substrands
   useEffect(() => {
     if (form.strands.length > 0) {
       const subs = form.strands.flatMap(s => SUBSTRANDS[s] || [])
@@ -61,9 +59,7 @@ export default function ExamForm({ onGenerate, loading }) {
     }
   }, [form.strands])
 
-  // -------------------------------
-  // 🎯 HANDLERS
-  // -------------------------------
+  // Grade selection
   const handleGradeClick = (grade, status) => {
     if (!status.active) {
       toast(`${grade} will be available from ${status.launchDate}`, {
@@ -72,7 +68,14 @@ export default function ExamForm({ onGenerate, loading }) {
       })
       return
     }
-    setForm(f => ({ ...f, grade, subject: '', strands: [], substrands: [] }))
+
+    setForm(f => ({
+      ...f,
+      grade,
+      subject: '',
+      strands: [],
+      substrands: []
+    }))
   }
 
   const set = (field) => (e) =>
@@ -94,16 +97,12 @@ export default function ExamForm({ onGenerate, loading }) {
         : [...f.substrands, sub],
     }))
 
-  // -------------------------------
-  // 🔐 LIMITS
-  // -------------------------------
+  // Usage limits
   const freeLeft = Math.max(0, 3 - (user?.freeGenerationsUsed || 0))
   const isPremium = user?.isPremium
   const canGenerate = isPremium || freeLeft > 0
 
-  // -------------------------------
-  // 🚀 SUBMIT
-  // -------------------------------
+  // Submit
   const handleSubmit = (e) => {
     e.preventDefault()
 
@@ -111,7 +110,6 @@ export default function ExamForm({ onGenerate, loading }) {
     if (!form.subject) return toast.error("Select subject")
     if (form.strands.length === 0) return toast.error("Select at least one strand")
 
-    // ✅ SEND ONLY WHAT ENGINE NEEDS
     onGenerate({
       subject: form.subject,
       grade: form.grade,
@@ -128,28 +126,37 @@ export default function ExamForm({ onGenerate, loading }) {
     <div className="h-full flex flex-col bg-white border-r border-gray-100 overflow-y-auto">
 
       <div className="p-5 border-b border-gray-100">
-        <h2 className="font-serif text-xl text-gray-900 mb-1">Exam Generator</h2>
-        <p className="text-xs text-gray-400">Structured CBC exam generation</p>
+        <h2 className="text-xl font-bold">Exam Generator</h2>
+        <p className="text-xs text-gray-500">CBC Structured Exam Generator</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex-1 p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="p-5 space-y-4">
 
         {/* School */}
         <div>
-          <label className="label">School</label>
-          <input className="input" value={form.school} onChange={set('school')} required />
+          <label className="text-sm font-semibold">School</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={form.school}
+            onChange={set('school')}
+          />
         </div>
 
         {/* Grade */}
         <div>
-          <label className="label">Grade</label>
-          <div className="space-y-2">
+          <label className="text-sm font-semibold">Grade</label>
+          <div className="flex flex-col gap-2">
             {Object.entries(GRADE_STATUS).map(([grade, status]) => (
-              <button key={grade} type="button"
+              <button
+                key={grade}
+                type="button"
                 onClick={() => handleGradeClick(grade, status)}
-                className={`w-full py-2 rounded-lg border ${
-                  form.grade === grade ? 'bg-brand-blue text-white' : 'bg-white'
-                }`}>
+                className={`p-2 rounded border ${
+                  form.grade === grade
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100'
+                }`}
+              >
                 {status.label}
               </button>
             ))}
@@ -159,8 +166,12 @@ export default function ExamForm({ onGenerate, loading }) {
         {/* Subject */}
         {subjects.length > 0 && (
           <div>
-            <label className="label">Subject</label>
-            <select className="select" value={form.subject} onChange={set('subject')}>
+            <label className="text-sm font-semibold">Subject</label>
+            <select
+              className="w-full border p-2 rounded"
+              value={form.subject}
+              onChange={set('subject')}
+            >
               <option value="">Select</option>
               {subjects.map(s => <option key={s}>{s}</option>)}
             </select>
@@ -170,16 +181,19 @@ export default function ExamForm({ onGenerate, loading }) {
         {/* Strands */}
         {availableStrands.length > 0 && (
           <div>
-            <label className="label">Strands</label>
+            <label className="text-sm font-semibold">Strands</label>
             <div className="flex flex-wrap gap-2">
               {availableStrands.map(strand => (
-                <button key={strand} type="button"
+                <button
+                  key={strand}
+                  type="button"
                   onClick={() => toggleStrand(strand)}
                   className={`px-3 py-1 rounded ${
                     form.strands.includes(strand)
-                      ? 'bg-brand-blue text-white'
-                      : 'bg-gray-100'
-                  }`}>
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200'
+                  }`}
+                >
                   {strand}
                 </button>
               ))}
@@ -190,16 +204,19 @@ export default function ExamForm({ onGenerate, loading }) {
         {/* Substrands */}
         {availableSubstrands.length > 0 && (
           <div>
-            <label className="label">Sub-strands (optional)</label>
+            <label className="text-sm font-semibold">Sub-strands (optional)</label>
             <div className="flex flex-wrap gap-2">
               {availableSubstrands.map(sub => (
-                <button key={sub} type="button"
+                <button
+                  key={sub}
+                  type="button"
                   onClick={() => toggleSubstrand(sub)}
                   className={`px-3 py-1 rounded ${
                     form.substrands.includes(sub)
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-gray-100'
-                  }`}>
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200'
+                  }`}
+                >
                   {sub}
                 </button>
               ))}
@@ -209,23 +226,29 @@ export default function ExamForm({ onGenerate, loading }) {
 
         {/* Exam Type */}
         <div>
-          <label className="label">Exam Type</label>
-          <select className="select" value={form.examType} onChange={set('examType')}>
+          <label className="text-sm font-semibold">Exam Type</label>
+          <select
+            className="w-full border p-2 rounded"
+            value={form.examType}
+            onChange={set('examType')}
+          >
             {EXAM_TYPES.map(t => <option key={t}>{t}</option>)}
           </select>
         </div>
 
         {/* Submit */}
-        <button type="submit"
+        <button
+          type="submit"
           disabled={loading || !canGenerate}
-          className="w-full py-3 bg-brand-blue text-white rounded-lg">
+          className="w-full py-3 bg-blue-600 text-white rounded font-bold"
+        >
           {loading ? "Generating..." : "Generate Exam"}
         </button>
 
         {/* Usage */}
         {!isPremium && (
-          <p className="text-xs text-center text-gray-400">
-            {freeLeft} free generations left
+          <p className="text-xs text-center text-gray-500">
+            {freeLeft} free generations remaining
           </p>
         )}
 
