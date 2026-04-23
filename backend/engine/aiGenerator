@@ -1,0 +1,184 @@
+````js
+/**
+ * ExamsForge - AI Generator Engine
+ * File: /backend/engine/aiGenerator.js
+ *
+ * Handles controlled AI-based question generation
+ * Ensures KICD alignment, structured output, and validation-ready JSON
+ */
+
+const axios = require('axios');
+
+// 🔧 CONFIG — replace with your actual API setup
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
+const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+
+// -------------------------------
+// 🧠 BUILD PROMPT
+// -------------------------------
+function buildPrompt({ subject, grade, strands, difficulty, marks, learningObjective }) {
+  return `
+You are an expert Kenyan secondary school examiner trained in KICD curriculum design.
+
+Your task is to generate ONE high-quality exam question.
+
+-----------------------------------
+📘 CONTEXT
+-----------------------------------
+- Subject: ${subject}
+- Grade: ${grade}
+- Strand: ${strands.join(', ')}
+- Difficulty Level: ${difficulty}
+- Marks: ${marks}
+${learningObjective ? `- Learning Outcome: ${learningObjective}` : ""}
+
+-----------------------------------
+📏 STRICT REQUIREMENTS
+-----------------------------------
+1. The question MUST align with KICD curriculum.
+2. It must be appropriate for ${grade}.
+3. It must test understanding, NOT memorization only.
+4. It must be clear, unambiguous, and exam-ready.
+5. Include mark allocation inside the question where necessary.
+6. The answer guide MUST include a marking scheme (step-by-step where applicable).
+7. Avoid common textbook repetition.
+8. Use real-life or applied context where possible.
+
+-----------------------------------
+🚫 DO NOT:
+-----------------------------------
+- Do NOT explain anything outside JSON
+- Do NOT include introductions or commentary
+- Do NOT return multiple questions
+- Do NOT leave fields empty
+
+-----------------------------------
+📦 OUTPUT FORMAT (STRICT JSON ONLY)
+-----------------------------------
+{
+  "questionText": "string",
+  "marks": ${marks},
+  "difficulty": "${difficulty}",
+  "strand": "string",
+  "subStrand": "string",
+  "answerGuide": "string"
+}
+
+-----------------------------------
+⚠️ VALIDATION RULES
+-----------------------------------
+- Marks in answerGuide must total ${marks}
+- Difficulty must match "${difficulty}"
+- Strand must be one of: ${strands.join(', ')}
+
+Return ONLY JSON.
+`;
+}
+
+// -------------------------------
+// 🧮 MARKS CONTROL
+// -------------------------------
+function pickMarksByDifficulty(difficulty) {
+  if (difficulty === "easy") return 2;
+  if (difficulty === "medium") return 4;
+  if (difficulty === "hard") return 6;
+  return 4;
+}
+
+// -------------------------------
+// 🧹 CLEAN RESPONSE
+// -------------------------------
+function cleanJSON(response) {
+  return response
+    .replace(/```json/g, '')
+    .replace(/```/g, '')
+    .trim();
+}
+
+// -------------------------------
+// 🤖 CALL CLAUDE API
+// -------------------------------
+async function callClaude(prompt) {
+  try {
+    const response = await axios.post(
+      CLAUDE_API_URL,
+      {
+        model: "claude-3-opus-20240229",
+        max_tokens: 1000,
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": CLAUDE_API_KEY,
+          "anthropic-version": "2023-06-01"
+        }
+      }
+    );
+
+    return response.data.content[0].text;
+
+  } catch (error) {
+    console.error("Claude API Error:", error.response?.data || error.message);
+    throw new Error("AI generation failed");
+  }
+}
+
+// -------------------------------
+// 🚀 MAIN GENERATOR FUNCTION
+// -------------------------------
+async function generateAIQuestion({
+  subject,
+  grade,
+  strands,
+  difficulty,
+  learningObjective = null
+}) {
+
+  const marks = pickMarksByDifficulty(difficulty);
+
+  const prompt = buildPrompt({
+    subject,
+    grade,
+    strands,
+    difficulty,
+    marks,
+    learningObjective
+  });
+
+  const rawResponse = await callClaude(prompt);
+
+  const cleaned = cleanJSON(rawResponse);
+
+  let parsed;
+
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch (err) {
+    console.error("JSON Parse Error:", cleaned);
+    throw new Error("Invalid AI JSON response");
+  }
+
+  // -------------------------------
+  // 🛡️ BASIC VALIDATION
+  // -------------------------------
+  if (!parsed.questionText || !parsed.answerGuide) {
+    throw new Error("Incomplete AI response");
+  }
+
+  if (parsed.marks !== marks) {
+    parsed.marks = marks; // enforce consistency
+  }
+
+  return parsed;
+}
+
+// -------------------------------
+// 📦 EXPORT
+// -------------------------------
+module.exports = {
+  generateAIQuestion
+};
+````
