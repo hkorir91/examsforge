@@ -3,7 +3,6 @@
 // Built from analysis of real CBC Grade 10 Kenya exam papers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { getSubjectFullMarks } = require('../models/curriculumHelpers')
 
 // ── Kenyan context pools ──────────────────────────────────────────────────────
 const KENYAN_NAMES = [
