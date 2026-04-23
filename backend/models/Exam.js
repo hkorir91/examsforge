@@ -5,22 +5,26 @@ const questionSchema = new mongoose.Schema({
   text: String,
   subParts: [
     {
-      label: String,
+      label: String,       // e.g. 'a', 'b', 'c'
       text: String,
       marks: Number,
       answer: String,
     }
   ],
   marks: Number,
-  answer: String,
+  answer: String,          // full model answer for single-part questions
   questionType: {
     type: String,
     enum: ['short_answer', 'structured', 'long_answer', 'calculation', 'practical'],
     default: 'structured',
   },
-  sourceQuestionId: {
+  sourceQuestionId: {      // reference to QuestionBank item used as seed
     type: mongoose.Schema.Types.ObjectId,
     ref: 'QuestionBank',
+    default: null,
+  },
+  diagram: {               // SVG diagram spec — rendered in ExamPreview and PDF
+    type: mongoose.Schema.Types.Mixed,
     default: null,
   },
 });
@@ -54,7 +58,7 @@ const examSchema = new mongoose.Schema(
     strands: { type: [String], default: [] },
     substrands: { type: [String], default: [] },
 
-    // Legacy single-strand fields (kept for backward compatibility)
+    // Legacy single-strand field (kept for backward compatibility)
     strand: { type: String, default: '' },
     substrand: { type: String, default: '' },
 
@@ -69,15 +73,11 @@ const examSchema = new mongoose.Schema(
     totalQuestions: { type: Number, required: true },
     duration: { type: String, required: true },
 
-    // ── Display Options ───────────────────────────────
-    showStrand: { type: Boolean, default: true },
-    sectionCount: { type: Number, default: 3, min: 1, max: 3 },
-
     // ── Exam Content ──────────────────────────────────
     instructions: [String],
-    sectionA: sectionSchema,
-    sectionB: sectionSchema,
-    sectionC: sectionSchema,
+    sectionA: sectionSchema,   // Short Answer
+    sectionB: sectionSchema,   // Structured / Long Answer
+    sectionC: sectionSchema,   // Extended / Calculation / Practical
 
     // ── Generation Metadata ──────────────────────────
     isHybrid: { type: Boolean, default: true },
@@ -90,6 +90,7 @@ const examSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ── Indexes ───────────────────────────────────────────
 examSchema.index({ user: 1, createdAt: -1 });
 examSchema.index({ grade: 1, subject: 1 });
 
