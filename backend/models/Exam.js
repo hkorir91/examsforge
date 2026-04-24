@@ -80,11 +80,13 @@ const examSchema = new mongoose.Schema(
     sectionC: sectionSchema,   // Extended / Calculation / Practical
 
     // ── Generation Metadata ──────────────────────────
+    showStrand: { type: Boolean, default: true },
+    sectionCount: { type: Number, default: 1 },
     isHybrid: { type: Boolean, default: true },
     questionBankHits: { type: Number, default: 0 },
     isPublic: { type: Boolean, default: false },
     downloadCount: { type: Number, default: 0 },
-    aiModel: { type: String, default: 'claude-sonnet-4-20250514' },
+    aiModel: { type: String, default: 'claude-sonnet-4-5' },
     generationTimeMs: { type: Number, default: 0 },
   },
   { timestamps: true }
