@@ -3,6 +3,7 @@
 // Built from analysis of real CBC Grade 10 Kenya exam papers
 // ─────────────────────────────────────────────────────────────────────────────
 
+const { getSubjectFullMarks } = require('../models/curriculumHelpers')
 
 // ── Kenyan context pools ──────────────────────────────────────────────────────
 const KENYAN_NAMES = [
@@ -17,7 +18,7 @@ const KENYAN_SCHOOLS = [
   'Maranda Senior School', 'Starehe Senior School', 'Highway Senior School',
   'Nakuru Senior School', 'Kisumu Senior School', 'Eldoret Senior School',
   'Strathmore Senior School', 'Upper Hill Senior School', 'Lenana Senior School',
-  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Senior School',
+  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Junior School',
 ]
 
 const KENYAN_PLACES = [
@@ -382,7 +383,7 @@ MANDATORY RULES — FOLLOW ALL WITHOUT EXCEPTION
 6. DIAGRAMS — MANDATORY FOR VISUAL SUBJECTS:
    For Mathematics: When a question involves geometric shapes, coordinate geometry, bearings, or number lines,
    include a "diagram" field in the question object with this format:
-   {"type": "cylinder|sphere|cone|triangle|right_triangle|circle|coordinate_grid|bearing|number_line|similar_shapes",
+   {"type": "cylinder|sphere|cone|triangle|right_triangle|circle|coordinate_grid|bearing|number_line|similar_shapes|bar_chart|pie_chart|histogram|venn_diagram|line_graph|animal_cell|plant_cell|microscope|beaker|soil_profile|circuit|human_heart|digestive_system|respiratory_system|flower|food_web|nephron|ray_diagram|series_parallel_circuit|water_cycle|rock_cycle|data_table",
     "params": {"r": "6cm", "h": "12cm"}, "caption": "Figure 1"}
    
    For Sciences (Biology, Chemistry, Physics, Agriculture): When a question involves cells, apparatus,
