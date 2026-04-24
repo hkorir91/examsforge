@@ -1,810 +1,1277 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// curriculumData.js — CBC Senior School Grade 10–12 Curriculum Data
-// Grade 10: Available ✅ | Grade 11: Blocked 🔒 | Grade 12: Blocked 🔒
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Grade Availability ───────────────────────────────────────────────────────
-export const GRADE_STATUS = {
-  'Grade 10': {
-    active: true,
-    label: 'Grade 10',
-    note: 'Available Now ✅',
-    launchDate: null,
-  },
-  'Grade 11': {
-    active: false,
-    label: 'Grade 11',
-    note: 'Available January 2027 🔒',
-    launchDate: 'January 2027',
-  },
-  'Grade 12': {
-    active: false,
-    label: 'Grade 12',
-    note: 'Available January 2028 🔒',
-    launchDate: 'January 2028',
-  },
-}
-
-// ── Exam Types ────────────────────────────────────────────────────────────────
-export const EXAM_TYPES = ['CAT', 'Midterm', 'End Term', 'End Year', 'Pre-Mock', 'Mock', 'Series']
-
-// ── CAT marks options (30–40 only) ────────────────────────────────────────────
-export const CAT_MARKS_OPTIONS = [30, 35, 40]
-
-// ── Full exam marks by subject (for End Term, End Year, Mock, Pre-Mock, Series) ─
-export const FULL_EXAM_MARKS = {
-  'English': 80,
-  'Literature in English': 80,
-  'Kiswahili': 80,
-  'Fasihi ya Kiswahili': 80,
-  'Biology': 80,
-  'Physics': 80,
-  'General Science': 80,
-  'Chemistry': 80,
-  'Applied Agriculture': 90,
-  // All other subjects default to 100
-}
-
-export function getSubjectFullMarks(subject) {
-  return FULL_EXAM_MARKS[subject] || 100
-}
-
-// Midterm: approximately half the full exam marks, rounded to nearest 5
-export function getSubjectMidtermMarks(subject) {
-  const full = getSubjectFullMarks(subject)
-  return Math.round((full / 2) / 5) * 5
-}
-
-// Returns correct marks for given exam type
-export function getExamTypeMarks(subject, examType) {
-  if (['End Term', 'End Year', 'Mock', 'Pre-Mock', 'Series'].includes(examType)) {
-    return getSubjectFullMarks(subject)
-  }
-  if (examType === 'Midterm') {
-    return getSubjectMidtermMarks(subject)
-  }
-  return null // CAT: teacher chooses 30-40
-}
-
-// ── Terms ─────────────────────────────────────────────────────────────────────
-export const TERMS = ['Term 1', 'Term 2', 'Term 3']
-
-// ── Kenyan names for question scenarios ──────────────────────────────────────
-export const KENYAN_NAMES = [
-  'Wanjiku', 'Kipchoge', 'Baraka', 'Amina', 'Otieno', 'Njeri', 'Kamau',
-  'Achieng', 'Mutua', 'Chebet', 'Odhiambo', 'Mwangi', 'Zawadi', 'Koech',
-  'Kimani', 'Auma', 'Nduta', 'Waweru', 'Simiyu', 'Juma', 'Nafula', 'Ouma',
-  'Kanini', 'Rotich', 'Adhiambo', 'Maina', 'Chepkorir', 'Onyango',
-]
-
-export const KENYAN_SCHOOLS = [
-  "Mang'u Senior School", 'Alliance Senior School', 'Starehe Senior School',
-  'Precious Blood Senior School', 'Maranda Senior School', 'Ngara Senior School',
-  'Strathmore Senior School', 'Highway Senior School', 'Moi Senior School Nairobi',
-  'Kaplamboi Senior School', 'Thika Senior School', 'St. Mary\'s Senior School',
-  'Kenya High Senior School', 'Lenana Senior School', 'Upper Hill Senior School',
-  'Nakuru Senior School', 'Kisumu Senior School', 'Eldoret Senior School',
-]
-
-export const KENYAN_PLACES = [
-  'Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Thika', 'Nakuru', 'Nyeri',
-  'Kakamega', 'Machakos', 'Garissa', 'Kitale', 'Kericho', 'Embu', 'Meru',
-  'Kisii', 'Kilifi', 'Nanyuki', 'Isiolo', 'Wajir', 'Marsabit',
-]
-
-// ── Subjects per pathway ───────────────────────────────────────────────────────
-export const STEM_SUBJECTS = [
-  'Mathematics',
-  'Essential Mathematics',
-  'Biology',
-  'Chemistry',
-  'Physics',
-  'General Science',
-  'Applied Agriculture',
-  'Computer Studies',
-  'Geography',
-]
-
-export const SOCIAL_SCIENCE_SUBJECTS = [
-  'Geography',
-  'History & Citizenship',
-  'CRE',
-  'IRE',
-  'HRE',
-  'Business Studies',
-  'English',
-  'Literature in English',
-  'Kiswahili',
-  'Fasihi ya Kiswahili',
-  'ICT',
-  'CSL',
-  'Physical Education',
-  'French',
-  'German',
-  'Mandarin',
-]
-
-// ── CBC Curriculum Data ────────────────────────────────────────────────────────
-// Structure: CBC_CURRICULUM[grade][subject] = array of strands
-// SUBSTRANDS[strand] = array of substrands
+// ExamsForge by SmartSchool Digital
+// CBC Senior School Curriculum — Grade 10, 11, 12
+// All 46 KICD Approved Subjects
 
 export const CBC_CURRICULUM = {
   'Grade 10': {
     subjects: [
+      // Core Subjects
       'Mathematics',
       'Essential Mathematics',
-      'Biology',
-      'Chemistry',
-      'Physics',
-      'General Science',
-      'Applied Agriculture',
-      'Computer Studies',
+      'English',
+      'Kiswahili',
+      'Community Service Learning',
+      // Languages
+      'Literature in English',
+      'Fasihi ya Kiswahili',
+      'Arabic',
+      'French',
+      'German',
+      'Chinese',
+      'Indigenous Languages',
+      'Sign Language',
+      'Kenyan Sign Language',
+      // Humanities
+      'History and Citizenship',
       'Geography',
-      'History & Citizenship',
       'CRE',
       'IRE',
       'HRE',
       'Business Studies',
-      'English',
-      'Literature in English',
-      'Kiswahili',
-      'Fasihi ya Kiswahili',
-      'ICT',
-      'CSL',
+      // Sciences
+      'Biology',
+      'Chemistry',
+      'Physics',
+      'General Science',
+      // Technical & Applied
+      'Agriculture',
+      'Computer Studies',
+      'Home Science',
+      'Aviation',
+      'Building and Construction',
+      'Electricity',
+      'Drawing and Design',
+      'Marine and Fisheries',
+      'Metalwork',
+      'Power Mechanics',
+      'Woodwork',
+      'Media Technology',
+      // Arts & Sports
+      'Art and Design',
+      'Music and Dance',
+      'Theatre and Film',
+      'Fine Arts',
+      'Sports and Recreation',
       'Physical Education',
-      'French',
-      'German',
-      'Mandarin',
+      // Life Skills
+      'Life Skills Education',
     ],
     strands: {
       'Mathematics': [
-        'Numbers',
-        'Algebra',
-        'Geometry',
-        'Measurements',
+        'Numbers and Algebra',
+        'Measurement and Geometry',
         'Statistics and Probability',
+        'Financial Mathematics',
       ],
       'Essential Mathematics': [
-        'Numbers',
-        'Algebra',
-        'Geometry',
-        'Measurements',
-        'Statistics and Probability',
-      ],
-      'Biology': [
-        'Introduction to Biology',
-        'Cell Biology',
-        'Classification of Living Things',
-        'Nutrition in Plants and Animals',
-        'Gaseous Exchange and Respiration',
-        'Transport in Animals and Plants',
-        'Excretion in Animals and Plants',
-        'Reproduction in Plants and Animals',
-        'Ecology and Environment',
-      ],
-      'Chemistry': [
-        'Introduction to Chemistry',
-        'States of Matter',
-        'Atomic Structure',
-        'The Periodic Table',
-        'Chemical Bonding',
-        'Acids, Bases and Salts',
-        'Organic Chemistry',
-        'Carbon and Its Compounds',
-      ],
-      'Physics': [
-        'Introduction to Physics',
-        'Mechanics',
-        'Pressure in Solids, Liquids and Gases',
-        'Thermal Physics',
-        'Light and Optics',
-        'Waves and Sound',
-        'Electricity and Magnetism',
-        'Uniform Circular Motion',
-      ],
-      'General Science': [
-        'Scientific Investigation',
-        'Matter and Its Properties',
-        'Living Things and Their Environment',
-        'Forces and Motion',
-        'Energy and Its Transformations',
-        'Earth and Space',
-        'Chemistry in Daily Life',
-      ],
-      'Applied Agriculture': [
-        'Land and Its Uses',
-        'Soil Science',
-        'Crop Production and Management',
-        'Land Preparation and Planting',
-        'Crop Nursery Management',
-        'Livestock Production',
-        'Farm Structures and Management',
-        'Agricultural Mechanization',
-      ],
-      'Computer Studies': [
-        'Introduction to ICT',
-        'Computer Hardware and Software',
-        'Operating Systems',
-        'Word Processing',
-        'Spreadsheets',
-        'Internet and Communication',
-        'Digital Safety and Ethics',
-        'Database Management',
-      ],
-      'Geography': [
-        'Introduction to Geography',
-        'Map Work and Fieldwork',
-        'Internal Land-forming Processes',
-        'External Land-forming Processes',
-        'Weather and Climate',
-        'Water and Drainage',
-        'Population and Settlement',
-        'Agriculture and Food Security',
-        'Environmental Conservation',
-      ],
-      'History & Citizenship': [
-        'Introduction to History and Citizenship',
-        'Peoples and Cultures of Kenya',
-        'Contacts and Interactions',
-        'Colonialism and Resistance in Kenya',
-        'The Struggle for Independence',
-        'Independent Kenya',
-        'Governance and Democracy',
-        'Public Resources and Citizenship',
-      ],
-      'CRE': [
-        'The Bible',
-        'Creation and the Environment',
-        'The Patriarchs and Their Faith',
-        'The Exodus and the Covenant',
-        'The Monarchy and Prophethood',
-        'The Life and Teachings of Jesus Christ',
-        'The Early Church',
-        'Christian Living and Ethics',
-      ],
-      'IRE': [
-        'The Quran (Al-Quran)',
-        'Hadith and Sunnah',
-        'Pillars of Islam (Arkan-ul-Islam)',
-        'Pillars of Faith (Arkan-ul-Iman)',
-        'Islamic Ethics and Social Teachings',
-        'Islamic History and Civilization',
-        'Fiqh (Islamic Jurisprudence)',
-      ],
-      'HRE': [
-        'Hinduism — Trimurti and Dashavatars',
-        'Jainism — Tirthankaras',
-        'Buddhism — Teachings of Buddha',
-        'Hindu Ethics and Social Values',
-        'Jain Philosophy and Way of Life',
-        'Buddhist Philosophy and Meditation',
-        'Community Service and Religious Duty',
-      ],
-      'Business Studies': [
-        'Money and Its Functions',
-        'Financial Goals and Planning',
-        'Budgeting in Business',
-        'Banking and Financial Institutions',
-        'Business Organisation and Management',
-        'Consumer Education and Rights',
-        'Entrepreneurship',
+        'Number and Operations',
+        'Measurement and Geometry',
+        'Data Handling',
+        'Financial Mathematics',
       ],
       'English': [
         'Listening and Speaking',
-        'Reading Comprehension',
-        'Grammar and Language Use',
-        'Writing Skills',
-        'Oral Literature',
-      ],
-      'Literature in English': [
-        'Oral Literature',
-        'Drama and Play',
-        'Poetry',
-        'Prose and Novel',
-        'Literary Criticism and Analysis',
+        'Reading',
+        'Writing',
+        'Language Use',
+        'Literature',
       ],
       'Kiswahili': [
         'Kusikiliza na Kuzungumza',
         'Kusoma',
-        'Sarufi na Matumizi ya Lugha',
         'Kuandika',
-        'Fasihi ya Kiswahili',
+        'Sarufi na Matumizi ya Lugha',
+        'Fasihi',
+      ],
+      'Community Service Learning': [
+        'Self and Community',
+        'Community Needs Assessment',
+        'Service Planning and Implementation',
+        'Reflection and Evaluation',
+      ],
+      'Literature in English': [
+        'Oral Literature',
+        'Prose',
+        'Drama',
+        'Poetry',
+        'Literary Appreciation',
       ],
       'Fasihi ya Kiswahili': [
         'Fasihi Simulizi',
-        'Mashairi',
-        'Hadithi Fupi',
-        'Riwaya',
+        'Ushairi',
+        'Hadithi Fupi na Riwaya',
         'Tamthilia',
+        'Uhakiki wa Fasihi',
       ],
-      'ICT': [
-        'Introduction to ICT',
-        'Computer Hardware and Software',
-        'Operating Systems',
-        'Word Processing Applications',
-        'Spreadsheet Applications',
-        'Internet and Email Communication',
-        'Digital Safety and Cyber Security',
-        'Multimedia and Presentations',
+      'Arabic': [
+        'Listening and Speaking',
+        'Reading and Comprehension',
+        'Writing and Composition',
+        'Grammar and Language Use',
+        'Islamic Culture and Literature',
       ],
-      'CSL': [
-        'Introduction to Community Service Learning',
-        'Planning CSL Projects',
-        'Implementing CSL Activities',
-        'Leadership and Teamwork in CSL',
-        'Reflection and Assessment in CSL',
-        'Citizenship and National Values',
+      'French': [
+        'Communication Orale',
+        'Lecture et Compréhension',
+        'Expression Écrite',
+        'Grammaire',
+        'Culture Francophone',
+      ],
+      'German': [
+        'Hören und Sprechen',
+        'Lesen und Verstehen',
+        'Schreiben',
+        'Grammatik',
+        'Kultur und Landeskunde',
+      ],
+      'Chinese': [
+        'Listening and Speaking',
+        'Reading',
+        'Writing',
+        'Grammar and Language Use',
+        'Chinese Culture',
+      ],
+      'Indigenous Languages': [
+        'Listening and Speaking',
+        'Reading',
+        'Writing',
+        'Grammar and Language Use',
+        'Oral Literature and Culture',
+      ],
+      'Sign Language': [
+        'Receptive Skills',
+        'Expressive Skills',
+        'Deaf Culture and History',
+        'Sign Language Grammar',
+      ],
+      'Kenyan Sign Language': [
+        'Receptive Skills',
+        'Expressive Skills',
+        'KSL Grammar and Structure',
+        'Deaf Culture and History',
+      ],
+      'History and Citizenship': [
+        'Pre-Colonial African History',
+        'Colonial History of Kenya',
+        'Governance and Citizenship',
+        'Economic History',
+      ],
+      'Geography': [
+        'Physical Geography',
+        'Human Geography',
+        'Environmental Geography',
+        'Regional Geography',
+        'Map Work and Fieldwork',
+      ],
+      'CRE': [
+        'The Old Testament',
+        'The New Testament',
+        'Church in Action',
+        'Christian Living Today',
+      ],
+      'IRE': [
+        'Quran and Hadith',
+        'Pillars of Islam',
+        'Islamic History and Civilization',
+        'Islamic Ethics and Values',
+      ],
+      'HRE': [
+        'Hindu Scriptures and Philosophy',
+        'Hindu Practices and Worship',
+        'Hindu Ethics and Values',
+        'Hindu Culture and Civilization',
+      ],
+      'Business Studies': [
+        'Business Concepts and Environment',
+        'Entrepreneurship',
+        'Financial Literacy',
+        'Marketing',
+        'Office Management',
+      ],
+      'Biology': [
+        'Cell Biology',
+        'Biochemistry',
+        'Classification of Living Things',
+        'Nutrition',
+        'Gaseous Exchange',
+        'Transport and Excretion',
+        'Ecology',
+      ],
+      'Chemistry': [
+        'Atomic Structure and Periodic Table',
+        'Chemical Bonding',
+        'Acids, Bases and Salts',
+        'Stoichiometry',
+        'Electrochemistry',
+        'Organic Chemistry',
+        'Environmental Chemistry',
+      ],
+      'Physics': [
+        'Mechanics',
+        'Waves',
+        'Electricity and Magnetism',
+        'Thermal Physics',
+        'Optics',
+      ],
+      'General Science': [
+        'Matter and Its Properties',
+        'Living Things and Their Environment',
+        'Energy and Its Transformations',
+        'Earth and Space',
+        'Science and Technology in Society',
+      ],
+      'Agriculture': [
+        'Crop Production',
+        'Animal Production',
+        'Soil and Water Management',
+        'Farm Structures and Mechanisation',
+        'Agricultural Economics',
+      ],
+      'Computer Studies': [
+        'Computer Systems',
+        'Programming Fundamentals',
+        'Data and Information Management',
+        'Networks and the Internet',
+        'Digital Citizenship and Ethics',
+      ],
+      'Home Science': [
+        'Food and Nutrition',
+        'Clothing and Textiles',
+        'Housing and Home Management',
+        'Family Health',
+      ],
+      'Aviation': [
+        'Introduction to Aviation',
+        'Principles of Flight',
+        'Aircraft Systems',
+        'Air Navigation and Meteorology',
+        'Aviation Safety and Regulations',
+      ],
+      'Building and Construction': [
+        'Building Materials and Tools',
+        'Site Preparation and Foundation',
+        'Masonry and Carpentry',
+        'Plumbing and Drainage',
+        'Building Regulations and Safety',
+      ],
+      'Electricity': [
+        'Electrical Theory and Principles',
+        'Electrical Wiring and Installation',
+        'Electrical Machines',
+        'Electronics',
+        'Electrical Safety',
+      ],
+      'Drawing and Design': [
+        'Principles of Design',
+        'Technical Drawing',
+        'Freehand Drawing',
+        'Graphic Design',
+        'Design Projects',
+      ],
+      'Marine and Fisheries': [
+        'Marine Ecosystems',
+        'Fish Biology and Identification',
+        'Fishing Methods and Technology',
+        'Aquaculture',
+        'Marine Resource Management',
+      ],
+      'Metalwork': [
+        'Properties of Metals',
+        'Hand Tools and Machine Tools',
+        'Marking and Measuring',
+        'Joining and Fabrication',
+        'Heat Treatment and Finishing',
+      ],
+      'Power Mechanics': [
+        'Internal Combustion Engines',
+        'Engine Systems',
+        'Power Transmission',
+        'Maintenance and Repair',
+        'Safety in Power Mechanics',
+      ],
+      'Woodwork': [
+        'Properties of Wood',
+        'Hand Tools and Power Tools',
+        'Joints and Constructions',
+        'Finishing and Surface Treatment',
+        'Woodwork Projects',
+      ],
+      'Media Technology': [
+        'Introduction to Media',
+        'Photography and Videography',
+        'Digital Media Production',
+        'Media and Society',
+        'Media Ethics',
+      ],
+      'Art and Design': [
+        'Drawing and Painting',
+        'Sculpture and Modelling',
+        'Printmaking',
+        'Textile Art',
+        'Design and Aesthetics',
+      ],
+      'Music and Dance': [
+        'Music Theory and Notation',
+        'Vocal Music',
+        'Instrumental Music',
+        'Traditional and Contemporary Dance',
+        'Music and Dance in Culture',
+      ],
+      'Theatre and Film': [
+        'Introduction to Theatre',
+        'Acting and Performance',
+        'Directing and Production',
+        'Film Studies',
+        'Script Writing',
+      ],
+      'Fine Arts': [
+        'Drawing and Composition',
+        'Painting Techniques',
+        'Sculpture and Three-Dimensional Art',
+        'Art History and Appreciation',
+        'Creative Projects',
+      ],
+      'Sports and Recreation': [
+        'Principles of Sports Science',
+        'Athletics and Track Events',
+        'Team Sports',
+        'Individual Sports',
+        'Recreation and Leisure Activities',
       ],
       'Physical Education': [
-        'Athletics and Track Events',
-        'Field Events',
-        'Ball Games and Team Sports',
-        'Indoor Games and Racket Sports',
-        'Health and Fitness',
+        'Physical Fitness and Health',
+        'Athletics',
+        'Games and Sports',
         'Swimming and Water Safety',
         'Outdoor and Adventure Activities',
       ],
-      'French': [
-        'Oral Communication (Expression Orale)',
-        'Reading Comprehension (Compréhension Écrite)',
-        'Grammar (Grammaire)',
-        'Writing Skills (Expression Écrite)',
-        'French Culture and Civilization',
-      ],
-      'German': [
-        'Oral Communication (Mündliche Kommunikation)',
-        'Reading Comprehension (Leseverstehen)',
-        'Grammar (Grammatik)',
-        'Writing Skills (Schreiben)',
-        'German Culture and Society',
-      ],
-      'Mandarin': [
-        'Oral Communication',
-        'Reading Comprehension',
-        'Writing and Characters',
-        'Grammar and Structure',
-        'Chinese Culture and Civilization',
+      'Life Skills Education': [
+        'Self-Awareness and Identity',
+        'Interpersonal Relationships',
+        'Decision Making and Problem Solving',
+        'Citizenship and Social Responsibility',
       ],
     },
   },
 
   'Grade 11': {
-    subjects: [], // Blocked — see GRADE_STATUS
-    strands: {},
+    subjects: [
+      'Mathematics',
+      'Essential Mathematics',
+      'English',
+      'Kiswahili',
+      'Community Service Learning',
+      'Literature in English',
+      'Fasihi ya Kiswahili',
+      'Arabic',
+      'French',
+      'German',
+      'Chinese',
+      'Indigenous Languages',
+      'Sign Language',
+      'Kenyan Sign Language',
+      'History and Citizenship',
+      'Geography',
+      'CRE',
+      'IRE',
+      'HRE',
+      'Business Studies',
+      'Biology',
+      'Chemistry',
+      'Physics',
+      'General Science',
+      'Agriculture',
+      'Computer Studies',
+      'Home Science',
+      'Aviation',
+      'Building and Construction',
+      'Electricity',
+      'Drawing and Design',
+      'Marine and Fisheries',
+      'Metalwork',
+      'Power Mechanics',
+      'Woodwork',
+      'Media Technology',
+      'Art and Design',
+      'Music and Dance',
+      'Theatre and Film',
+      'Fine Arts',
+      'Sports and Recreation',
+      'Physical Education',
+      'Life Skills Education',
+    ],
+    strands: {
+      'Mathematics': [
+        'Numbers and Algebra',
+        'Sequences and Series',
+        'Measurement and Geometry',
+        'Statistics and Probability',
+        'Financial Mathematics',
+        'Calculus (Introductory)',
+      ],
+      'Essential Mathematics': [
+        'Number and Operations',
+        'Algebra and Graphs',
+        'Measurement and Geometry',
+        'Statistics and Data Analysis',
+        'Financial Mathematics',
+      ],
+      'English': [
+        'Listening and Speaking',
+        'Reading',
+        'Writing',
+        'Language Use',
+        'Literature',
+      ],
+      'Kiswahili': [
+        'Kusikiliza na Kuzungumza',
+        'Kusoma',
+        'Kuandika',
+        'Sarufi na Matumizi ya Lugha',
+        'Fasihi',
+      ],
+      'Community Service Learning': [
+        'Community Engagement and Partnerships',
+        'Social Issues and Advocacy',
+        'Project Management',
+        'Civic Responsibility',
+      ],
+      'Literature in English': [
+        'Oral Literature and Traditions',
+        'Prose Fiction',
+        'Drama and Performance',
+        'Poetry and Versification',
+        'Critical and Creative Writing',
+      ],
+      'Fasihi ya Kiswahili': [
+        'Fasihi Simulizi ya Kina',
+        'Ushairi wa Hali ya Juu',
+        'Riwaya na Hadithi Fupi',
+        'Tamthilia',
+        'Uhakiki wa Fasihi',
+      ],
+      'Arabic': [
+        'Advanced Listening and Speaking',
+        'Reading and Text Analysis',
+        'Composition and Creative Writing',
+        'Advanced Grammar',
+        'Arabic Literature',
+      ],
+      'French': [
+        'Communication Avancée',
+        'Analyse de Textes',
+        'Composition et Rédaction',
+        'Grammaire Avancée',
+        'Littérature Française',
+      ],
+      'German': [
+        'Fortgeschrittenes Hören und Sprechen',
+        'Textanalyse',
+        'Aufsatz und Kreatives Schreiben',
+        'Fortgeschrittene Grammatik',
+        'Deutsche Literatur',
+      ],
+      'Chinese': [
+        'Advanced Listening and Speaking',
+        'Reading and Text Analysis',
+        'Advanced Writing',
+        'Advanced Grammar',
+        'Chinese Literature and Culture',
+      ],
+      'Indigenous Languages': [
+        'Advanced Listening and Speaking',
+        'Reading and Text Analysis',
+        'Writing and Composition',
+        'Advanced Grammar',
+        'Oral Literature and Folklore',
+      ],
+      'Sign Language': [
+        'Advanced Receptive Skills',
+        'Advanced Expressive Skills',
+        'Sign Language Linguistics',
+        'Interpreting Skills',
+      ],
+      'Kenyan Sign Language': [
+        'Advanced Receptive Skills',
+        'Advanced Expressive Skills',
+        'KSL Linguistics and Structure',
+        'Interpreting and Transliteration',
+      ],
+      'History and Citizenship': [
+        'Nationalism and Independence',
+        'Post-Independence Kenya',
+        'International Relations',
+        'Constitutional Development',
+        'Contemporary Issues',
+      ],
+      'Geography': [
+        'Geomorphology',
+        'Climatology',
+        'Population Geography',
+        'Urban Geography',
+        'Agriculture and Land Use',
+        'Industry and Trade',
+      ],
+      'CRE': [
+        'Christian Living and Modern Challenges',
+        'Human Sexuality and Relationships',
+        'Social Justice and Stewardship',
+        'Faith in Action',
+      ],
+      'IRE': [
+        'Advanced Quran Studies',
+        'Islamic Jurisprudence',
+        'Islamic History and Scholars',
+        'Contemporary Islamic Issues',
+      ],
+      'HRE': [
+        'Advanced Hindu Philosophy',
+        'Hindu Rituals and Festivals',
+        'Hindu Social Ethics',
+        'Contemporary Hindu Issues',
+      ],
+      'Business Studies': [
+        'Business Operations',
+        'Financial Accounting',
+        'Human Resource Management',
+        'Business Law',
+        'Trade and Commerce',
+      ],
+      'Biology': [
+        'Cell Biology and Biochemistry',
+        'Genetics and Heredity',
+        'Reproduction',
+        'Growth and Development',
+        'Regulation and Coordination',
+        'Evolution',
+        'Applied Biology',
+      ],
+      'Chemistry': [
+        'Reaction Kinetics',
+        'Chemical Equilibrium',
+        'Thermochemistry',
+        'Organic Chemistry',
+        'Industrial Chemistry',
+        'Analytical Chemistry',
+      ],
+      'Physics': [
+        'Linear and Circular Motion',
+        'Work, Energy and Power',
+        'Electromagnetism',
+        'Electronics',
+        'Radioactivity',
+        'Waves and Optics',
+      ],
+      'General Science': [
+        'Advanced Matter and Properties',
+        'Life Processes and Systems',
+        'Forces and Energy',
+        'Earth Systems and Space',
+        'Applied Science and Technology',
+      ],
+      'Agriculture': [
+        'Advanced Crop Production',
+        'Livestock Management',
+        'Soil Science',
+        'Agricultural Engineering',
+        'Farm Business Management',
+      ],
+      'Computer Studies': [
+        'Advanced Programming',
+        'Database Management',
+        'Web Technologies',
+        'Algorithms and Data Structures',
+        'Cybersecurity',
+      ],
+      'Home Science': [
+        'Advanced Food Science',
+        'Textile Technology',
+        'Household Management',
+        'Entrepreneurship in Home Science',
+      ],
+      'Aviation': [
+        'Advanced Principles of Flight',
+        'Navigation Systems',
+        'Aircraft Maintenance',
+        'Air Traffic Management',
+        'Aviation Law and Regulations',
+      ],
+      'Building and Construction': [
+        'Advanced Masonry',
+        'Roofing and Flooring',
+        'Structural Design',
+        'Electrical and Plumbing Integration',
+        'Project Management in Construction',
+      ],
+      'Electricity': [
+        'Advanced Circuit Analysis',
+        'Industrial Wiring',
+        'Electrical Machines and Motors',
+        'Renewable Energy Systems',
+        'Electrical Project Work',
+      ],
+      'Drawing and Design': [
+        'Advanced Technical Drawing',
+        'Computer-Aided Design (CAD)',
+        'Product Design',
+        'Architectural Drawing',
+        'Design Portfolio',
+      ],
+      'Marine and Fisheries': [
+        'Marine Biology',
+        'Advanced Fishing Technology',
+        'Aquaculture Management',
+        'Marine Environmental Management',
+        'Fish Processing and Value Addition',
+      ],
+      'Metalwork': [
+        'Advanced Fabrication',
+        'Welding and Joining Techniques',
+        'Machine Operations',
+        'Sheet Metal Work',
+        'Metalwork Projects',
+      ],
+      'Power Mechanics': [
+        'Advanced Engine Systems',
+        'Fuel and Lubrication Systems',
+        'Electrical Systems in Vehicles',
+        'Diagnostics and Troubleshooting',
+        'Power Mechanics Projects',
+      ],
+      'Woodwork': [
+        'Advanced Joinery',
+        'Cabinet Making',
+        'Wood Turning and Carving',
+        'Furniture Design and Construction',
+        'Woodwork Projects',
+      ],
+      'Media Technology': [
+        'Advanced Photography',
+        'Video Production and Editing',
+        'Radio and Podcast Production',
+        'Social Media and Digital Marketing',
+        'Media Law and Ethics',
+      ],
+      'Art and Design': [
+        'Advanced Drawing and Painting',
+        'Ceramics and Sculpture',
+        'Graphic Design and Typography',
+        'Fashion Design',
+        'Art Portfolio Development',
+      ],
+      'Music and Dance': [
+        'Harmony and Counterpoint',
+        'Choral Music',
+        'Instrumental Ensemble',
+        'Choreography and Dance Composition',
+        'Music and Dance Production',
+      ],
+      'Theatre and Film': [
+        'Advanced Acting Techniques',
+        'Theatre Production',
+        'Film Production and Editing',
+        'Drama and Society',
+        'Performance and Critique',
+      ],
+      'Fine Arts': [
+        'Advanced Drawing Techniques',
+        'Mixed Media and Experimental Art',
+        'Digital Art',
+        'Contemporary African Art',
+        'Art Exhibition and Critique',
+      ],
+      'Sports and Recreation': [
+        'Exercise Physiology',
+        'Sports Psychology',
+        'Coaching and Training Techniques',
+        'Sports Management',
+        'Sports Nutrition and Injury Prevention',
+      ],
+      'Physical Education': [
+        'Advanced Physical Fitness',
+        'Athletics and Track and Field',
+        'Games Strategy and Tactics',
+        'Sports Leadership and Officiating',
+        'Health and Wellness',
+      ],
+      'Life Skills Education': [
+        'Conflict Resolution',
+        'Financial Literacy and Planning',
+        'Career Guidance',
+        'Mental Health and Wellbeing',
+      ],
+    },
   },
 
   'Grade 12': {
-    subjects: [], // Blocked — see GRADE_STATUS
-    strands: {},
+    subjects: [
+      'Mathematics',
+      'Essential Mathematics',
+      'English',
+      'Kiswahili',
+      'Community Service Learning',
+      'Literature in English',
+      'Fasihi ya Kiswahili',
+      'Arabic',
+      'French',
+      'German',
+      'Chinese',
+      'Indigenous Languages',
+      'Sign Language',
+      'Kenyan Sign Language',
+      'History and Citizenship',
+      'Geography',
+      'CRE',
+      'IRE',
+      'HRE',
+      'Business Studies',
+      'Biology',
+      'Chemistry',
+      'Physics',
+      'General Science',
+      'Agriculture',
+      'Computer Studies',
+      'Home Science',
+      'Aviation',
+      'Building and Construction',
+      'Electricity',
+      'Drawing and Design',
+      'Marine and Fisheries',
+      'Metalwork',
+      'Power Mechanics',
+      'Woodwork',
+      'Media Technology',
+      'Art and Design',
+      'Music and Dance',
+      'Theatre and Film',
+      'Fine Arts',
+      'Sports and Recreation',
+      'Physical Education',
+      'Life Skills Education',
+    ],
+    strands: {
+      'Mathematics': [
+        'Advanced Algebra',
+        'Calculus',
+        'Vectors and Matrices',
+        'Statistics and Probability',
+        'Financial Mathematics',
+        'Complex Numbers',
+      ],
+      'Essential Mathematics': [
+        'Advanced Number and Operations',
+        'Applied Algebra',
+        'Advanced Measurement',
+        'Statistical Analysis',
+        'Personal Financial Management',
+      ],
+      'English': [
+        'Advanced Listening and Speaking',
+        'Critical Reading',
+        'Advanced Writing',
+        'Language and Style',
+        'Literature and Criticism',
+      ],
+      'Kiswahili': [
+        'Mawasiliano ya Hali ya Juu',
+        'Usomaji wa Kina',
+        'Uandishi wa Hali ya Juu',
+        'Sarufi ya Kina',
+        'Fasihi ya Kina',
+      ],
+      'Community Service Learning': [
+        'Social Enterprise and Innovation',
+        'Community Impact Assessment',
+        'Leadership and Change',
+        'Global Citizenship',
+      ],
+      'Literature in English': [
+        'Advanced Oral Literature',
+        'The Novel and Short Story',
+        'Advanced Drama',
+        'Advanced Poetry',
+        'Comparative Literature',
+      ],
+      'Fasihi ya Kiswahili': [
+        'Fasihi Simulizi ya Kina Zaidi',
+        'Ushairi wa Hali ya Juu Zaidi',
+        'Riwaya ya Kina',
+        'Tamthilia ya Kina',
+        'Uhakiki Linganishi wa Fasihi',
+      ],
+      'Arabic': [
+        'Advanced Arabic Communication',
+        'Classical Arabic Literature',
+        'Modern Arabic Literature',
+        'Advanced Arabic Grammar',
+        'Arabic Research and Composition',
+      ],
+      'French': [
+        'Communication de Haut Niveau',
+        'Littérature Française Avancée',
+        'Rédaction et Recherche',
+        'Grammaire de Haut Niveau',
+        'Francophonie et Mondialisation',
+      ],
+      'German': [
+        'Fortgeschrittene Kommunikation',
+        'Deutsche Literatur Vertieft',
+        'Schreiben und Forschung',
+        'Grammatik auf hohem Niveau',
+        'Deutschland und die Welt',
+      ],
+      'Chinese': [
+        'Advanced Chinese Communication',
+        'Classical Chinese Literature',
+        'Modern Chinese Literature',
+        'Advanced Chinese Grammar',
+        'China and the World',
+      ],
+      'Indigenous Languages': [
+        'Advanced Language Use',
+        'Oral Literature and Preservation',
+        'Language and Identity',
+        'Creative Writing',
+        'Language Research',
+      ],
+      'Sign Language': [
+        'Professional Sign Language',
+        'Sign Language Research',
+        'Interpreting and Translation',
+        'Deaf Community Advocacy',
+      ],
+      'Kenyan Sign Language': [
+        'Professional KSL Communication',
+        'KSL Research and Documentation',
+        'Professional Interpreting',
+        'Deaf Community Development',
+      ],
+      'History and Citizenship': [
+        'Kenya and the Global Community',
+        'Democracy and Governance',
+        'Economic Development and Planning',
+        'Human Rights and Justice',
+        'Contemporary African Issues',
+      ],
+      'Geography': [
+        'Environmental Management',
+        'Global Issues and Sustainable Development',
+        'Advanced Map Work and GIS',
+        'Transport and Trade',
+        'Regional Studies',
+      ],
+      'CRE': [
+        'Christian Responses to Contemporary Issues',
+        'Peace and Justice',
+        'Christian Vocation and Service',
+        'Interfaith Dialogue',
+      ],
+      'IRE': [
+        'Advanced Islamic Jurisprudence',
+        'Islamic Economics and Finance',
+        'Islam and Contemporary Issues',
+        'Islamic Research and Scholarship',
+      ],
+      'HRE': [
+        'Advanced Hindu Philosophy',
+        'Hindu Responses to Contemporary Issues',
+        'Hinduism and World Religions',
+        'Hindu Research and Scholarship',
+      ],
+      'Business Studies': [
+        'Advanced Financial Management',
+        'Strategic Management',
+        'Global Business',
+        'Business Innovation and Entrepreneurship',
+      ],
+      'Biology': [
+        'Molecular Biology and Biotechnology',
+        'Ecology and Conservation',
+        'Applied Genetics',
+        'Human Physiology',
+        'Evolution and Biodiversity',
+        'Environmental Biology',
+      ],
+      'Chemistry': [
+        'Advanced Organic Chemistry',
+        'Environmental and Green Chemistry',
+        'Advanced Electrochemistry',
+        'Chemical Analysis',
+        'Industrial Processes',
+        'Nanochemistry (Introduction)',
+      ],
+      'Physics': [
+        'Advanced Mechanics',
+        'Electromagnetism and Electronics',
+        'Nuclear Physics',
+        'Astrophysics (Introduction)',
+        'Quantum Physics (Introduction)',
+        'Applied Physics',
+      ],
+      'General Science': [
+        'Science Research Methods',
+        'Environmental Science',
+        'Applied Physics and Chemistry',
+        'Life Sciences and Biotechnology',
+        'Science, Technology and Society',
+      ],
+      'Agriculture': [
+        'Farm Enterprise Management',
+        'Sustainable Agriculture',
+        'Value Addition and Agribusiness',
+        'Research and Innovation in Agriculture',
+      ],
+      'Computer Studies': [
+        'Advanced Programming',
+        'Artificial Intelligence (Introductory)',
+        'Cloud Computing',
+        'Software Engineering',
+        'Data Science Fundamentals',
+      ],
+      'Home Science': [
+        'Advanced Nutrition and Dietetics',
+        'Fashion Design and Technology',
+        'Home-Based Enterprise',
+        'Community Development',
+      ],
+      'Aviation': [
+        'Commercial Aviation Operations',
+        'Advanced Navigation',
+        'Aviation Business Management',
+        'Safety Management Systems',
+        'Aviation Research Project',
+      ],
+      'Building and Construction': [
+        'Advanced Structural Work',
+        'Interior Finishing',
+        'Construction Project Management',
+        'Sustainable Building Practices',
+        'Construction Research Project',
+      ],
+      'Electricity': [
+        'Advanced Industrial Electricity',
+        'Solar and Renewable Energy',
+        'Smart Electrical Systems',
+        'Electrical Entrepreneurship',
+        'Electrical Research Project',
+      ],
+      'Drawing and Design': [
+        'Advanced CAD and Digital Design',
+        'Industrial Design',
+        'Environmental and Spatial Design',
+        'Design Entrepreneurship',
+        'Design Research Project',
+      ],
+      'Marine and Fisheries': [
+        'Advanced Aquaculture',
+        'Marine Conservation',
+        'Fish Business and Entrepreneurship',
+        'Marine Research Methods',
+        'Marine and Fisheries Project',
+      ],
+      'Metalwork': [
+        'Advanced Welding',
+        'Precision Engineering',
+        'Metal Fabrication Projects',
+        'Metalwork Entrepreneurship',
+        'Research and Innovation in Metalwork',
+      ],
+      'Power Mechanics': [
+        'Advanced Automotive Systems',
+        'Heavy Equipment Mechanics',
+        'Power Mechanics Entrepreneurship',
+        'Environmental Considerations',
+        'Power Mechanics Research Project',
+      ],
+      'Woodwork': [
+        'Advanced Furniture Making',
+        'Wood Technology',
+        'Woodwork Entrepreneurship',
+        'Sustainable Wood Use',
+        'Woodwork Research Project',
+      ],
+      'Media Technology': [
+        'Advanced Film and TV Production',
+        'Digital Marketing and Branding',
+        'Media Entrepreneurship',
+        'Media Research and Analysis',
+        'Media Technology Project',
+      ],
+      'Art and Design': [
+        'Professional Studio Practice',
+        'Art and Design Entrepreneurship',
+        'Community Art and Design',
+        'Art Research and Criticism',
+        'Final Art Portfolio',
+      ],
+      'Music and Dance': [
+        'Music Composition and Arrangement',
+        'Professional Performance',
+        'Music and Dance Entrepreneurship',
+        'Music Technology',
+        'Music and Dance Research Project',
+      ],
+      'Theatre and Film': [
+        'Professional Theatre Production',
+        'Advanced Film Making',
+        'Theatre and Film Entrepreneurship',
+        'Theatre Research and Criticism',
+        'Final Theatre or Film Project',
+      ],
+      'Fine Arts': [
+        'Professional Art Practice',
+        'Art Entrepreneurship',
+        'Community and Public Art',
+        'Advanced Art Research',
+        'Final Art Exhibition',
+      ],
+      'Sports and Recreation': [
+        'Advanced Sports Science',
+        'Sports Business and Entrepreneurship',
+        'Sports Research Methods',
+        'Community Sports Development',
+        'Sports Career Pathways',
+      ],
+      'Physical Education': [
+        'Advanced Sports Performance',
+        'Sports Science and Research',
+        'PE Leadership and Teaching',
+        'Sports Entrepreneurship',
+        'Health Promotion and Community Fitness',
+      ],
+      'Life Skills Education': [
+        'Entrepreneurship and Innovation',
+        'Civic Education and Governance',
+        'Global Citizenship',
+        'Transition to Adulthood',
+      ],
+    },
   },
 }
 
-// ── Substrands ────────────────────────────────────────────────────────────────
+// Sub-strands mapped to strands
 export const SUBSTRANDS = {
   // Mathematics
-  'Numbers': [
-    'Integers and Rational Numbers', 'Surds and Indices',
-    'Logarithms', 'Commercial Arithmetic', 'Sequences and Series',
-  ],
-  'Algebra': [
-    'Algebraic Expressions', 'Linear Equations and Inequalities',
-    'Quadratic Equations', 'Simultaneous Equations', 'Polynomials',
-  ],
-  'Geometry': [
-    'Angles and Triangles', 'Circle Theorems', 'Constructions',
-    'Transformation', 'Coordinate Geometry', 'Vectors',
-  ],
-  'Measurements': [
-    'Area and Perimeter', 'Volume and Surface Area',
-    'Scale Drawing and Maps', 'Trigonometry', 'Bearings',
-  ],
-  'Statistics and Probability': [
-    'Data Representation', 'Measures of Central Tendency',
-    'Measures of Dispersion', 'Probability', 'Set Theory',
-  ],
+  'Numbers and Algebra': ['Indices and Logarithms', 'Quadratic Equations', 'Inequalities', 'Simultaneous Equations', 'Polynomials'],
+  'Sequences and Series': ['Arithmetic Progressions', 'Geometric Progressions', 'Binomial Theorem', 'Sum to Infinity'],
+  'Measurement and Geometry': ['Trigonometry', 'Circles and Chords', 'Vectors in 2D and 3D', 'Transformation Geometry', 'Constructions'],
+  'Statistics and Probability': ['Measures of Central Tendency', 'Measures of Dispersion', 'Probability Theory', 'Distributions', 'Data Representation'],
+  'Financial Mathematics': ['Commercial Arithmetic', 'Simple and Compound Interest', 'Annuities and Investments', 'Depreciation'],
+  'Calculus (Introductory)': ['Limits and Continuity', 'Differentiation', 'Integration', 'Applications of Calculus'],
+  'Calculus': ['Advanced Differentiation', 'Advanced Integration', 'Differential Equations', 'Applications'],
+  'Advanced Algebra': ['Complex Numbers', 'Matrices and Determinants', 'Partial Fractions', 'Mathematical Induction'],
+  'Vectors and Matrices': ['Matrix Operations', 'Determinants and Inverses', 'Transformations', 'Linear Equations'],
 
-  // Biology
-  'Introduction to Biology': [
-    'Branches of Biology', 'Careers in Biology',
-    'Biological Equipment and Safety', 'Scientific Method in Biology',
-  ],
-  'Cell Biology': [
-    'Cell Structure and Function', 'Cell Types (Prokaryotic and Eukaryotic)',
-    'Cell Division', 'Microscopy and Laboratory Techniques',
-    'Levels of Organization', 'Specialized Cells',
-  ],
-  'Classification of Living Things': [
-    'Principles of Classification', 'Kingdom Monera and Fungi',
-    'Kingdom Plantae', 'Kingdom Animalia', 'Binomial Nomenclature',
-  ],
-  'Nutrition in Plants and Animals': [
-    'Photosynthesis', 'Mineral Salts in Plants',
-    'Human Digestive System', 'Digestion and Absorption',
-    'Balanced Diet and Malnutrition',
-  ],
-  'Gaseous Exchange and Respiration': [
-    'Aerobic and Anaerobic Respiration', 'Human Respiratory System',
-    'Gaseous Exchange in Plants', 'Breathing Mechanism',
-  ],
-  'Transport in Animals and Plants': [
-    'Blood and Blood Groups', 'The Human Heart',
-    'Circulatory System', 'Lymphatic System',
-    'Transpiration and Osmosis', 'Absorption in Roots',
-  ],
-  'Excretion in Animals and Plants': [
-    'Human Excretory System', 'Kidney Structure and Function',
-    'Excretion in Plants', 'Homeostasis',
-  ],
-  'Reproduction in Plants and Animals': [
-    'Sexual and Asexual Reproduction', 'Pollination and Fertilization',
-    'Human Reproductive System', 'Sexually Transmitted Infections',
-    'Seed Germination',
-  ],
-  'Ecology and Environment': [
-    'Ecosystems and Food Chains', 'Biodiversity and Conservation',
-    'Human Activities and the Environment', 'Pollution',
-  ],
-
-  // Chemistry
-  'Introduction to Chemistry': [
-    'Branches and Careers in Chemistry', 'Laboratory Safety',
-    'Apparatus and Measurements', 'Applications of Chemistry',
-  ],
-  'States of Matter': [
-    'Properties of Solids, Liquids and Gases', 'Changes of State',
-    'Diffusion and Brownian Motion',
-  ],
-  'Atomic Structure': [
-    'Sub-atomic Particles', 'Atomic Number and Mass Number',
-    'Electron Configuration', 'Isotopes and Their Uses',
-  ],
-  'The Periodic Table': [
-    'Periods and Groups', 'Trends in the Periodic Table',
-    'Alkali Metals', 'Halogens', 'Noble Gases', 'Transition Metals',
-  ],
-  'Chemical Bonding': [
-    'Ionic Bonding', 'Covalent Bonding', 'Metallic Bonding',
-    'Chemical Formulae', 'Balancing Equations',
-  ],
-  'Acids, Bases and Salts': [
-    'Properties of Acids and Bases', 'pH Scale',
-    'Neutralization Reactions', 'Preparation of Salts',
-  ],
-  'Organic Chemistry': [
-    'Alkanes and Alkenes', 'Alcohols and Carboxylic Acids',
-    'Polymers', 'Fuels and Energy',
-  ],
-
-  // Physics
-  'Introduction to Physics': [
-    'Branches and Careers in Physics', 'Measurement and SI Units',
-    'Scalar and Vector Quantities', 'Scientific Notation',
-  ],
-  'Mechanics': [
-    'Velocity and Acceleration', 'Newton\'s Laws of Motion',
-    'Friction and Circular Motion', 'Work, Energy and Power',
-    'Simple Machines', 'Elasticity and Hooke\'s Law',
-  ],
-  'Pressure in Solids, Liquids and Gases': [
-    'Pressure in Solids', 'Pressure in Fluids',
-    'Atmospheric Pressure', 'Pascal\'s Principle',
-    'Archimedes\' Principle', 'Boyle\'s Law',
-  ],
-  'Thermal Physics': [
-    'Temperature and Heat', 'Thermal Expansion',
-    'Heat Transfer', 'Gas Laws',
-  ],
-  'Electricity and Magnetism': [
-    'Static Electricity', 'Electric Current and Circuits',
-    'Ohm\'s Law', 'Magnetism', 'Electromagnetic Induction',
-  ],
-
-  // Applied Agriculture
-  'Land and Its Uses': [
-    'Types of Land Tenure', 'Land Evaluation',
-    'Factors Affecting Land Productivity', 'Sustainable Land Use',
-  ],
-  'Soil Science': [
-    'Soil Formation and Profile', 'Soil Texture and Structure',
-    'Soil pH and Fertility', 'Soil Erosion and Conservation',
-    'Soil Water',
-  ],
-  'Crop Production and Management': [
-    'Field Crop Production', 'Horticultural Crops',
-    'Crop Pests and Diseases', 'Organic Farming',
-  ],
-  'Land Preparation and Planting': [
-    'Primary and Secondary Cultivation', 'Conservation Tillage',
-    'Planting Methods and Spacing', 'Seedbed Preparation',
-  ],
-  'Crop Nursery Management': [
-    'Nursery Site Selection', 'Nursery Bed Preparation',
-    'Transplanting', 'Seedling Care',
-  ],
-  'Livestock Production': [
-    'Cattle Breeds and Management', 'Poultry Farming',
-    'Goat and Sheep Farming', 'Feeds and Feeding',
-    'Animal Diseases and Health',
-  ],
-
-  // Geography
-  'Introduction to Geography': [
-    'Branches of Geography', 'Importance of Geography',
-    'Geography and Careers', 'Geography and Other Subjects',
-  ],
-  'Map Work and Fieldwork': [
-    'Types of Maps', 'Map Reading and Interpretation',
-    'Grid References', 'Relief Representation',
-    'Field Data Collection Methods',
-  ],
-  'Internal Land-forming Processes': [
-    'Plate Tectonics', 'Volcanicity',
-    'Faulting and Folding', 'Earthquakes', 'Features of East African Rift Valley',
-  ],
-  'External Land-forming Processes': [
-    'River Processes and Features', 'Wind Erosion and Deposition',
-    'Glaciation', 'Marine Action', 'Weathering Types',
-  ],
-  'Weather and Climate': [
-    'Elements of Weather', 'Climate Types in Kenya',
-    'Factors Influencing Climate', 'Climate Change',
-    'Measuring Weather Elements',
-  ],
-  'Water and Drainage': [
-    'Water Cycle', 'River Systems', 'Lakes in Kenya',
-    'Water Resources and Management', 'Underground Water',
-  ],
-  'Population and Settlement': [
-    'Population Distribution', 'Population Growth',
-    'Migration', 'Settlement Patterns', 'Urbanization',
-  ],
-
-  // History & Citizenship
-  'Peoples and Cultures of Kenya': [
-    'Cushitic Peoples', 'Bantu Peoples', 'Nilotic Peoples',
-    'Migration into Kenya', 'Cultural Diversity and Cohesion',
-  ],
-  'Colonialism and Resistance in Kenya': [
-    'Establishment of Colonial Rule', 'Colonial Administrative Systems',
-    'African Resistance to Colonial Rule', 'Economic Impact of Colonialism',
-  ],
-  'The Struggle for Independence': [
-    'Rise of Nationalism', 'Political Parties', 'Lancaster House Conferences',
-    'The Road to Independence 1963',
-  ],
-  'Independent Kenya': [
-    'Post-Independence Challenges', 'Economic Development',
-    'Constitutional Changes', 'Kenya\'s Foreign Policy',
-  ],
-  'Governance and Democracy': [
-    'Structure of Government', 'The Constitution of Kenya 2010',
-    'Elections and Electoral Process', 'IEBC and Electoral Management',
-    'Devolution in Kenya',
-  ],
-  'Public Resources and Citizenship': [
-    'Types of Public Resources', 'Importance of Public Resources',
-    'Sustainable Use of Public Resources', 'Responsible Citizenship',
-    'Rights and Responsibilities',
-  ],
-
-  // CRE
-  'The Bible': [
-    'Books of the Old Testament', 'Books of the New Testament',
-    'The Bible as Word of God', 'Literary Forms in the Bible',
-    'How to Study the Bible',
-  ],
-  'Creation and the Environment': [
-    'The Creation Narrative', 'The Fall of Man',
-    'Human Stewardship of the Environment', 'Environmental Conservation',
-  ],
-  'The Exodus and the Covenant': [
-    'Moses and the Plagues of Egypt', 'The Passover',
-    'The Exodus Journey', 'The Sinai Covenant',
-    'The Ten Commandments',
-  ],
-  'The Life and Teachings of Jesus Christ': [
-    'The Infancy of Jesus', 'The Galilean Ministry',
-    'The Miracles of Jesus', 'Parables of Jesus',
-    'The Passion, Death and Resurrection',
-  ],
-  'Christian Living and Ethics': [
-    'The Holy Spirit and the Church', 'Christian Values',
-    'Social Justice and Service', 'Stewardship',
-  ],
-
-  // IRE
-  'The Quran (Al-Quran)': [
-    'Compilation of the Quran', 'Diacriticalisation',
-    'Types of Quranic Verses', 'Asbabu al-nuzuul', 'Tajweed Rules',
-  ],
-  'Hadith and Sunnah': [
-    'Definition and Types of Hadith', 'Isnad and Matn',
-    'Qualities of a Muhaddith', 'Importance of Hadith',
-  ],
-  'Pillars of Islam (Arkan-ul-Islam)': [
-    'Shahadah', 'Salah', 'Zakat', 'Sawm', 'Hajj',
-  ],
-  'Islamic Ethics and Social Teachings': [
-    'Character and Conduct (Akhlaq)', 'Family Values in Islam',
-    'Responsibilities to Society', 'Islamic Economic Ethics',
-  ],
-
-  // HRE
-  'Hinduism — Trimurti and Dashavatars': [
-    'Brahma, Vishnu and Shiva', 'The Ten Avatars of Vishnu',
-    'Lessons from Dashavatars', 'Hindu Worship and Rituals',
-  ],
-  'Jainism — Tirthankaras': [
-    'The Twenty-Four Tirthankaras', 'Contributions of Tirthankaras',
-    'Jain Principles: Ahimsa, Satya, Asteya', 'Jain Way of Life',
-  ],
-  'Buddhism — Teachings of Buddha': [
-    'Life of Siddhartha Gautama', 'The Four Noble Truths',
-    'The Eightfold Path', 'Paramitmas', 'Buddhist Social Ethics',
-  ],
-
-  // Business Studies
-  'Money and Its Functions': [
-    'Functions of Money', 'Kenyan Currency Features',
-    'Supply and Demand for Money', 'Role of Central Bank of Kenya',
-  ],
-  'Financial Goals and Planning': [
-    'Setting SMART Financial Goals', 'Short-term and Long-term Goals',
-    'Ethical Practices in Finance', 'Financial Decision Making',
-  ],
-  'Budgeting in Business': [
-    'Importance of Budgeting', 'Types of Budgets',
-    'Preparing a Business Budget', 'Surplus and Deficit Budgets',
-  ],
-  'Banking and Financial Institutions': [
-    'Types of Bank Accounts', 'Banking Services in Kenya',
-    'Mobile Money Services', 'Credit and Loans', 'Trends in Banking',
-  ],
+  // Essential Mathematics
+  'Number and Operations': ['Whole Numbers and Integers', 'Fractions and Decimals', 'Percentages', 'Ratios and Proportions'],
+  'Data Handling': ['Data Collection', 'Tables and Charts', 'Measures of Central Tendency', 'Interpretation of Data'],
 
   // English
-  'Listening and Speaking': [
-    'Oral Presentations', 'Listening Comprehension',
-    'Pronunciation and Fluency', 'Debate and Discussion',
-  ],
-  'Reading Comprehension': [
-    'Comprehension Strategies', 'Summary Writing',
-    'Vocabulary in Context', 'Reading for Information',
-  ],
-  'Grammar and Language Use': [
-    'Parts of Speech', 'Tenses and Aspect', 'Sentence Structure',
-    'Punctuation and Spelling', 'Direct and Reported Speech',
-  ],
-  'Writing Skills': [
-    'Creative Writing', 'Formal and Informal Letters',
-    'Report Writing', 'Essay Writing', 'Summary Writing',
-  ],
-
-  // Literature in English
-  'Oral Literature': [
-    'Folktales and Myths', 'Proverbs and Riddles',
-    'Songs and Chants', 'Characteristics of Oral Literature',
-  ],
-  'Drama and Play': [
-    'Elements of Drama', 'Themes in Drama',
-    'Characterization', 'Stage Directions',
-  ],
-  'Poetry': [
-    'Forms of Poetry', 'Poetic Devices', 'Themes in Poetry',
-    'Interpretation of Poems',
-  ],
-  'Prose and Novel': [
-    'Plot and Setting', 'Characterization', 'Themes and Issues',
-    'Narrative Techniques',
-  ],
+  'Listening and Speaking': ['Oral Presentation', 'Listening Comprehension', 'Discussion and Debate', 'Public Speaking'],
+  'Reading': ['Comprehension Skills', 'Skimming and Scanning', 'Inference and Deduction', 'Critical Reading'],
+  'Writing': ['Composition Writing', 'Summary Writing', 'Letter and Report Writing', 'Creative Writing'],
+  'Language Use': ['Grammar and Syntax', 'Vocabulary Development', 'Punctuation', 'Style and Register'],
+  'Literature': ['Prose Analysis', 'Drama Analysis', 'Poetry Analysis', 'Literary Devices'],
 
   // Kiswahili
-  'Kusikiliza na Kuzungumza': [
-    'Uwasilishaji wa Mdomo', 'Kusikiliza kwa Makini',
-    'Mazungumzo na Mdahalo',
-  ],
-  'Kusoma': [
-    'Ufahamu wa Kusoma', 'Mkakati wa Kusoma',
-    'Muhtasari wa Maandishi',
-  ],
-  'Sarufi na Matumizi ya Lugha': [
-    'Nomino na Vivumishi', 'Vitenzi na Nyakati',
-    'Sentensi na Muundo Wake', 'Viunganishi',
-  ],
-  'Kuandika': [
-    'Insha ya Ubunifu', 'Barua Rasmi na Zisizo Rasmi',
-    'Ripoti na Taarifa', 'Muhtasari',
-  ],
+  'Kusikiliza na Kuzungumza': ['Uwasiliano wa Mdomo', 'Mazungumzo na Mijadala', 'Hotuba na Uwasilishaji', 'Kusikiliza kwa Makini'],
+  'Kusoma': ['Ufahamu wa Kusoma', 'Kusoma kwa Haraka', 'Uchambuzi wa Maandishi', 'Kusoma kwa Kina'],
+  'Kuandika': ['Insha', 'Muhtasari', 'Barua na Ripoti', 'Uandishi wa Ubunifu'],
+  'Sarufi na Matumizi ya Lugha': ['Sarufi ya Kiswahili', 'Msamiati', 'Alama za Uakifishaji', 'Rejista na Mtindo'],
+  'Fasihi': ['Ushairi', 'Hadithi Fupi', 'Riwaya', 'Tamthilia', 'Vipengele vya Fasihi'],
 
-  // Fasihi ya Kiswahili
-  'Fasihi Simulizi': [
-    'Hadithi za Kimapokeo', 'Methali na Vitendawili',
-    'Nyimbo za Kimapokeo', 'Sifa za Fasihi Simulizi',
-  ],
-  'Mashairi': [
-    'Aina za Mashairi', 'Vipengele vya Mashairi',
-    'Dhamira za Mashairi', 'Uchanganuzi wa Mashairi',
-  ],
+  // Biology
+  'Cell Biology': ['Cell Structure and Function', 'Cell Division (Mitosis and Meiosis)', 'Cell Transport', 'Biochemical Reactions'],
+  'Cell Biology and Biochemistry': ['Biomolecules', 'Enzyme Action', 'ATP and Energy', 'Metabolic Pathways'],
+  'Genetics and Heredity': ['Mendelian Genetics', 'Dihybrid Cross', 'Linkage and Sex-Linked Traits', 'Genetic Disorders'],
+  'Reproduction': ['Sexual Reproduction in Humans', 'Reproduction in Plants', 'Fertilisation and Development', 'Reproductive Health'],
+  'Regulation and Coordination': ['Nervous System', 'Endocrine System', 'Homeostasis', 'Receptors and Effectors'],
+  'Ecology': ['Ecosystems and Biomes', 'Food Webs and Energy Flow', 'Population Ecology', 'Conservation Biology'],
+  'Molecular Biology and Biotechnology': ['DNA Structure and Replication', 'Protein Synthesis', 'Genetic Engineering', 'Biotechnology Applications'],
+  'Nutrition': ['Types of Nutrients', 'Digestion and Absorption', 'Malnutrition and Deficiency Diseases', 'Balanced Diet'],
+  'Gaseous Exchange': ['Structure of Respiratory System', 'Mechanism of Breathing', 'Gas Exchange in Plants', 'Respiratory Diseases'],
+  'Transport and Excretion': ['Blood and Blood Groups', 'Heart and Circulation', 'Excretory Organs', 'Kidney Function'],
 
-  // ICT / Computer Studies
-  'Introduction to ICT': [
-    'Definition and Uses of ICT', 'ICT Devices and Functions',
-    'Impact of ICT on Society',
-  ],
-  'Computer Hardware and Software': [
-    'Input and Output Devices', 'Storage Devices',
-    'System and Application Software', 'Computer Maintenance',
-  ],
-  'Operating Systems': [
-    'Functions of an OS', 'Types of Operating Systems',
-    'File Management', 'User Interface',
-  ],
-  'Word Processing Applications': [
-    'Creating and Formatting Documents', 'Tables and Graphics',
-    'Mail Merge', 'Document Security',
-  ],
-  'Spreadsheet Applications': [
-    'Creating Spreadsheets', 'Formulas and Functions',
-    'Charts and Graphs', 'Data Analysis',
-  ],
-  'Internet and Email Communication': [
-    'Internet Browsing', 'Email Etiquette',
-    'Social Media', 'Online Safety',
-  ],
-  'Digital Safety and Cyber Security': [
-    'Cyberbullying', 'Data Privacy',
-    'Malware and Viruses', 'Safe Internet Use',
-  ],
+  // Chemistry
+  'Atomic Structure and Periodic Table': ['Atomic Models', 'Electronic Configuration', 'Periodic Trends', 'Chemical Families'],
+  'Acids, Bases and Salts': ['pH and Indicators', 'Titration and Neutralisation', 'Salt Formation', 'Buffer Solutions'],
+  'Stoichiometry': ['Mole Concept', 'Empirical Formulae', 'Limiting Reagent', 'Yield Calculations'],
+  'Organic Chemistry': ['Hydrocarbons', 'Functional Groups', 'Reactions of Organic Compounds', 'Polymers'],
+  'Reaction Kinetics': ['Rate of Reaction', 'Factors Affecting Rate', 'Activation Energy', 'Catalysis'],
+  'Chemical Equilibrium': ["Le Chatelier's Principle", 'Equilibrium Constant', 'Industrial Applications', 'Ionic Equilibria'],
+  'Thermochemistry': ['Enthalpy Changes', "Hess's Law", 'Bond Energies', 'Calorimetry'],
+  'Electrochemistry': ['Electrolysis', 'Electrochemical Cells', 'Electrode Potentials', 'Industrial Applications'],
+  'Environmental Chemistry': ['Water Treatment', 'Air Pollution', 'Soil Chemistry', 'Green Chemistry'],
 
-  // CSL
-  'Introduction to Community Service Learning': [
-    'Definition and Principles of CSL', 'CSL vs Community Service',
-    'Benefits of CSL',
-  ],
-  'Planning CSL Projects': [
-    'Identifying Community Needs', 'Setting CSL Objectives',
-    'Planning Activities and Resources',
-  ],
-  'Leadership and Teamwork in CSL': [
-    'Leadership Styles', 'Roles in a CSL Team',
-    'Conflict Resolution', 'Responsible Citizenship',
-  ],
+  // Physics
+  'Mechanics': ["Newton's Laws of Motion", 'Momentum and Impulse', 'Work, Energy and Power', 'Projectile Motion'],
+  'Linear and Circular Motion': ['Equations of Motion', 'Circular Motion', 'Angular Velocity', 'Centripetal Force'],
+  'Electromagnetism': ['Magnetic Fields', 'Electromagnetic Induction', 'AC and DC Circuits', 'Transformers'],
+  'Waves': ['Wave Properties', 'Sound Waves', 'Electromagnetic Spectrum', 'Interference and Diffraction'],
+  'Radioactivity': ['Nuclear Structure', 'Types of Radiation', 'Half-Life', 'Nuclear Reactions and Safety'],
+  'Electronics': ['Semiconductors', 'Diodes and Transistors', 'Logic Gates', 'Amplifiers'],
+  'Thermal Physics': ['Heat and Temperature', 'Thermodynamic Processes', 'Heat Transfer', 'Gas Laws'],
+  'Optics': ['Reflection of Light', 'Refraction and Lenses', 'Optical Instruments', 'Dispersion of Light'],
+
+  // History
+  'Pre-Colonial African History': ['African Political Systems', 'Trade and Economy', 'Social Organisation', 'African Religions'],
+  'Colonial History of Kenya': ['European Exploration', 'Establishment of Colonial Rule', 'African Resistance', 'Colonial Economic Policies'],
+  'Nationalism and Independence': ['African Nationalism', 'Kenya African Union', 'Mau Mau', 'Independence Negotiations'],
+  'Post-Independence Kenya': ['Constitutional Developments', 'Political Parties', 'Economic Policies', 'Social Development'],
+  'Governance and Citizenship': ['Structures of Government', 'Rights and Responsibilities', 'Rule of Law', 'Democratic Governance'],
+  'International Relations': ['Kenya and East Africa', 'Kenya and the African Union', 'Kenya and the United Nations', 'Foreign Policy'],
+  'Contemporary Issues': ['Ethnic Relations', 'Environmental Challenges', 'Technology and Society', 'Globalisation'],
+
+  // Geography
+  'Physical Geography': ['Plate Tectonics', 'Rocks and Minerals', 'Rivers and Valleys', 'Coastal Landforms'],
+  'Climatology': ['Weather Systems', 'Climate Zones', 'Climate Change', 'Meteorological Instruments'],
+  'Population Geography': ['Population Growth', 'Migration', 'Urbanisation', 'Population Policies'],
+  'Map Work and Fieldwork': ['Topographic Maps', 'Geographical Coordinates', 'Data Collection', 'GIS Introduction'],
+  'Geomorphology': ['Weathering and Erosion', 'Glaciation', 'Desert Landforms', 'Karst Topography'],
+  'Human Geography': ['Settlement Patterns', 'Land Use', 'Economic Activities', 'Cultural Geography'],
+  'Environmental Geography': ['Natural Resources', 'Environmental Degradation', 'Conservation', 'Sustainable Development'],
+  'Agriculture and Land Use': ['Types of Farming', 'Irrigation and Water Use', 'Land Reform', 'Food Security'],
+  'Industry and Trade': ['Types of Industries', 'Industrial Location', 'International Trade', 'Economic Blocs'],
+  'Environmental Management': ['Pollution Management', 'Wildlife Conservation', 'Forestry Management', 'Water Resource Management'],
+
+  // Business Studies
+  'Business Concepts and Environment': ['Nature of Business', 'Business Environment', 'Forms of Business Ownership', 'Business Objectives'],
+  'Entrepreneurship': ['Entrepreneurial Traits', 'Business Opportunities', 'Business Plan', 'Start-Up Challenges'],
+  'Financial Accounting': ['Double Entry Bookkeeping', 'Final Accounts', 'Bank Reconciliation', 'Interpretation of Accounts'],
+  'Financial Literacy': ['Personal Finance', 'Budgeting', 'Investment Options', 'Taxation'],
+  'Marketing': ['Market Research', 'Marketing Mix', 'Consumer Behaviour', 'Digital Marketing'],
+  'Office Management': ['Office Organisation', 'Communication in Business', 'Record Keeping', 'Office Technology'],
+  'Business Operations': ['Production Management', 'Supply Chain', 'Quality Management', 'Inventory Control'],
+
+  // Agriculture
+  'Crop Production': ['Crop Ecology', 'Land Preparation', 'Planting and Spacing', 'Crop Management and Harvesting'],
+  'Animal Production': ['Livestock Selection', 'Animal Nutrition', 'Animal Health', 'Livestock Records'],
+  'Soil and Water Management': ['Soil Formation and Types', 'Soil Fertility', 'Irrigation Methods', 'Drainage and Conservation'],
+  'Agricultural Economics': ['Farm Planning', 'Costs and Returns', 'Agricultural Marketing', 'Credit and Finance'],
+  'Farm Structures and Mechanisation': ['Farm Layouts', 'Farm Buildings', 'Agricultural Tools', 'Machinery Maintenance'],
+
+  // Computer Studies
+  'Computer Systems': ['Hardware Components', 'Software Types', 'Operating Systems', 'Computer Maintenance'],
+  'Programming Fundamentals': ['Problem Solving', 'Algorithms and Flowcharts', 'Coding Basics', 'Debugging'],
+  'Data and Information Management': ['Data Types', 'Spreadsheets', 'Databases', 'Data Security'],
+  'Networks and the Internet': ['Network Types', 'Internet Services', 'Email and Communication', 'Cloud Computing'],
+  'Digital Citizenship and Ethics': ['Online Safety', 'Intellectual Property', 'Digital Footprint', 'Responsible Technology Use'],
+
+  // Home Science
+  'Food and Nutrition': ['Nutrients and Functions', 'Meal Planning', 'Food Preparation', 'Food Safety and Hygiene'],
+  'Clothing and Textiles': ['Fibres and Fabrics', 'Sewing Techniques', 'Garment Construction', 'Laundry and Care'],
+  'Housing and Home Management': ['Home Organisation', 'Interior Design', 'Home Safety', 'Home Maintenance'],
+  'Family Health': ['Personal Hygiene', 'Common Illnesses', 'First Aid', 'Family Planning'],
+
+  // CRE
+  'The Old Testament': ['The Holy Bible', 'The Exodus', 'The Sinai Covenant', 'Loyalty to God (Elijah)', 'Old Testament Prophets and Prophet Amos'],
+  'The New Testament': ['New Testament Books', 'Infancy and Early Life of Jesus Christ', 'Galilean Ministry', "Paul's First Letter to the Corinthians"],
+  'Church in Action': ['The Holy Spirit and Gifts of the Holy Spirit', 'The Holy Trinity', 'Sacraments'],
+  'Christian Living Today': ['Christian Ethics', 'Human Rights and Gender-Based Violence', 'Human Sexuality', 'Marriage and Family', 'Christian Response to Medicine and Technology'],
+
+  // IRE
+  'Quran and Hadith': ['Quranic Recitation and Memorisation', 'Interpretation of Quran', 'Hadith Collection', 'Application of Hadith'],
+  'Pillars of Islam': ['Shahada', 'Salah', 'Zakat', 'Sawm', 'Hajj'],
+  'Islamic History and Civilization': ['Early Islamic History', 'Islamic Golden Age', 'Islamic Scholars', 'Islam in East Africa'],
+  'Islamic Ethics and Values': ['Moral Values', 'Family Life in Islam', 'Social Justice', 'Islamic Economics'],
+
+  // Aviation
+  'Introduction to Aviation': ['History of Aviation', 'Types of Aircraft', 'Aviation Industry', 'Career Opportunities in Aviation'],
+  'Principles of Flight': ['Lift and Thrust', 'Drag and Weight', 'Aircraft Performance', 'Flight Controls'],
+  'Aircraft Systems': ['Airframe', 'Propulsion Systems', 'Hydraulics', 'Avionics'],
+  'Air Navigation and Meteorology': ['Navigation Instruments', 'Charts and Maps', 'Weather Patterns', 'Meteorological Hazards'],
+  'Aviation Safety and Regulations': ['Safety Procedures', 'Emergency Protocols', 'KCAA Regulations', 'ICAO Standards'],
+
+  // Building and Construction
+  'Building Materials and Tools': ['Bricks and Mortar', 'Concrete and Steel', 'Timber and Roofing Materials', 'Hand Tools and Power Tools'],
+  'Site Preparation and Foundation': ['Site Surveying', 'Excavation', 'Foundation Types', 'Drainage Systems'],
+  'Masonry and Carpentry': ['Bricklaying', 'Blockwork', 'Timber Framing', 'Doors and Windows'],
+  'Plumbing and Drainage': ['Pipe Systems', 'Water Supply', 'Waste Disposal', 'Sanitation Systems'],
+
+  // Electricity
+  'Electrical Theory and Principles': ['Current, Voltage and Resistance', "Ohm's Law", 'Series and Parallel Circuits', 'Electrical Power'],
+  'Electrical Wiring and Installation': ['Domestic Wiring', 'Switchgear and Controls', 'Safety Devices', 'Wiring Diagrams'],
+  'Electrical Machines': ['Electric Motors', 'Generators', 'Transformers', 'Motor Maintenance'],
 
   // Physical Education
-  'Athletics and Track Events': [
-    'Running Techniques', 'Relay Races',
-    'Hurdles', 'Rules and Safety in Athletics',
-  ],
-  'Ball Games and Team Sports': [
-    'Football and Volleyball', 'Basketball and Netball',
-    'Hockey', 'Team Tactics and Rules',
-  ],
-  'Health and Fitness': [
-    'Physical Fitness Components', 'Exercise and Health',
-    'Nutrition and Sport', 'First Aid in Sports',
-  ],
+  'Physical Fitness and Health': ['Components of Fitness', 'Exercise and Health', 'Body Composition', 'Fitness Testing'],
+  'Athletics': ['Sprints and Relays', 'Middle and Long Distance', 'Jumps', 'Throws'],
+  'Games and Sports': ['Football', 'Basketball', 'Volleyball', 'Netball', 'Hockey'],
+  'Swimming and Water Safety': ['Swimming Strokes', 'Water Safety Rules', 'Lifesaving', 'Competitive Swimming'],
 
-  // Languages
-  'Oral Communication (Expression Orale)': [
-    'Greetings and Introductions', 'Daily Conversations',
-    'Listening Comprehension',
-  ],
-  'Reading Comprehension (Compréhension Écrite)': [
-    'Reading Short Texts', 'Vocabulary in Context', 'Summary',
-  ],
-  'Grammar (Grammaire)': [
-    'Articles and Nouns', 'Verb Tenses', 'Adjectives and Adverbs',
-    'Sentence Construction',
-  ],
-  'Writing Skills (Expression Écrite)': [
-    'Paragraphs and Short Essays', 'Formal Letters', 'Descriptive Writing',
-  ],
+  // Music and Dance
+  'Music Theory and Notation': ['Note Values', 'Scales and Keys', 'Time Signatures', 'Sight Reading'],
+  'Vocal Music': ['Breathing and Voice Production', 'Choral Singing', 'Solo Performance', 'Traditional Kenyan Music'],
+  'Instrumental Music': ['Keyboard Instruments', 'String Instruments', 'Wind Instruments', 'Percussion Instruments'],
+  'Traditional and Contemporary Dance': ['Traditional Kenyan Dances', 'Contemporary Dance Styles', 'Dance Composition', 'Performance Skills'],
+
+  // Theatre and Film
+  'Introduction to Theatre': ['History of Theatre', 'Elements of Drama', 'Theatre Spaces', 'Theatre Practitioners'],
+  'Acting and Performance': ['Character Development', 'Voice and Movement', 'Improvisation', 'Rehearsal Techniques'],
+  'Directing and Production': ['The Director\'s Role', 'Set Design', 'Lighting and Sound', 'Costume and Makeup'],
+  'Film Studies': ['History of Film', 'Film Genres', 'Film Language', 'Kenyan Cinema'],
+
+  // Life Skills
+  'Self-Awareness and Identity': ['Personal Values', 'Emotional Intelligence', 'Self-Esteem', 'Goal Setting'],
+  'Interpersonal Relationships': ['Communication Skills', 'Peer Relationships', 'Family Relationships', 'Conflict Management'],
+  'Decision Making and Problem Solving': ['Critical Thinking', 'Identifying Options', 'Evaluating Consequences', 'Creative Problem Solving'],
+  'Citizenship and Social Responsibility': ['Community Participation', 'Environmental Responsibility', 'Volunteerism', 'Social Justice'],
 }
 
-// ── Marks and Questions Options ───────────────────────────────────────────────
-export const MARKS_OPTIONS = [
-  30, 35, 40, 50, 60, 70, 80, 90, 100
-]
+export const TERMS = ['Term 1', 'Term 2', 'Term 3']
+export const MARKS_OPTIONS = [30, 40, 50, 70, 80, 100]
+export const QUESTIONS_OPTIONS = [10, 12, 15, 20, 25]
+export const GRADES = Object.keys(CBC_CURRICULUM)
 
-export const QUESTIONS_OPTIONS = [
-  5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 21, 25
-]
+// ── GRADE STATUS ─────────────────────────────────────────
+export const GRADE_STATUS = {
+  'Grade 10': {
+    active: true,
+    label: 'Grade 10',
+    note: 'Available Now',
+    launchDate: null,
+  },
+  'Grade 11': {
+    active: false,
+    label: 'Grade 11',
+    note: 'Coming Soon',
+    launchDate: 'Term 2 2026',
+  },
+  'Grade 12': {
+    active: false,
+    label: 'Grade 12',
+    note: 'Coming Soon',
+    launchDate: 'Term 1 2027',
+  },
+}
+
+// ── CAT MARKS OPTIONS ────────────────────────────────────
+export const CAT_MARKS_OPTIONS = [20, 25, 30, 40]
+
+// ── SUBJECT-SPECIFIC MARKS ───────────────────────────────
+const SUBJECT_EXAM_MARKS = {
+  'Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'Essential Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'English': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'Kiswahili': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'Biology': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Chemistry': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Physics': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Geography': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'History and Citizenship': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'CRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'IRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'HRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Business Studies': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Agriculture': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Computer Studies': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Home Science': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+}
+
+// ── getExamTypeMarks ─────────────────────────────────────
+export function getExamTypeMarks(subject, examType) {
+  return SUBJECT_EXAM_MARKS[subject]?.[examType] ?? null
+}
+
+// ── UPDATED EXAM TYPES (matches ExamForm) ────────────────
+export const EXAM_TYPES = ['CAT', 'Midterm', 'End Term', 'End Year', 'Pre-Mock', 'Mock', 'Series']
