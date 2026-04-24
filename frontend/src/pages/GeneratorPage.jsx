@@ -184,7 +184,7 @@ export default function GeneratorPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-md w-full">
           {[
-            { step: '1', title: 'Select Grade & Subject', desc: 'Choose Grade 10, 11 or 12 and select your subject' },
+            { step: '1', title: 'Select Grade & Subject', desc: 'Choose Grade 10 and select your subject' },
             { step: '2', title: 'Pick Strand(s)', desc: 'Select one or more strands — multi-select supported' },
             { step: '3', title: 'Generate & Download', desc: 'Click Generate — the Machine builds your unique CBC exam' },
           ].map(({ step, title, desc }) => (
