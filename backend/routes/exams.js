@@ -138,21 +138,44 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
 
     // 5. Call Machine with 45-second timeout
     const TIMEOUT_MS = 45000;
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject({ isTimeout: true }), TIMEOUT_MS)
-    );
 
+    // Auto-retry once on timeout or network blip
     let message;
-    try {
-      message = await Promise.race([
-        anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-        timeoutPromise,
-      ]);
-    } catch (claudeErr) {
+    let attempts = 0;
+    const maxAttempts = 2;
+    let lastClaudeErr = null;
+
+    while (attempts < maxAttempts) {
+      attempts++;
+      try {
+        const freshTimeout = new Promise((_, reject) =>
+          setTimeout(() => reject({ isTimeout: true }), TIMEOUT_MS)
+        );
+        message = await Promise.race([
+          anthropic.messages.create({
+            model: 'claude-sonnet-4-5',
+            max_tokens: 6000,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+          freshTimeout,
+        ]);
+        lastClaudeErr = null;
+        break; // success — exit retry loop
+      } catch (err) {
+        lastClaudeErr = err;
+        if (err.isTimeout || err.status === 529 || err.status === 503) {
+          if (attempts < maxAttempts) {
+            console.warn(`Attempt ${attempts} failed (${err.isTimeout ? 'timeout' : err.status}), retrying...`);
+            await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
+            continue;
+          }
+        }
+        break; // non-retryable error — exit loop
+      }
+    }
+
+    if (lastClaudeErr) {
+      const claudeErr = lastClaudeErr;
       if (claudeErr.isTimeout) {
         return res.status(504).json({
           error: 'The Machine took too long to respond. Please try again.',
@@ -235,7 +258,7 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
         sectionCount,
         isHybrid,
         questionBankHits,
-        aiModel: 'claude-sonnet-4-20250514',
+        aiModel: 'claude-sonnet-4-5',
         generationTimeMs,
       });
     } catch (saveErr) {
