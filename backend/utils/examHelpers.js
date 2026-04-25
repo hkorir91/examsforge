@@ -18,7 +18,7 @@ const KENYAN_SCHOOLS = [
   'Maranda Senior School', 'Starehe Senior School', 'Highway Senior School',
   'Nakuru Senior School', 'Kisumu Senior School', 'Eldoret Senior School',
   'Strathmore Senior School', 'Upper Hill Senior School', 'Lenana Senior School',
-  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Junior School',
+  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Senior School',
 ]
 
 const KENYAN_PLACES = [
