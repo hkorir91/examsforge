@@ -3,8 +3,6 @@
 // Built from analysis of real CBC Grade 10 Kenya exam papers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { getSubjectFullMarks } = require('../models/curriculumHelpers')
-
 // ── Kenyan context pools ──────────────────────────────────────────────────────
 const KENYAN_NAMES = [
   'Wanjiku', 'Kipchoge', 'Baraka', 'Amina', 'Otieno', 'Njeri', 'Kamau',
@@ -18,7 +16,7 @@ const KENYAN_SCHOOLS = [
   'Maranda Senior School', 'Starehe Senior School', 'Highway Senior School',
   'Nakuru Senior School', 'Kisumu Senior School', 'Eldoret Senior School',
   'Strathmore Senior School', 'Upper Hill Senior School', 'Lenana Senior School',
-  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Senior School',
+  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Junior School',
 ]
 
 const KENYAN_PLACES = [
@@ -403,7 +401,7 @@ JSON OUTPUT FORMAT — RETURN ONLY THIS, NO OTHER TEXT
 ═══════════════════════════════════════════════════
 
 {
-  "title": "${grade} ${subject} ${examType} Examination",
+  "title": "${grade} ${subject} — ${examType} Examination, ${term} ${year}",
   "time": "${getDuration(examType, totalMarks)}",
   "instructions": [
     "Write your name, admission number, and class clearly at the top of the answer booklet.",
