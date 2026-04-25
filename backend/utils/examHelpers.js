@@ -1,546 +1,565 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// examHelpers.js — Exam generation utilities and Machine prompt builder
-// Built from analysis of real CBC Grade 10 Kenya exam papers
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * ExamsForge by SmartSchool Digital
+ * examHelpers.js — Phase 2: Subject-Aware Hybrid Generation Pipeline
+ *
+ * Architecture:
+ * 1. Retrieve question pool from bank (QuestionBank model)
+ * 2. Select balanced set to fit marks/questions requested
+ * 3. Build subject-specific AI prompt with correct question formats
+ * 4. AI transforms seed questions with Kenyan context
+ * 5. Build full exam JSON with marking scheme
+ */
 
-// ── Kenyan context pools ──────────────────────────────────────────────────────
-const KENYAN_NAMES = [
-  'Wanjiku', 'Kipchoge', 'Baraka', 'Amina', 'Otieno', 'Njeri', 'Kamau',
-  'Achieng', 'Mutua', 'Chebet', 'Odhiambo', 'Mwangi', 'Zawadi', 'Koech',
-  'Kimani', 'Nafula', 'Ouma', 'Kanini', 'Rotich', 'Adhiambo',
-  'Simiyu', 'Juma', 'Waweru', 'Auma', 'Nduta', 'Onyango', 'Maina',
-]
-
-const KENYAN_SCHOOLS = [
-  "Mang'u Senior School", 'Alliance Senior School', 'Precious Blood Senior School',
-  'Maranda Senior School', 'Starehe Senior School', 'Highway Senior School',
-  'Nakuru Senior School', 'Kisumu Senior School', 'Eldoret Senior School',
-  'Strathmore Senior School', 'Upper Hill Senior School', 'Lenana Senior School',
-  'Thika Senior School', 'Kenya High Senior School', 'Kaplamboi Junior School',
-]
-
-const KENYAN_PLACES = [
-  'Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Thika', 'Nakuru', 'Nyeri',
-  'Kakamega', 'Machakos', 'Kericho', 'Embu', 'Meru', 'Kisii', 'Kilifi',
-  'Nanyuki', 'Garissa', 'Kitale', 'Isiolo',
-]
-
-// ── Subject full-exam marks ───────────────────────────────────────────────────
-const SUBJECT_FULL_MARKS = {
-  'English': 80, 'Literature in English': 80, 'Kiswahili': 80,
-  'Fasihi ya Kiswahili': 80, 'Biology': 80, 'Physics': 80,
-  'General Science': 80, 'Chemistry': 80, 'Applied Agriculture': 90,
+// ── Grade context ────────────────────────────────────────
+function getGradeContext(grade) {
+  const contexts = {
+    'Grade 10': 'CBC Senior School — Grade 10 (Age 15–16)',
+    'Grade 11': 'CBC Senior School — Grade 11 (Age 16–17)',
+    'Grade 12': 'CBC Senior School — Grade 12 (Age 17–18)',
+  };
+  return contexts[grade] || grade;
 }
 
-function getSubjectTotalMarks(subject, examType) {
-  if (['End Term', 'End Year', 'Mock', 'Pre-Mock', 'Series'].includes(examType)) {
-    return SUBJECT_FULL_MARKS[subject] || 100
+function getDuration(examType, marks) {
+  if (examType === 'CAT') {
+    if (marks <= 20) return '30 minutes';
+    if (marks <= 30) return '45 minutes';
+    return '1 hour';
   }
-  if (examType === 'Midterm') {
-    const full = SUBJECT_FULL_MARKS[subject] || 100
-    return Math.round((full / 2) / 5) * 5
+  if (examType === 'Midterm') return marks <= 50 ? '1 hour 30 minutes' : '2 hours';
+  if (examType === 'End Year') return marks >= 100 ? '2 hours 30 minutes' : '2 hours';
+  if (examType === 'Pre-Mock' || examType === 'Mock' || examType === 'Series') return marks >= 100 ? '2 hours 30 minutes' : '2 hours';
+  return marks >= 100 ? '2 hours 30 minutes' : '2 hours'; // End Term
+}
+
+// ── Subject classification ───────────────────────────────
+const SUBJECT_TYPES = {
+  // Sciences — require calculations, experiments, diagrams
+  science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
+  // Mathematics — require working shown, calculations, proofs
+  mathematics: ['Mathematics', 'Essential Mathematics'],
+  // Languages — require comprehension passages, grammar, composition
+  language: ['English', 'Kiswahili', 'Arabic', 'French', 'German', 'Chinese',
+    'Indigenous Languages', 'Literature in English', 'Fasihi ya Kiswahili',
+    'Sign Language', 'Kenyan Sign Language'],
+  // Humanities — require case studies, source analysis, essays
+  humanities: ['History and Citizenship', 'Geography', 'CRE', 'IRE', 'HRE',
+    'Business Studies', 'Life Skills Education', 'Community Service Learning'],
+  // Technical — require practical procedures, tools, safety
+  technical: ['Agriculture', 'Computer Studies', 'Home Science', 'Aviation',
+    'Building and Construction', 'Electricity', 'Drawing and Design',
+    'Marine and Fisheries', 'Metalwork', 'Power Mechanics', 'Woodwork',
+    'Media Technology'],
+  // Arts & Sports — require practical knowledge, performance, technique
+  arts: ['Art and Design', 'Music and Dance', 'Theatre and Film', 'Fine Arts',
+    'Sports and Recreation', 'Physical Education'],
+};
+
+function getSubjectType(subject) {
+  for (const [type, subjects] of Object.entries(SUBJECT_TYPES)) {
+    if (subjects.includes(subject)) return type;
   }
-  return null // CAT: caller provides 30-40
+  return 'humanities';
 }
 
-// ── Default section count by exam type ───────────────────────────────────────
-function getDefaultSectionCount(examType) {
-  if (['End Term', 'End Year', 'Mock', 'Pre-Mock', 'Series'].includes(examType)) return 3
-  if (examType === 'Midterm') return 2
-  return 1 // CAT
+// ── Subject-specific instructions ───────────────────────
+function getSubjectInstructions(subject, examType, totalMarks) {
+  const type = getSubjectType(subject);
+
+  const base = {
+    science: `
+SCIENCE-SPECIFIC REQUIREMENTS — CRITICAL:
+- EVERY science question MUST contain specific, actual content — not vague descriptions
+- For Chemistry: write actual equations e.g. "Balance: Fe + O₂ → Fe₂O₃" not "balance an equation"
+- For Physics: write actual values e.g. "A car moves at 20m/s for 5 seconds, calculate distance" not "calculate distance for a moving car"
+- For Biology: write specific organism names, organs, processes — not "a certain organism"
+- Include at least ONE question requiring a labelled diagram or description of experimental apparatus
+- Include questions on safety precautions where relevant
+- For Chemistry: include at least one balanced equation or stoichiometry calculation
+- For Biology: include questions on structure and function with specific named structures
+- For Physics: include at least one calculation showing formula, substitution, and answer with units
+- Practical questions should ask learners to describe procedures step by step
+- Use data/results tables where appropriate for analysis questions`,
+
+    mathematics: `
+MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
+- EVERY mathematics question MUST contain ACTUAL numbers, expressions, equations or values
+- DO NOT write "Wanjiku encounters expressions to simplify" without giving the actual expression
+- ALWAYS write the full mathematical content: e.g. "Simplify: (2³ × 2⁵) ÷ 2⁴" not "simplify an expression"
+- ALWAYS write actual equations: e.g. "Solve: x² – 5x – 6 = 0" not "solve a quadratic equation"
+- ALWAYS include specific measurements: e.g. "A rectangle has length (x+5)cm and width (x-2)cm" not "a rectangle"
+- For logarithms: write "Evaluate: log₁₀ 1000" not "evaluate a logarithm"
+- For geometry: write actual coordinates, angles, lengths — e.g. "Triangle ABC where A(1,2) B(3,4) C(5,2)"
+- For bearings: write actual bearing values — e.g. "on a bearing of 070°" not "on some bearing"
+- ALL calculation questions must show: state formula → substitute values → solve → state answer with units
+- Include questions from Number/Algebra, Geometry, Statistics — balanced coverage
+- Section C must include multi-step problems requiring 3+ calculation steps
+- Answers must show complete working — method marks awarded even if final answer is wrong
+- Include at least one geometry/construction question with measurements
+- SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with marks`,
+
+    language: `
+LANGUAGE-SPECIFIC REQUIREMENTS:
+- Section A: Grammar, vocabulary, and language use questions (fill gaps, identify errors, explain usage)
+- Section B: Comprehension questions based on a SHORT passage (4–6 sentences) set in Kenyan context
+  * Include: main idea, inference, vocabulary in context, and language feature questions
+  * Passage MUST be included in the question text itself
+- Section C: Composition/essay question with clear instructions
+  * Give learners a choice of TWO topics (they answer ONE)
+  * Topics must be relevant to Kenyan senior school learners
+- For Kiswahili: use Kiswahili throughout — all questions, answers, instructions
+- For Arabic: include Arabic script where appropriate
+- Avoid testing memorisation — test understanding and application`,
+
+    humanities: `
+HUMANITIES-SPECIFIC REQUIREMENTS:
+- Include at least ONE source-based or data-based question (map extract, graph, table, photograph description, quote)
+- Geography: include map work / sketch map question in at least one section
+- History: include a source analysis question with a short extract followed by questions
+- Business Studies: use Kenyan business examples (M-Pesa, Equity Bank, Safaricom, Nakumatt, local markets)
+- CRE/IRE/HRE: questions must test understanding and application of values, not just recitation
+- Avoid pure recall questions — test application, analysis, and evaluation
+- Essays in Section C must have clear marking criteria with awarded marks per point`,
+
+    technical: `
+TECHNICAL SUBJECT REQUIREMENTS:
+- Include questions on tools, materials, and equipment used in the subject
+- Include safety precautions and procedures
+- Agriculture: include questions on specific crops/livestock common in Kenya (maize, beans, dairy cattle, poultry)
+- Computer Studies: include programming logic, flowcharts, or pseudocode questions
+- Home Science: include nutrition calculations, meal planning, or garment construction questions
+- Aviation/Electricity/Power Mechanics: include questions on regulations, safety standards, and calculations
+- Include at least one question requiring a step-by-step procedure or process description
+- Use Kenyan industry examples and local context throughout`,
+
+    arts: `
+ARTS AND PHYSICAL EDUCATION REQUIREMENTS:
+- Music and Dance: include music notation, theory questions, AND performance technique
+- Theatre and Film: include script analysis, staging, or character development questions
+- Art and Design: include questions on techniques, elements of art, and Kenyan/African art traditions
+- Physical Education: include fitness principles, rules of games, health concepts
+- Sports and Recreation: include biomechanics, training methods, sports psychology basics
+- Questions must test both knowledge AND practical understanding
+- Include questions that reference Kenyan cultural arts, sports personalities, or local events`,
+  };
+
+  return base[type] || base.humanities;
 }
 
-// ── Section mark splits ───────────────────────────────────────────────────────
-function getSectionMarkSplit(totalMarks, sectionCount) {
-  if (sectionCount === 1) return [totalMarks, 0, 0]
-  if (sectionCount === 2) {
-    // Section A ~40%, Section B ~60%
-    const a = Math.round(totalMarks * 0.4 / 5) * 5 || Math.round(totalMarks * 0.4)
-    const b = totalMarks - a
-    return [a, b, 0]
-  }
-  if (sectionCount === 3) {
-    // Section A ~20% (short answer), B ~40% (structured), C ~40% (long/calculations)
-    const a = Math.round(totalMarks * 0.2 / 5) * 5 || Math.round(totalMarks * 0.2)
-    const remainder = totalMarks - a
-    const b = Math.round(remainder / 2 / 5) * 5 || Math.round(remainder / 2)
-    const c = totalMarks - a - b
-    return [a, b, c]
-  }
-  return [totalMarks, 0, 0]
+// ── Subject-specific question format rules ───────────────
+function getQuestionFormatRules(subject) {
+  const type = getSubjectType(subject);
+
+  const formats = {
+    science: `
+QUESTION FORMAT FOR SCIENCE:
+Section A (Short Answer — 2 marks each):
+  - "Define the term ___" or "State TWO functions of ___"
+  - "Give TWO differences between ___ and ___"
+  - "Name the instrument used to ___"
+
+Section B (Structured — 5–8 marks, multi-part):
+  - (a) Describe the structure of ___ (2 marks)
+  - (b) Explain how ___ works (3 marks)
+  - (c) State ONE safety precaution when handling ___ (1 mark)
+
+Section C (Long Answer — 10–15 marks):
+  - Extended experiment/calculation question
+  - Include data table, graph interpretation, or multi-step calculation
+  - Must include: observation → analysis → conclusion format for practicals`,
+
+    mathematics: `
+QUESTION FORMAT FOR MATHEMATICS:
+Section A (Short Answer — 2–3 marks each):
+  - Direct calculation questions
+  - "Simplify", "Evaluate", "Solve for x"
+
+Section B (Structured — 5–8 marks, multi-part):
+  - Multi-step problems with labelled sub-parts (a), (b), (c)
+  - Word problems in Kenyan context
+
+Section C (Long Answer / Extended Calculation — 10–15 marks):
+  - Complex multi-step problems
+  - Proof or derivation questions
+  - Applied problems requiring interpretation`,
+
+    language: `
+QUESTION FORMAT FOR LANGUAGE:
+Section A (Language Use — 2 marks each):
+  - Grammar identification, correction, or completion
+  - Vocabulary in context
+  - Language feature identification
+
+Section B (Comprehension — structured around a passage):
+  - Provide a 4–6 sentence passage in Kenyan context
+  - Questions: main idea, inference, vocabulary, language feature
+
+Section C (Composition / Essay):
+  - Provide TWO topic choices — learner answers ONE
+  - Clear word count or length guidance
+  - Mark allocation: Content, Organisation, Language use`,
+
+    humanities: `
+QUESTION FORMAT FOR HUMANITIES:
+Section A (Short Answer — 2 marks each):
+  - "Define", "State", "Identify", "Give ONE example of"
+  - Data/map/source reference questions
+
+Section B (Structured — 5–8 marks):
+  - Multi-part questions with source, map, or data stimulus
+  - (a) From the source/map, identify ___ (2 marks)
+  - (b) Explain ___ (3 marks)
+  - (c) Suggest how ___ (2 marks)
+
+Section C (Essay / Extended Response — 10–15 marks):
+  - "Discuss", "Analyse", "Evaluate", "Examine"
+  - Clear marking guide: 1 mark per valid point, up to maximum
+  - Introduction, body points, conclusion expected`,
+
+    technical: `
+QUESTION FORMAT FOR TECHNICAL SUBJECTS:
+Section A (Short Answer — 2 marks each):
+  - "Name", "State", "List TWO"
+  - Tool/material identification
+  - Safety rule questions
+
+Section B (Structured — 5–8 marks):
+  - Process/procedure questions with steps
+  - Diagram labelling or description
+  - Calculation questions (where applicable)
+
+Section C (Extended / Project — 10–15 marks):
+  - Design a solution to a given problem
+  - Plan a project or procedure step-by-step
+  - Evaluate advantages and disadvantages of a method`,
+
+    arts: `
+QUESTION FORMAT FOR ARTS AND PE:
+Section A (Short Answer — 2 marks each):
+  - "Define", "Name", "State TWO rules of"
+  - Identify elements/principles/techniques
+
+Section B (Structured — 5–8 marks):
+  - Analysis of a technique, performance, or artwork
+  - Describe how to perform/create ___
+  - Compare two styles/techniques
+
+Section C (Extended — 10–15 marks):
+  - "Describe in detail how you would prepare for/perform/create ___"
+  - Analysis of a Kenyan cultural art form or sport
+  - Planning/choreography/composition question`,
+  };
+
+  return formats[type] || formats.humanities;
 }
 
-// ── Duration calculator ───────────────────────────────────────────────────────
-function getDuration(examType, totalMarks) {
-  if (examType === 'CAT') return '1 hour'
-  if (totalMarks <= 40) return '1 hour 20 minutes'
-  if (totalMarks <= 60) return '1 hour 30 minutes'
-  if (totalMarks <= 80) return '1 hour 50 minutes'
-  if (totalMarks <= 90) return '2 hours'
-  return '2 hours 30 minutes'
-}
-
-// ── Param validation ──────────────────────────────────────────────────────────
+// ── Validate exam params ─────────────────────────────────
 function validateExamParams(params) {
-  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params
-  if (!grade) return 'Grade is required.'
-  if (!['Grade 10', 'Grade 11', 'Grade 12'].includes(grade)) return 'Invalid grade.'
-  if (grade !== 'Grade 10') return 'Only Grade 10 is currently available.'
-  if (!subject) return 'Subject is required.'
-  if (!strands || strands.length === 0) return 'At least one strand must be selected.'
-  if (!examType) return 'Exam type is required.'
-  if (!term) return 'Term is required.'
-  if (!year || isNaN(year)) return 'A valid year is required.'
-  if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.'
-  if (!totalQuestions || totalQuestions < 2) return 'At least 2 questions are required.'
-  if (!school || !school.trim()) return 'School name is required.'
-  return null
+  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
+
+  if (!grade) return 'Grade is required.';
+  if (!['Grade 10', 'Grade 11', 'Grade 12'].includes(grade)) {
+    return 'Grade must be Grade 10, 11, or 12 (CBC Senior School).';
+  }
+  if (!subject) return 'Subject is required.';
+  if (!strands || !Array.isArray(strands) || strands.length === 0) {
+    return 'At least one strand must be selected.';
+  }
+  if (!examType || !['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'].includes(examType)) {
+    return 'Exam type must be CAT, Midterm, End Term, Pre-Mock, or Mock.';
+  }
+  if (!term) return 'Term is required.';
+  if (!year || isNaN(year)) return 'Valid year is required.';
+  if (!totalMarks || totalMarks < 10 || totalMarks > 150) {
+    return 'Total marks must be between 10 and 150.';
+  }
+  if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
+    return 'Total questions must be between 5 and 50.';
+  }
+  if (!school || school.trim().length < 2) return 'School name is required.';
+
+  return null;
 }
 
-// ── Question bank helpers ─────────────────────────────────────────────────────
+// ── Select balanced question set ─────────────────────────
 function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
-  if (!pool || pool.length === 0) {
-    return { sectionA: [], sectionB: [], sectionC: [] }
-  }
-  const shuffled = [...pool].sort(() => Math.random() - 0.5)
-  const third = Math.ceil(shuffled.length / 3)
-  return {
-    sectionA: shuffled.slice(0, third),
-    sectionB: shuffled.slice(third, third * 2),
-    sectionC: shuffled.slice(third * 2),
-  }
+  if (!pool || pool.length === 0) return { sectionA: [], sectionB: [], sectionC: [] };
+
+  const saCount = Math.round(totalQuestions * 0.4);
+  const strCount = Math.round(totalQuestions * 0.35);
+  const laCount = totalQuestions - saCount - strCount;
+
+  const shortAnswer = pool.filter(q => q.marks <= 3 || q.questionType === 'short_answer');
+  const structured = pool.filter(q => (q.marks >= 4 && q.marks <= 7) || q.questionType === 'structured');
+  const longAnswer = pool.filter(q => q.marks >= 8 || q.questionType === 'long_answer' || q.questionType === 'calculation' || q.questionType === 'practical');
+
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+  const sectionA = shuffle(shortAnswer).slice(0, saCount);
+  const sectionB = shuffle(structured).slice(0, strCount);
+  const sectionC = shuffle(longAnswer).slice(0, laCount);
+
+  const used = new Set([...sectionA, ...sectionB, ...sectionC].map(q => q._id?.toString()));
+  const remaining = shuffle(pool.filter(q => !used.has(q._id?.toString())));
+
+  const fillA = saCount - sectionA.length;
+  const fillB = strCount - sectionB.length;
+  const fillC = laCount - sectionC.length;
+
+  if (fillA > 0) sectionA.push(...remaining.splice(0, fillA));
+  if (fillB > 0) sectionB.push(...remaining.splice(0, fillB));
+  if (fillC > 0) sectionC.push(...remaining.splice(0, fillC));
+
+  return { sectionA, sectionB, sectionC };
 }
 
-// ── Subject-specific prompt rules ────────────────────────────────────────────
-function getSubjectRules(subject) {
-  const rules = {
-    'Mathematics': `
-- Questions are NUMERICAL with actual values, equations, or problems to solve — NOT explanatory
-- Each question or sub-part contains a specific calculation, construction, or problem to work through
-- Show what formula or approach is needed clearly in the question
-- For sub-parts: use (a), (b), (c) then (i), (ii), (iii) within each part
-- Section A: shorter calculations (2-4 marks each question, no sub-parts needed)
-- Section B: medium structured problems with (a)(b)(c) sub-parts (8-12 marks each)
-- Section C: longer structured problems — multi-step calculations with (a)(b)(c)(d) (10-15 marks each)
-- Include Kenya-specific contexts: maps of Kenya, Kenyan distances, shillings, land in hectares
-- For geometry: refer to actual Kenyan landmarks and towns for bearings/distances
-- Mark scheme: show full working, not just the answer`,
-
-    'Biology': `
-- Every question MUST open with a scenario from a Kenyan context (school lab, field trip, community health)
-- Section A: short-answer questions — define, name, state, identify (2-4 marks each, 1-2 sub-parts)
-- Section B: structured questions with clear (a)(b)(c) sub-parts — explain, describe, discuss (8-12 marks each)
-- Section C: extended questions — analyse, evaluate, compare (10-15 marks each with 3-4 sub-parts)
-- Include diagrams in question prompts where relevant (e.g. "The diagram below shows a plant cell...")
-- Use instruction verbs correctly: State/Name (1-2 marks), Explain/Describe (3-4 marks), Analyse/Evaluate (5+ marks)
-- Marking scheme: give specific points with mark allocation per point`,
-
-    'Chemistry': `
-- Every question MUST open with a scenario (school lab experiment, industrial application, community health)
-- Include calculation questions in Sections B and C with actual numbers
-- Use Kenyan industries and examples: Rift Valley soda ash, Kenyan oil refineries, Mumias Sugar
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: definitions and short answers (2-4 marks)
-- Section B: structured questions mixing theory and calculations (8-12 marks each)
-- Section C: extended structured problems with calculations and explanations (10-15 marks each)
-- Marking scheme: show worked solutions for calculations`,
-
-    'Physics': `
-- Every question MUST open with a scenario (school demonstration, engineering application, everyday life)
-- MUST include numerical calculations in Sections B and C — show given values clearly
-- Use Kenyan contexts: Kenya Power electricity, dams in Kenya, roads and vehicles
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: short answers and basic definitions (2-4 marks)
-- Section B: structured questions with calculations and diagrams (8-12 marks each)
-- Section C: extended questions with multi-step calculations (10-15 marks each)
-- Where diagrams are needed, describe clearly in the question text
-- Marking scheme: show full formula, substitution, and answer with units`,
-
-    'Applied Agriculture': `
-- Every question MUST open with a Kenyan farming scenario (small-scale farmer, school farm, county agricultural office)
-- Use Kenyan crops: maize, tea, coffee, pyrethrum, tomatoes, cabbages, potatoes
-- Reference Kenyan counties: Kericho (tea), Kisumu (rice), Nakuru (wheat), Meru (miraa)
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: identify, state, name questions (2-4 marks)
-- Section B: structured questions — explain, describe practices (8-12 marks)
-- Section C: extended questions — evaluate, justify, discuss (10-15 marks)
-- Include practical application: e.g. preparing a field, managing a nursery, crop calendar`,
-
-    'Geography': `
-- Every question MUST open with a Kenyan geographical scenario (field trip, community, national park)
-- Reference real Kenyan features: Lake Victoria, Mount Kenya, Rift Valley, Tana River, Indian Ocean
-- Reference real Kenyan towns, counties and regions
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: short answer — define, state, identify (2-4 marks each)
-- Section B: structured — describe, explain geographical processes (8-12 marks each)
-- Section C: extended — discuss, evaluate, analyse with maps/data (10-15 marks each)
-- Where map interpretation is needed, describe the scenario clearly`,
-
-    'History & Citizenship': `
-- Every question MUST open with a historical scenario or contemporary Kenyan situation
-- Reference real Kenyan history: colonial period, independence 1963, constitution 2010
-- Reference real Kenyan institutions: IEBC, National Assembly, County Government, CBK
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: short answer — state, identify, name (2-4 marks)
-- Section B: structured — describe, explain historical events and significance (8-12 marks)
-- Section C: extended — discuss, analyse, evaluate causes and effects (10-15 marks)
-- Questions should connect past events to present-day Kenya and citizenship`,
-
-    'CRE': `
-- Every question MUST open with a scenario from a Kenyan context (church, school devotion, community)
-- Reference specific Bible books, chapters and verses where appropriate
-- Use Kenyan names and settings for scenarios
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: short answer — state, name, identify biblical facts (2-4 marks)
-- Section B: structured — explain, describe, analyse biblical events and teachings (8-12 marks)
-- Section C: extended — discuss, evaluate Christian values and their application in Kenya today (10-15 marks)
-- Marking scheme: specific biblical references and clear model answers`,
-
-    'IRE': `
-- Every question MUST open with a scenario from a Muslim community context in Kenya
-- Reference specific Quranic Surahs and Hadith where appropriate
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: define, state, identify Islamic terms and teachings (2-4 marks)
-- Section B: structured — explain, describe, analyse Islamic practices (8-12 marks)
-- Section C: extended — discuss, evaluate Islamic teachings and their application (10-15 marks)
-- Use correct Arabic terms with explanations`,
-
-    'HRE': `
-- Every question MUST open with a scenario from a Hindu/Jain/Buddhist community context
-- Reference Hinduism, Jainism, and Buddhism appropriately
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: name, define, identify (2-4 marks)
-- Section B: structured — explain, describe teachings (8-12 marks)
-- Section C: extended — discuss, compare, apply teachings to modern Kenyan society (10-15 marks)`,
-
-    'Business Studies': `
-- Every question MUST open with a Kenyan business scenario (small business, school canteen, bank visit)
-- Include calculation questions: budget preparation, income/expenditure, profit/loss
-- Reference Kenyan institutions: CBK, KRA, NSSF, NHIF, M-Pesa, Equity Bank
-- Reference Kenyan shillings (KES) in all financial questions
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: define, identify, state business concepts (2-4 marks)
-- Section B: structured — explain, evaluate, analyse business situations (8-12 marks)
-- Section C: extended — including financial calculations and business decision-making (10-15 marks)`,
-
-    'English': `
-- Section A (Language): listening/speaking task, grammar questions, reading comprehension, writing
-- Grammar questions: identify parts of speech, rewrite sentences, fill blanks
-- Reading comprehension: based on a Kenyan-context passage
-- Writing: formal letter, essay, story continuation, summary
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section B (Literature): questions on set texts — oral literature, drama, poetry, prose`,
-
-    'Kiswahili': `
-- Section A (Kiswahili): ufahamu wa kusoma, sarufi, kuandika
-- Grammar: tambua sehemu za sentensi, badilisha wakati, jaza pengo
-- Ufahamu: maswali kuhusu kifungu cha habari
-- Kuandika: insha ya ubunifu, barua rasmi
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section B (Fasihi): maswali kuhusu fasihi simulizi, mashairi, riwaya`,
-
-    'Computer Studies': `
-- Every question MUST open with a Kenyan ICT scenario (school lab, business, community)
-- Reference realistic Kenyan technology contexts: mobile money, internet cafes, school systems
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: define, identify, name ICT terms and components (2-4 marks)
-- Section B: structured — describe, explain ICT processes and applications (8-12 marks)
-- Section C: extended — practical scenarios and problem solving (10-15 marks)
-- Include step-by-step practical questions (e.g. steps to format a document)`,
-
-    'Physical Education': `
-- Every question MUST open with a sports or fitness scenario from a Kenyan school or community
-- Reference Kenyan sports achievements and athletes
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: state, name, identify (2-4 marks)
-- Section B: describe techniques, rules, safety (8-12 marks)
-- Section C: analyse, evaluate performance and health aspects (10-15 marks)`,
-  }
-
-  return rules[subject] || `
-- Every question MUST open with a relevant Kenyan scenario
-- Sub-parts: (a)(b)(c) then (i)(ii)(iii) within each
-- Section A: short answer (2-4 marks per question)
-- Section B: structured questions (8-12 marks per question)
-- Section C: extended questions (10-15 marks per question)
-- Use instruction verbs that match marks: State/Name/Identify (1-2), Explain/Describe (3-4), Analyse/Evaluate/Discuss (5+)`
-}
-
-// ── Standard instructions per exam type/subject ──────────────────────────────
-function getExamInstructions(subject, examType, sectionCount) {
-  const base = [
-    'Write your name, admission number, and class clearly at the top of the answer booklet.',
-    'Answer ALL questions in each section.',
-    'All answers must be written in the answer booklet provided.',
-    'Mobile phones and electronic devices are NOT permitted in the examination room.',
-  ]
-  if (['Mathematics', 'Essential Mathematics'].includes(subject)) {
-    return [
-      'Write your name, admission number, and class clearly at the top of the answer booklet.',
-      'Answer ALL questions provided.',
-      'Show ALL working clearly — marks may be awarded for correct working even if the final answer is wrong.',
-      'Use mathematical tables or a scientific calculator where necessary.',
-      'All working must be in the spaces provided.',
-      'Mobile phones and electronic devices are NOT permitted in the examination room.',
-    ]
-  }
-  if (['Chemistry', 'Physics', 'Biology', 'Applied Agriculture', 'General Science'].includes(subject)) {
-    return [
-      'Write your name, admission number, and class clearly at the top of the answer booklet.',
-      'Answer ALL questions in each section.',
-      'In structured questions, show all working clearly where calculations are involved.',
-      'Use a blue or black pen for writing. Pencils should be used only for drawings and diagrams.',
-      'Make drawings neat, clear, and large, and label them correctly using ruled lines.',
-      'All answers must be written in the answer booklet provided.',
-      'Mobile phones and electronic devices are NOT permitted in the examination room.',
-    ]
-  }
-  return base
-}
-
-// ── Section instruction text ──────────────────────────────────────────────────
-function getSectionInstruction(sectionIndex, totalMarks, examType) {
-  const instructions = [
-    'Answer ALL questions in this section. Write your answers concisely in the spaces provided.',
-    'Answer ALL questions in this section. Show all working clearly where calculations are involved.',
-    'Answer ALL questions in this section. Write your answers clearly and in detail.',
-  ]
-  return instructions[sectionIndex] || instructions[0]
-}
-
-// ── Main prompt builder ───────────────────────────────────────────────────────
-function buildExamPrompt({
+// ── Build hybrid prompt ──────────────────────────────────
+function buildHybridExamPrompt({
   grade, subject, strands, substrands, examType, term, year,
-  totalMarks, totalQuestions, school, sectionCount,
-  bankSeeds, isHybrid,
+  totalMarks, totalQuestions, school,
+  sectionASeeds, sectionBSeeds, sectionCSeeds,
+  sectionCount = 3,
 }) {
-  const [marksA, marksB, marksC] = getSectionMarkSplit(totalMarks, sectionCount)
+  const gradeContext = getGradeContext(grade);
+  const duration = getDuration(examType, totalMarks);
+  const strandList = strands.join(', ');
+  const substrandList = substrands.length > 0 ? substrands.join(', ') : 'All sub-strands within selected strands';
+  const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
+  const questionFormats = getQuestionFormatRules(subject);
 
-  // Calculate questions per section based on marks
-  const questionsPerSection = (marks, avgMarksPerQ) => Math.max(1, Math.round(marks / avgMarksPerQ))
-  const qA = questionsPerSection(marksA, 4)   // Section A: ~4 marks each
-  const qB = questionsPerSection(marksB, 10)  // Section B: ~10 marks each
-  const qC = questionsPerSection(marksC, 12)  // Section C: ~12 marks each
+  const saMarks = sectionASeeds.reduce((s, q) => s + (q.marks || 2), 0);
+  const sbMarks = sectionBSeeds.reduce((s, q) => s + (q.marks || 5), 0);
+  const scMarks = sectionCSeeds.reduce((s, q) => s + (q.marks || 9), 0);
 
-  const strandText = strands.join(', ')
-  const substrandText = substrands && substrands.length > 0 ? substrands.join(', ') : 'All sub-strands'
+  const formatSeeds = (seeds) =>
+    seeds.map((q, i) => `  Q${i + 1} [${q.marks || '?'} marks, ${q.difficulty || 'medium'}, type: ${q.questionType || 'structured'}]:
+    Original text: "${q.questionText}"
+    Answer guide: "${q.answerGuide}"`).join('\n');
 
-  const bankContext = isHybrid && bankSeeds
-    ? `\nQUESTION BANK SEEDS (use these as inspiration but rephrase completely — change names, values, contexts):\n${JSON.stringify(bankSeeds, null, 2)}\n`
-    : ''
+  const hasSectionA = sectionASeeds.length > 0;
+  const hasSectionB = sectionBSeeds.length > 0;
+  const hasSectionC = sectionCSeeds.length > 0 && sectionCount >= 3;
 
-  const prompt = `You are an expert CBC (Competency-Based Curriculum) Senior School examination setter for the Kenya Certificate of Basic Education (KCBE). You have deep knowledge of the Kenyan CBC curriculum and set examinations exactly like experienced Kenyan teachers.
+  return `You are a senior Kenyan CBC curriculum examiner specialising in ${subject} for ${gradeContext}.
 
-EXAM DETAILS:
+Your task is to TRANSFORM the provided seed questions into a complete, professional ${subject} exam paper.
+
+CRITICAL RULES — AI GUARDRAILS:
+1. ONLY transform the provided seed questions. Do NOT invent entirely new topics.
+2. You MUST rephrase every question — change wording, names, values, contexts, scenarios.
+3. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Aisha, Linet, Mwangi, Chebet
+4. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Garissa, Kitale, Kakamega
+5. Preserve each question's learning objective, curriculum strand, and approximate difficulty.
+6. Preserve approximate mark weight — do not significantly change marks allocation.
+7. ABSOLUTELY NO multiple choice questions anywhere in the paper.
+8. Use competency-based CBC action verbs: Analyse, Evaluate, Explain, Calculate, Describe, Justify, Differentiate, Assess, Examine, Outline
+9. Output must be teacher-ready, professional, and match Kenya national exam standards.
+10. NEVER write vague question descriptions — always include ACTUAL numbers, expressions, equations, measurements
+11. Include learner details section (Name, Admission No., Class, Date, Signature) in instructions
+
+EXAM SPECIFICATIONS:
 - School: ${school}
-- Grade: ${grade}
+- Grade: ${grade} (${gradeContext})
 - Subject: ${subject}
-- Strand(s): ${strandText}
-- Sub-strand(s): ${substrandText}
+- Strand(s): ${strandList}
+- Sub-strand(s): ${substrandList}
 - Exam Type: ${examType}
-- Term: ${term}
-- Year: ${year}
+- Term: ${term}, ${year}
 - Total Marks: ${totalMarks}
+- Duration: ${duration}
+- Total Questions: ${totalQuestions}
 - Number of Sections: ${sectionCount}
-- Duration: ${getDuration(examType, totalMarks)}
-${bankContext}
+${subjectInstructions}
+${questionFormats}
 
-═══════════════════════════════════════════════════
-MANDATORY RULES — FOLLOW ALL WITHOUT EXCEPTION
-═══════════════════════════════════════════════════
+SEED QUESTIONS TO TRANSFORM:
+${hasSectionA ? `\nSECTION A SEEDS (Short Answer, ~${saMarks} marks total):\n${formatSeeds(sectionASeeds)}` : ''}
+${hasSectionB ? `\nSECTION B SEEDS (Structured Questions, ~${sbMarks} marks total):\n${formatSeeds(sectionBSeeds)}` : ''}
+${hasSectionC ? `\nSECTION C SEEDS (Long Answer / Calculations, ~${scMarks} marks total):\n${formatSeeds(sectionCSeeds)}` : ''}
 
-1. KENYAN SCENARIOS: Every question MUST start with a real Kenyan context paragraph.
-   - Use names from this list: ${KENYAN_NAMES.slice(0, 12).join(', ')}
-   - Use real Kenyan schools like: ${KENYAN_SCHOOLS.slice(0, 5).join(', ')}
-   - Use real Kenyan places: ${KENYAN_PLACES.slice(0, 8).join(', ')}
-   - Example: "Wanjiku, a Grade 10 learner at ${KENYAN_SCHOOLS[Math.floor(Math.random() * 5)]}, observes..."
-
-2. SUB-PART FORMAT: Questions with multiple parts MUST use:
-   - First level: a), b), c), d) 
-   - Second level within each: i), ii), iii), iv)
-   - Example: "a) i) Define the term... (2 marks)\n   ii) State two examples... (2 marks)"
-
-3. INSTRUCTION VERBS (match to marks):
-   - 1 mark: State / Name / Identify / Give / List
-   - 2 marks: Define / Outline / Mention / Write / Describe briefly
-   - 3-4 marks: Explain / Describe / Illustrate
-   - 5-6 marks: Discuss / Analyse / Evaluate / Examine / Compare
-   - 7+ marks: Justify / Assess / Critically analyse
-
-4. MARKS MUST ADD UP EXACTLY:
-   - Section A total: EXACTLY ${marksA} marks (${qA} questions)
-   - Section B total: EXACTLY ${marksB} marks (${qB} questions)${sectionCount >= 3 ? `
-   - Section C total: EXACTLY ${marksC} marks (${qC} questions)` : ''}
-   - Grand total: EXACTLY ${totalMarks} marks
-
-5. MARKING SCHEME: Every question and sub-part MUST have:
-   - A detailed model answer
-   - Specific marking points
-   - Clear mark allocation per point
-
-6. DIAGRAMS — MANDATORY FOR VISUAL SUBJECTS:
-   For Mathematics: When a question involves geometric shapes, coordinate geometry, bearings, or number lines,
-   include a "diagram" field in the question object with this format:
-   {"type": "cylinder|sphere|cone|triangle|right_triangle|circle|coordinate_grid|bearing|number_line|similar_shapes|bar_chart|pie_chart|histogram|venn_diagram|line_graph|animal_cell|plant_cell|microscope|beaker|soil_profile|circuit|human_heart|digestive_system|respiratory_system|flower|food_web|nephron|ray_diagram|series_parallel_circuit|water_cycle|rock_cycle|data_table",
-    "params": {"r": "6cm", "h": "12cm"}, "caption": "Figure 1"}
-   
-   For Sciences (Biology, Chemistry, Physics, Agriculture): When a question involves cells, apparatus,
-   body systems, soil, circuits or specimens, include:
-   {"type": "animal_cell|plant_cell|microscope|beaker|soil_profile|circuit|human_heart",
-    "params": {"labelledParts": [{"label": "A"}, {"label": "B"}, {"label": "C"}, {"label": "D"}]},
-    "caption": "Figure 1: [description]"}
-   
-   For all other questions: omit the "diagram" field entirely (do NOT include diagram: null).
-   Only include diagrams when they genuinely help the student understand the question.
-
-7. SUBJECT RULES:
-${getSubjectRules(subject)}
-
-═══════════════════════════════════════════════════
-JSON OUTPUT FORMAT — RETURN ONLY THIS, NO OTHER TEXT
-═══════════════════════════════════════════════════
+OUTPUT FORMAT — Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
 
 {
-  "title": "${grade} ${subject} — ${examType} Examination, ${term} ${year}",
-  "time": "${getDuration(examType, totalMarks)}",
+  "title": "${grade} ${subject} ${examType} Examination",
+  "time": "${duration}",
   "instructions": [
     "Write your name, admission number, and class clearly at the top of the answer booklet.",
     "Answer ALL questions in each section.",
+    "In Section A, write concise answers in the spaces provided.",
+    "In Sections B and C, show all working clearly where calculations are involved.",
     "All answers must be written in the answer booklet provided.",
     "Mobile phones and electronic devices are NOT permitted in the examination room."
   ],
   "sectionA": {
-    "marks": ${marksA},
+    "marks": ${saMarks || Math.round(totalMarks * 0.3)},
     "instruction": "Answer ALL questions in this section. Write your answers concisely in the spaces provided.",
     "questions": [
       {
         "num": 1,
-        "text": "[Opening Kenyan scenario paragraph for this question]",
-        "marks": [total marks for this question — sum of all subParts],
-        "answer": "",
-        "subParts": [
-          {
-            "label": "a",
-            "text": "a) [Question text with marks in brackets, e.g.] State TWO reasons why... (2 marks)",
-            "marks": 2,
-            "answer": "Model answer: Point 1 (1 mark). Point 2 (1 mark)."
-          },
-          {
-            "label": "b",
-            "text": "b) i) Define the term '...' (1 mark)\\n   ii) Give ONE example of... (1 mark)",
-            "marks": 2,
-            "answer": "i) Definition here (1 mark).\\nii) Example here (1 mark)."
-          }
-        ]
+        "text": "Transformed question text in Kenyan CBC context",
+        "marks": 2,
+        "questionType": "short_answer",
+        "answer": "Model answer: Main point (1 mark). Supporting detail (1 mark)."
       }
     ]
   },
   "sectionB": {
-    "marks": ${marksB},
-    "instruction": "Answer ALL questions in this section. Show all working clearly where calculations are involved.",
+    "marks": ${sbMarks || Math.round(totalMarks * 0.4)},
+    "instruction": "Answer ALL questions in this section. Show your working clearly where applicable.",
     "questions": [
       {
-        "num": [continue numbering from Section A],
-        "text": "[Opening Kenyan scenario for this question]",
-        "marks": [total marks — must sum subParts marks],
-        "answer": "",
-        "subParts": [
-          {
-            "label": "a",
-            "text": "a) i) [sub-question i] (2 marks)\\n   ii) [sub-question ii] (2 marks)\\n   iii) [sub-question iii] (2 marks)",
-            "marks": 6,
-            "answer": "i) Answer to i (2 marks).\\nii) Answer to ii (2 marks).\\niii) Answer to iii (2 marks)."
-          },
-          {
-            "label": "b",
-            "text": "b) Explain FOUR ways... (4 marks)",
-            "marks": 4,
-            "answer": "i) Point 1 (1 mark).\\nii) Point 2 (1 mark).\\niii) Point 3 (1 mark).\\niv) Point 4 (1 mark)."
-          }
-        ]
+        "num": ${sectionASeeds.length + 1},
+        "text": "Structured question:\\n(a) First part (2 marks)\\n(b) Second part (3 marks)",
+        "marks": 5,
+        "questionType": "structured",
+        "answer": "(a) Answer part a — 2 marks: [answer]\\n(b) Answer part b — 3 marks: [answer]"
+      }
+    ]
+  },
+  "sectionC": {
+    "marks": ${scMarks || Math.round(totalMarks * 0.3)},
+    "instruction": "Answer ALL questions in this section. Show all working clearly. Marks are awarded for correct method as well as correct answers.",
+    "questions": [
+      {
+        "num": ${sectionASeeds.length + sectionBSeeds.length + 1},
+        "text": "Extended question:\\n(a) Part a (3 marks)\\n(b) Part b (3 marks)\\n(c) Part c (4 marks)",
+        "marks": 10,
+        "questionType": "long_answer",
+        "answer": "(a) Answer — 3 marks: [detailed]\\n(b) Answer — 3 marks: [detailed]\\n(c) Answer — 4 marks: [detailed]"
+      }
+    ]
+  }
+}
+
+Transform ALL ${totalQuestions} seed questions now. Ensure JSON is complete and valid.`;
+}
+
+// ── Fallback: pure AI prompt ─────────────────────────────
+function buildFallbackExamPrompt({
+  grade, subject, strands, substrands, examType, term, year,
+  totalMarks, totalQuestions, school,
+  sectionCount = 3,
+}) {
+  const gradeContext = getGradeContext(grade);
+  const duration = getDuration(examType, totalMarks);
+  const strandList = strands.join(', ');
+  const substrandList = substrands.length > 0 ? substrands.join(', ') : `All sub-strands within ${strandList}`;
+  const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
+  const questionFormats = getQuestionFormatRules(subject);
+
+  const saCount = Math.round(totalQuestions * 0.4);
+  const sbCount = Math.round(totalQuestions * 0.35);
+  const scCount = sectionCount >= 3 ? totalQuestions - saCount - sbCount : 0;
+  const effectiveSbCount = sectionCount >= 2 ? sbCount : totalQuestions - saCount;
+
+  const saMarks = saCount * 2;
+  const sbMarks = sectionCount >= 2 ? Math.round(totalMarks * 0.4) : totalMarks - saMarks;
+  const scMarks = sectionCount >= 3 ? totalMarks - saMarks - sbMarks : 0;
+  const scPerQ = scCount > 0 ? Math.round(scMarks / scCount) : 0;
+
+  return `You are a highly experienced Kenyan CBC curriculum specialist and senior examiner for ${subject} at ${gradeContext}.
+
+Generate a COMPLETE, PROFESSIONAL ${examType} examination paper that meets Kenya national exam standards.
+
+EXAMINATION DETAILS:
+- School: ${school}
+- Grade/Class: ${grade} (${gradeContext})
+- Subject: ${subject}
+- Strand(s): ${strandList}
+- Sub-Strand(s): ${substrandList}
+- Exam Type: ${examType}
+- Term: ${term}, ${year}
+- Total Marks: ${totalMarks}
+- Duration: ${duration}
+- Total Questions: ${totalQuestions}
+- Number of Sections: ${sectionCount}
+
+QUESTION DISTRIBUTION:
+- Section A (Short Answer): ${saCount} questions × 2 marks = ${saMarks} marks
+${sectionCount >= 2 ? `- Section B (Structured): ${effectiveSbCount} questions × ~${Math.round(sbMarks / effectiveSbCount)} marks = ${sbMarks} marks` : ''}
+${sectionCount >= 3 ? `- Section C (Long Answer): ${scCount} questions × ${scPerQ} marks = ${scMarks} marks` : ''}
+
+CRITICAL CBC REQUIREMENTS:
+1. ALL questions must align with Kenya CBC Senior School competency-based approach
+2. ABSOLUTELY NO multiple choice questions — structured, short answer, and long answer ONLY
+3. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Mwangi, Chebet
+4. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Kitale, Garissa
+5. Questions appropriate for ${grade} CBC Senior School learners
+6. Use CBC action verbs: Analyse, Evaluate, Explain, Calculate, Describe, Justify, Differentiate, Examine
+7. Distribute difficulty: 30% foundational, 50% developing, 20% extending
+8. All questions must be unambiguous, clear, and professionally worded
+9. Marking scheme must be detailed with clear per-mark breakdown
+10. Every question must directly map to the specified strands: ${strandList}
+11. NEVER write vague question descriptions — always include actual numbers, expressions, equations, names, values
+12. Include learner details section and score grid for exams with 10+ questions
+${subjectInstructions}
+${questionFormats}
+
+Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
+
+{
+  "title": "${grade} ${subject} ${examType} Examination",
+  "time": "${duration}",
+  "instructions": [
+    "Write your name, admission number, and class clearly at the top of the answer booklet.",
+    "Answer ALL questions in each section.",
+    "In Section A, write concise answers in the spaces provided.",
+    "In Sections B and C, show all working clearly where calculations are involved.",
+    "All answers must be written in the answer booklet provided.",
+    "Mobile phones and electronic devices are NOT permitted in the examination room."
+  ],
+  "sectionA": {
+    "marks": ${saMarks},
+    "instruction": "Answer ALL questions in this section. Write your answers concisely in the spaces provided. Each question carries 2 marks.",
+    "questions": [
+      {
+        "num": 1,
+        "text": "Short answer question in Kenyan CBC context for ${subject}",
+        "marks": 2,
+        "questionType": "short_answer",
+        "answer": "Model answer: Point 1 (1 mark). Point 2 with elaboration (1 mark)."
+      }
+    ]
+  },
+  "sectionB": {
+    "marks": ${sbMarks},
+    "instruction": "Answer ALL questions in this section. Show your working clearly. Marks are allocated as shown.",
+    "questions": [
+      {
+        "num": ${saCount + 1},
+        "text": "Structured ${subject} question:\\n(a) Part a (2 marks)\\n(b) Part b (3 marks)",
+        "marks": 5,
+        "questionType": "structured",
+        "answer": "(a) Answer — 2 marks: [answer with mark breakdown]\\n(b) Answer — 3 marks: [answer with mark breakdown]"
       }
     ]
   }${sectionCount >= 3 ? `,
   "sectionC": {
-    "marks": ${marksC},
-    "instruction": "Answer ALL questions in this section. Write your answers clearly and in detail.",
+    "marks": ${scMarks},
+    "instruction": "Answer ALL questions in this section. Show all working clearly. Marks are awarded for correct method as well as correct answers.",
     "questions": [
       {
-        "num": [continue numbering],
-        "text": "[Opening Kenyan scenario]",
-        "marks": [total marks],
-        "answer": "",
-        "subParts": [
-          {
-            "label": "a",
-            "text": "a) Analyse THREE factors that... (6 marks)",
-            "marks": 6,
-            "answer": "i) Factor 1: explanation (2 marks).\\nii) Factor 2: explanation (2 marks).\\niii) Factor 3: explanation (2 marks)."
-          },
-          {
-            "label": "b",
-            "text": "b) i) Evaluate the significance of... (4 marks)\\n   ii) Propose TWO solutions... (2 marks)",
-            "marks": 6,
-            "answer": "i) Significance: detailed answer (4 marks).\\nii) Solution 1 (1 mark). Solution 2 (1 mark)."
-          }
-        ]
+        "num": ${saCount + effectiveSbCount + 1},
+        "text": "Extended ${subject} question:\\n(a) Part a (${Math.round(scPerQ * 0.3)} marks)\\n(b) Part b (${Math.round(scPerQ * 0.35)} marks)\\n(c) Part c (${scPerQ - Math.round(scPerQ * 0.3) - Math.round(scPerQ * 0.35)} marks)",
+        "marks": ${scPerQ},
+        "questionType": "long_answer",
+        "answer": "(a) Model answer — ${Math.round(scPerQ * 0.3)} marks: [detailed model answer]\\n(b) Model answer — ${Math.round(scPerQ * 0.35)} marks: [detailed model answer]\\n(c) Model answer — ${scPerQ - Math.round(scPerQ * 0.3) - Math.round(scPerQ * 0.35)} marks: [detailed model answer]"
       }
     ]
   }` : ''}
 }
 
-CRITICAL CHECKS BEFORE RETURNING:
-✓ Does Section A marks total exactly ${marksA}?
-✓ Does Section B marks total exactly ${marksB}?${sectionCount >= 3 ? `
-✓ Does Section C marks total exactly ${marksC}?` : ''}
-✓ Does the grand total equal exactly ${totalMarks}?
-✓ Does every question start with a Kenyan scenario?
-✓ Does every sub-part have a model answer?
-✓ Are question numbers continuous across sections?
-✓ Are instruction verbs appropriate for mark allocations?
-
-Return ONLY the JSON object. No markdown, no explanation, no code blocks.`
-
-  return prompt
-}
-
-// ── Public functions ──────────────────────────────────────────────────────────
-function buildFallbackExamPrompt(params) {
-  return buildExamPrompt({ ...params, isHybrid: false, bankSeeds: null })
-}
-
-function buildHybridExamPrompt(params) {
-  const { sectionASeeds, sectionBSeeds, sectionCSeeds, ...rest } = params
-  const bankSeeds = {
-    sectionA: (sectionASeeds || []).map(q => ({
-      questionText: q.questionText,
-      answerGuide: q.answerGuide,
-      marks: q.marks,
-      strand: q.strand,
-    })).slice(0, 5),
-    sectionB: (sectionBSeeds || []).map(q => ({
-      questionText: q.questionText,
-      answerGuide: q.answerGuide,
-      marks: q.marks,
-      strand: q.strand,
-    })).slice(0, 4),
-    sectionC: (sectionCSeeds || []).map(q => ({
-      questionText: q.questionText,
-      answerGuide: q.answerGuide,
-      marks: q.marks,
-      strand: q.strand,
-    })).slice(0, 3),
-  }
-  return buildExamPrompt({ ...rest, isHybrid: true, bankSeeds })
+Generate all ${totalQuestions} questions now covering the strands: ${strandList}. Ensure JSON is complete and valid.`;
 }
 
 module.exports = {
-  buildFallbackExamPrompt,
   buildHybridExamPrompt,
+  buildFallbackExamPrompt,
   validateExamParams,
   selectBalancedQuestions,
   getDuration,
-  getDefaultSectionCount,
-  getSubjectTotalMarks,
-  getSectionMarkSplit,
-}
+  getGradeContext,
+  getSubjectType,
+  getSubjectInstructions,
+  getQuestionFormatRules,
+};
