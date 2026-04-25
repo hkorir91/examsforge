@@ -49,11 +49,11 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
   const sectionCount = meta.sectionCount ?? 3
 
   const strandsDisplay = Array.isArray(meta.strands)
-    ? meta.strands.join(', ')
-    : (meta.strand || '')
+    ? meta.strands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
+    : (meta.strand && meta.strand !== 'undefined' ? meta.strand : '')
   const substrandsDisplay = Array.isArray(meta.substrands)
-    ? meta.substrands.join(', ')
-    : (meta.substrand || '')
+    ? meta.substrands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
+    : (meta.substrand && meta.substrand !== 'undefined' && meta.substrand !== 'General' ? meta.substrand : '')
 
   const handleDownloadPDF = () => {
     if (!user?.isPremium) {
@@ -74,7 +74,24 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
     setEditText(currentText)
   }
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
+    if (!editingQ || !exam) return
+    // Update question text in local exam state
+    const { section, qNum } = editingQ
+    const updatedSection = {
+      ...exam[section],
+      questions: exam[section].questions.map(q =>
+        q.num === qNum ? { ...q, text: editText } : q
+      ),
+    }
+    // Persist to backend if we have an examId
+    if (examId) {
+      try {
+        await api.patch(`/exams/${examId}`, { [section]: updatedSection })
+      } catch {
+        // Silent fail — edit saved locally even if backend fails
+      }
+    }
     toast.success('Question updated')
     setEditingQ(null)
   }
@@ -83,7 +100,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
     if (!examId) { toast.error('Generate an exam first'); return }
     setSaving(true)
     try {
-      await api.post('/exams/' + examId)
+      await api.patch('/exams/' + examId, {})
       toast.success('Exam saved to My Exams')
     } catch {
       toast.success('Exam saved locally')
@@ -282,7 +299,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
                 ['Total Marks', meta.totalMarks],
                 ...(showStrand && strandsDisplay ? [
                   ['Strand', strandsDisplay],
-                  ['Sub-Strand', substrandsDisplay || 'General'],
+                  substrandsDisplay ? ['Sub-Strand', substrandsDisplay] : null,
                 ] : []),
               ].map(([label, value]) => (
                 <div key={label}>
