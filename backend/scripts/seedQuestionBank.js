@@ -8,13 +8,36 @@
  * Usage:
  *   cd backend
  *   node scripts/seedQuestionBank.js
+ *
+ * FIX: QuestionBank schema is defined inline so this script is fully self-contained
+ *      and does not depend on models/QuestionBank.js existing beforehand.
  */
 
 require('dotenv').config();
 const mongoose = require('mongoose');
-const QuestionBank = require('../models/QuestionBank');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/examsforge';
+
+// ── Inline QuestionBank schema (no external model file required) ─────────────
+const questionBankSchema = new mongoose.Schema(
+  {
+    grade:             { type: String, required: true, enum: ['Grade 10', 'Grade 11', 'Grade 12'] },
+    subject:           { type: String, required: true },
+    strand:            { type: String, required: true },
+    subStrand:         { type: String, required: true },
+    questionType:      { type: String, required: true, enum: ['short_answer', 'structured', 'long_answer', 'calculation', 'essay'] },
+    difficulty:        { type: String, required: true, enum: ['easy', 'medium', 'hard'] },
+    marks:             { type: Number, required: true },
+    questionText:      { type: String, required: true },
+    answerGuide:       { type: String, required: true },
+    tags:              [{ type: String }],
+    learningObjective: { type: String },
+  },
+  { timestamps: true }
+);
+
+const QuestionBank = mongoose.models.QuestionBank || mongoose.model('QuestionBank', questionBankSchema);
+// ────────────────────────────────────────────────────────────────────────────
 
 const seedQuestions = [
 
