@@ -43,8 +43,10 @@ const SUBJECT_TYPES = {
     'Indigenous Languages', 'Literature in English', 'Fasihi ya Kiswahili',
     'Sign Language', 'Kenyan Sign Language'],
   // Humanities — require case studies, source analysis, essays
-  humanities: ['History and Citizenship', 'Geography', 'CRE', 'IRE', 'HRE',
+  humanities: ['History and Citizenship', 'CRE', 'IRE', 'HRE',
     'Business Studies', 'Life Skills Education', 'Community Service Learning'],
+  // Geography — has its own specific rules
+  geography: ['Geography'],
   // Technical — require practical procedures, tools, safety
   technical: ['Agriculture', 'Computer Studies', 'Home Science', 'Aviation',
     'Building and Construction', 'Electricity', 'Drawing and Design',
@@ -120,6 +122,40 @@ HUMANITIES-SPECIFIC REQUIREMENTS:
 - CRE/IRE/HRE: questions must test understanding and application of values, not just recitation
 - Avoid pure recall questions — test application, analysis, and evaluation
 - Essays in Section C must have clear marking criteria with awarded marks per point`,
+
+    geography: `
+GEOGRAPHY-SPECIFIC REQUIREMENTS — CRITICAL:
+
+STRAND COVERAGE — questions MUST cover these official KICD Grade 10 Geography strands:
+1. Practical Geography: Introduction to Geography, Map Reading and Interpretation, Statistical Methods, GIS
+2. Natural Systems and Processes: Rocks, Earth Movements, Folding, Vulcanicity, Earthquakes
+3. Human and Economic Activities: Agriculture, Mining, Energy, Industry
+
+QUESTION CONTENT RULES:
+- EVERY question must be specific — name actual landforms, processes, places, data
+- Map Reading: reference actual Kenyan topographic maps, grid references, contour lines
+- Statistical Methods: include actual data tables or graphs for interpretation
+- Rocks: name specific rock types (granite, limestone, sandstone, basalt) and their formation
+- Vulcanicity: name actual Kenyan/African volcanoes (Mt Kenya, Mt Kilimanjaro, Longonot, Suswa)
+- Earthquakes: reference actual earthquake zones in East Africa (Great Rift Valley)
+- Folding: name types (anticline, syncline, monocline) with diagrams
+- Agriculture: reference Kenyan farming regions, crops, and methods
+- Mining: reference actual Kenyan minerals (soda ash, fluorspar, gold, limestone, titanium)
+- Energy: reference Kenyan energy sources (geothermal at Olkaria, hydroelectric at Masinga/Gitaru/Kiambere, wind at Ngong/Lake Turkana)
+- Industry: reference actual Kenyan industries (EPZ, KICOMI, Bamburi Cement, East African Breweries)
+
+DIAGRAM REQUIREMENTS:
+- Vulcanicity question: include diagram field with type "composite_volcano" or "shield_volcano"
+- Folding question: include diagram field with type "fold_diagram"
+- Rock cycle question: include diagram field with type "rock_cycle"
+- Map reading question: include diagram field with type "contour_map"
+- Statistical question: describe a data table or graph in the question text
+
+KENYAN GEOGRAPHY CONTEXT:
+- Always use real Kenyan examples: Rift Valley, Lake Victoria, Mt Kenya, Indian Ocean coast
+- Reference real counties: Narok, Nakuru, Turkana, Mombasa, Kisumu, Kilifi
+- Use real distances, populations, production figures where relevant
+- Section C essays must reference specific Kenyan geographical features and problems`,
 
     technical: `
 TECHNICAL SUBJECT REQUIREMENTS:
@@ -215,6 +251,29 @@ Section C (Essay / Extended Response — 10–15 marks):
   - "Discuss", "Analyse", "Evaluate", "Examine"
   - Clear marking guide: 1 mark per valid point, up to maximum
   - Introduction, body points, conclusion expected`,
+
+    geography: `
+QUESTION FORMAT FOR GEOGRAPHY:
+Section A (Short Answer — 2 marks each):
+  - "Define the term ___" (1+1 marks for definition + example)
+  - "State TWO characteristics of ___" (1 mark each)
+  - "Name TWO types of ___" (1 mark each)
+  - "Differentiate between ___ and ___" (2 marks)
+  - "Give the function of ___ as shown in the map extract" (2 marks)
+
+Section B (Structured — 5–10 marks, multi-part WITH scenario):
+  - Must include a stimulus: data table, map description, photograph description, or diagram
+  - (a) i) Identify ___ from the diagram/map (1 mark) ii) State the function of ___ (2 marks)
+  - (b) Explain THREE ways ___ affects ___ (3 marks)
+  - (c) Suggest how Kenya can improve ___ (2 marks)
+  - Include at least ONE question with a diagram field (fold, volcano, rock cycle, map)
+
+Section C (Essay — 10–15 marks):
+  - Extended questions: "Discuss", "Examine", "Analyse", "Evaluate"
+  - Must reference specific Kenyan examples and case studies
+  - Mark allocation: 1 mark per valid point clearly stated
+  - End with: "any other relevant point (1 mark)" to show flexibility
+  - Include at least one sketch map or diagram instruction within question`,
 
     technical: `
 QUESTION FORMAT FOR TECHNICAL SUBJECTS:
@@ -434,6 +493,35 @@ OUTPUT FORMAT — Return ONLY a valid JSON object. No explanation, no markdown, 
 Transform ALL ${totalQuestions} seed questions now. Ensure JSON is complete and valid.`;
 }
 
+// ── Param validation ──────────────────────────────────────
+function validateExamParams(params) {
+  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
+  if (!grade) return 'Grade is required.';
+  if (!subject) return 'Subject is required.';
+  if (!strands || strands.length === 0) return 'At least one strand must be selected.';
+  if (!examType) return 'Exam type is required.';
+  if (!term) return 'Term is required.';
+  if (!year || isNaN(year)) return 'A valid year is required.';
+  if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.';
+  if (!totalQuestions || totalQuestions < 2) return 'At least 2 questions are required.';
+  if (!school || !school.trim()) return 'School name is required.';
+  return null;
+}
+
+// ── Question bank helpers ─────────────────────────────────
+function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
+  if (!pool || pool.length === 0) {
+    return { sectionA: [], sectionB: [], sectionC: [] };
+  }
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const third = Math.ceil(shuffled.length / 3);
+  return {
+    sectionA: shuffled.slice(0, third),
+    sectionB: shuffled.slice(third, third * 2),
+    sectionC: shuffled.slice(third * 2),
+  };
+}
+
 // ── Fallback: pure AI prompt ─────────────────────────────
 function buildFallbackExamPrompt({
   grade, subject, strands, substrands, examType, term, year,
@@ -452,14 +540,20 @@ function buildFallbackExamPrompt({
   const scCount = sectionCount >= 3 ? totalQuestions - saCount - sbCount : 0;
   const effectiveSbCount = sectionCount >= 2 ? sbCount : totalQuestions - saCount;
 
-  const saMarks = saCount * 2;
-  const sbMarks = sectionCount >= 2 ? Math.round(totalMarks * 0.4) : totalMarks - saMarks;
+  // Fix marks calculation — don't assume 2 marks per Section A question
+  const saMarks = Math.round(totalMarks * 0.25);
+  const sbMarks = sectionCount >= 2 ? Math.round(totalMarks * 0.40) : totalMarks - saMarks;
   const scMarks = sectionCount >= 3 ? totalMarks - saMarks - sbMarks : 0;
   const scPerQ = scCount > 0 ? Math.round(scMarks / scCount) : 0;
+  const saPerQ = Math.round(saMarks / saCount);
+  const sbPerQ = Math.round(sbMarks / effectiveSbCount);
+
+  const isGeography = subject === 'Geography';
 
   return `You are a highly experienced Kenyan CBC curriculum specialist and senior examiner for ${subject} at ${gradeContext}.
 
 Generate a COMPLETE, PROFESSIONAL ${examType} examination paper that meets Kenya national exam standards.
+Every single question MUST be fully written out — NO placeholder text, NO vague descriptions.
 
 EXAMINATION DETAILS:
 - School: ${school}
@@ -475,25 +569,39 @@ EXAMINATION DETAILS:
 - Number of Sections: ${sectionCount}
 
 QUESTION DISTRIBUTION:
-- Section A (Short Answer): ${saCount} questions × 2 marks = ${saMarks} marks
-${sectionCount >= 2 ? `- Section B (Structured): ${effectiveSbCount} questions × ~${Math.round(sbMarks / effectiveSbCount)} marks = ${sbMarks} marks` : ''}
-${sectionCount >= 3 ? `- Section C (Long Answer): ${scCount} questions × ${scPerQ} marks = ${scMarks} marks` : ''}
+- Section A (Short Answer): ${saCount} questions totalling ${saMarks} marks (~${saPerQ} marks each)
+${sectionCount >= 2 ? `- Section B (Structured): ${effectiveSbCount} questions totalling ${sbMarks} marks (~${sbPerQ} marks each)` : ''}
+${sectionCount >= 3 ? `- Section C (Long Answer): ${scCount} questions totalling ${scMarks} marks (~${scPerQ} marks each)` : ''}
+GRAND TOTAL: EXACTLY ${totalMarks} marks
 
 CRITICAL CBC REQUIREMENTS:
 1. ALL questions must align with Kenya CBC Senior School competency-based approach
 2. ABSOLUTELY NO multiple choice questions — structured, short answer, and long answer ONLY
-3. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Mwangi, Chebet
-4. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Kitale, Garissa
-5. Questions appropriate for ${grade} CBC Senior School learners
-6. Use CBC action verbs: Analyse, Evaluate, Explain, Calculate, Describe, Justify, Differentiate, Examine
+3. EVERY question must contain the COMPLETE, ACTUAL question — not a description of a question
+4. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Mwangi, Chebet
+5. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Kitale, Garissa
+6. Use CBC action verbs matching mark allocations:
+   - 1-2 marks: State, Name, Identify, Give, Define, List
+   - 3-4 marks: Explain, Describe, Outline, Differentiate
+   - 5+ marks: Discuss, Analyse, Evaluate, Examine, Justify
 7. Distribute difficulty: 30% foundational, 50% developing, 20% extending
-8. All questions must be unambiguous, clear, and professionally worded
-9. Marking scheme must be detailed with clear per-mark breakdown
-10. Every question must directly map to the specified strands: ${strandList}
-11. NEVER write vague question descriptions — always include actual numbers, expressions, equations, names, values
-12. Include learner details section and score grid for exams with 10+ questions
+8. Marking scheme: specific per-mark breakdown for EVERY question and sub-part
+9. Every question directly maps to the specified strands: ${strandList}
+10. Question numbers must be CONTINUOUS across all sections (1, 2, 3... not restarting)
+11. Sub-parts use: a) b) c) at first level, i) ii) iii) at second level
 ${subjectInstructions}
 ${questionFormats}
+
+${isGeography ? `
+GEOGRAPHY DIAGRAM INSTRUCTIONS:
+When generating questions about:
+- Folding → add "diagram": {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
+- Vulcanicity → add "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
+- Rocks → add "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}
+- Map Reading → add "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
+- Earthquakes → add "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Wave Propagation"}
+Only include diagram field when it genuinely helps the student understand the question.
+` : ''}
 
 Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
 
@@ -510,46 +618,69 @@ Return ONLY a valid JSON object. No explanation, no markdown, no text outside th
   ],
   "sectionA": {
     "marks": ${saMarks},
-    "instruction": "Answer ALL questions in this section. Write your answers concisely in the spaces provided. Each question carries 2 marks.",
+    "instruction": "Answer ALL ${saCount} questions in this section. Write your answers concisely in the spaces provided.",
     "questions": [
       {
         "num": 1,
-        "text": "Short answer question in Kenyan CBC context for ${subject}",
-        "marks": 2,
+        "text": "[COMPLETE question text here — Kenyan scenario + actual question with specific content]",
+        "marks": ${saPerQ},
         "questionType": "short_answer",
-        "answer": "Model answer: Point 1 (1 mark). Point 2 with elaboration (1 mark)."
+        "subParts": [
+          {"label": "a", "text": "a) [Complete sub-question] (1 mark)", "marks": 1, "answer": "[Model answer — 1 mark]"},
+          {"label": "b", "text": "b) [Complete sub-question] (1 mark)", "marks": 1, "answer": "[Model answer — 1 mark]"}
+        ],
+        "answer": ""
       }
     ]
   },
   "sectionB": {
     "marks": ${sbMarks},
-    "instruction": "Answer ALL questions in this section. Show your working clearly. Marks are allocated as shown.",
+    "instruction": "Answer ALL ${effectiveSbCount} questions in this section. Marks are allocated as shown.",
     "questions": [
       {
         "num": ${saCount + 1},
-        "text": "Structured ${subject} question:\\n(a) Part a (2 marks)\\n(b) Part b (3 marks)",
-        "marks": 5,
+        "text": "[COMPLETE scenario — specific Kenyan context with all data needed to answer the question]",
+        "marks": ${sbPerQ},
         "questionType": "structured",
-        "answer": "(a) Answer — 2 marks: [answer with mark breakdown]\\n(b) Answer — 3 marks: [answer with mark breakdown]"
+        "subParts": [
+          {"label": "a", "text": "a) i) [Sub-question] (X marks)\\n   ii) [Sub-question] (X marks)", "marks": 0, "answer": "i) [Model answer] (X marks).\\nii) [Model answer] (X marks)."},
+          {"label": "b", "text": "b) [Sub-question] (X marks)", "marks": 0, "answer": "[Model answer with point-by-point breakdown]"}
+        ],
+        "answer": ""
       }
     ]
   }${sectionCount >= 3 ? `,
   "sectionC": {
     "marks": ${scMarks},
-    "instruction": "Answer ALL questions in this section. Show all working clearly. Marks are awarded for correct method as well as correct answers.",
+    "instruction": "Answer ALL ${scCount} questions in this section. Show all working clearly.",
     "questions": [
       {
         "num": ${saCount + effectiveSbCount + 1},
-        "text": "Extended ${subject} question:\\n(a) Part a (${Math.round(scPerQ * 0.3)} marks)\\n(b) Part b (${Math.round(scPerQ * 0.35)} marks)\\n(c) Part c (${scPerQ - Math.round(scPerQ * 0.3) - Math.round(scPerQ * 0.35)} marks)",
+        "text": "[COMPLETE scenario with all data, map description, or source material needed]",
         "marks": ${scPerQ},
         "questionType": "long_answer",
-        "answer": "(a) Model answer — ${Math.round(scPerQ * 0.3)} marks: [detailed model answer]\\n(b) Model answer — ${Math.round(scPerQ * 0.35)} marks: [detailed model answer]\\n(c) Model answer — ${scPerQ - Math.round(scPerQ * 0.3) - Math.round(scPerQ * 0.35)} marks: [detailed model answer]"
+        "subParts": [
+          {"label": "a", "text": "a) [Extended question requiring detailed answer] (X marks)", "marks": 0, "answer": "[Comprehensive model answer — point 1 (1 mark), point 2 (1 mark)...]"},
+          {"label": "b", "text": "b) [Further sub-question] (X marks)", "marks": 0, "answer": "[Model answer]"},
+          {"label": "c", "text": "c) [Final sub-question] (X marks)", "marks": 0, "answer": "[Model answer]"}
+        ],
+        "answer": ""
       }
     ]
   }` : ''}
 }
 
-Generate all ${totalQuestions} questions now covering the strands: ${strandList}. Ensure JSON is complete and valid.`;
+FINAL CHECK BEFORE RETURNING:
+✓ Section A has EXACTLY ${saCount} questions totalling EXACTLY ${saMarks} marks?
+${sectionCount >= 2 ? `✓ Section B has EXACTLY ${effectiveSbCount} questions totalling EXACTLY ${sbMarks} marks?` : ''}
+${sectionCount >= 3 ? `✓ Section C has EXACTLY ${scCount} questions totalling EXACTLY ${scMarks} marks?` : ''}
+✓ Grand total equals EXACTLY ${totalMarks} marks?
+✓ Every question has COMPLETE, actual content — no placeholders?
+✓ Every sub-part has a model answer in the marking scheme?
+✓ Question numbers are continuous across all sections?
+✓ All questions reference the specified strands: ${strandList}?
+
+Generate all ${totalQuestions} questions now. Ensure JSON is complete and valid.`;
 }
 
 module.exports = {
