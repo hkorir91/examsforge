@@ -157,11 +157,9 @@ export const CBC_CURRICULUM = {
         'Economic History',
       ],
       'Geography': [
-        'Physical Geography',
-        'Human Geography',
-        'Environmental Geography',
-        'Regional Geography',
-        'Map Work and Fieldwork',
+        'Practical Geography',
+        'Natural Systems and Processes',
+        'Human and Economic Activities',
       ],
       'CRE': [
         'The Old Testament',
@@ -1122,17 +1120,26 @@ export const SUBSTRANDS = {
   'International Relations': ['Kenya and East Africa', 'Kenya and the African Union', 'Kenya and the United Nations', 'Foreign Policy'],
   'Contemporary Issues': ['Ethnic Relations', 'Environmental Challenges', 'Technology and Society', 'Globalisation'],
 
-  // Geography
-  'Physical Geography': ['Plate Tectonics', 'Rocks and Minerals', 'Rivers and Valleys', 'Coastal Landforms'],
-  'Climatology': ['Weather Systems', 'Climate Zones', 'Climate Change', 'Meteorological Instruments'],
-  'Population Geography': ['Population Growth', 'Migration', 'Urbanisation', 'Population Policies'],
-  'Map Work and Fieldwork': ['Topographic Maps', 'Geographical Coordinates', 'Data Collection', 'GIS Introduction'],
-  'Geomorphology': ['Weathering and Erosion', 'Glaciation', 'Desert Landforms', 'Karst Topography'],
-  'Human Geography': ['Settlement Patterns', 'Land Use', 'Economic Activities', 'Cultural Geography'],
-  'Environmental Geography': ['Natural Resources', 'Environmental Degradation', 'Conservation', 'Sustainable Development'],
-  'Agriculture and Land Use': ['Types of Farming', 'Irrigation and Water Use', 'Land Reform', 'Food Security'],
-  'Industry and Trade': ['Types of Industries', 'Industrial Location', 'International Trade', 'Economic Blocs'],
-  'Environmental Management': ['Pollution Management', 'Wildlife Conservation', 'Forestry Management', 'Water Resource Management'],
+  // Geography — Official KICD Grade 10 Strands & Sub-strands
+  'Practical Geography': [
+    'Introduction to Geography',
+    'Map Reading and Interpretation',
+    'Statistical Methods',
+    'Geographic Information System',
+  ],
+  'Natural Systems and Processes': [
+    'Rocks',
+    'Earth Movements',
+    'Folding',
+    'Vulcanicity',
+    'Earthquakes',
+  ],
+  'Human and Economic Activities': [
+    'Agriculture',
+    'Mining',
+    'Energy',
+    'Industry',
+  ],
 
   // Business Studies
   'Business Concepts and Environment': ['Nature of Business', 'Business Environment', 'Forms of Business Ownership', 'Business Objectives'],
