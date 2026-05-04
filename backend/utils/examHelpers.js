@@ -312,34 +312,6 @@ Section C (Extended — 10–15 marks):
   return formats[type] || formats.humanities;
 }
 
-// ── Validate exam params ─────────────────────────────────
-function validateExamParams(params) {
-  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
-
-  if (!grade) return 'Grade is required.';
-  if (!['Grade 10', 'Grade 11', 'Grade 12'].includes(grade)) {
-    return 'Grade must be Grade 10, 11, or 12 (CBC Senior School).';
-  }
-  if (!subject) return 'Subject is required.';
-  if (!strands || !Array.isArray(strands) || strands.length === 0) {
-    return 'At least one strand must be selected.';
-  }
-  if (!examType || !['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'].includes(examType)) {
-    return 'Exam type must be CAT, Midterm, End Term, Pre-Mock, or Mock.';
-  }
-  if (!term) return 'Term is required.';
-  if (!year || isNaN(year)) return 'Valid year is required.';
-  if (!totalMarks || totalMarks < 10 || totalMarks > 150) {
-    return 'Total marks must be between 10 and 150.';
-  }
-  if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
-    return 'Total questions must be between 5 and 50.';
-  }
-  if (!school || school.trim().length < 2) return 'School name is required.';
-
-  return null;
-}
-
 // ── Select balanced question set ─────────────────────────
 function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
   if (!pool || pool.length === 0) return { sectionA: [], sectionB: [], sectionC: [] };
@@ -499,7 +471,9 @@ function validateExamParams(params) {
   if (!grade) return 'Grade is required.';
   if (!subject) return 'Subject is required.';
   if (!strands || strands.length === 0) return 'At least one strand must be selected.';
-  if (!examType) return 'Exam type is required.';
+  if (!examType || !['CAT', 'Midterm', 'End Term', 'End Year', 'Pre-Mock', 'Mock', 'Series'].includes(examType)) {
+    return 'Exam type must be CAT, Midterm, End Term, End Year, Pre-Mock, Mock, or Series.';
+  }
   if (!term) return 'Term is required.';
   if (!year || isNaN(year)) return 'A valid year is required.';
   if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.';
