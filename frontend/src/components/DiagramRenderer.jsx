@@ -1,7 +1,8 @@
 // DiagramRenderer.jsx
-// Auto-renders SVG diagrams for Math and Science exam questions
+// Auto-renders SVG diagrams for Geography, Math, Science exam questions
 // Math: cylinder, sphere, cone, triangle, circle, coordinate_grid, bearing, number_line, similar_shapes
 // Science: animal_cell, plant_cell, microscope, beaker, soil_profile, circuit, human_heart
+// Geography: water_cycle, rock_cycle, fold_diagram, composite_volcano, contour_map, earthquake_waves
 
 const S = ({ children, w = 200, h = 200, caption }) => (
   <div className="flex flex-col items-center my-3">
@@ -1127,6 +1128,197 @@ const Nephron = ({ params = {}, caption }) => {
   )
 }
 
+// ── GEOGRAPHY: Fold Diagram (anticline + syncline) ────────────────────────────
+const FoldDiagram = ({ params = {}, caption }) => {
+  const foldType = params.foldType || 'anticline_syncline'
+  // X = anticline axis at ~col 80, Y = syncline axis at ~col 200
+  const strata = [
+    { y: 60,  fill: '#fde68a', stroke: '#92400e' },
+    { y: 85,  fill: '#fef3c7', stroke: '#92400e' },
+    { y: 110, fill: '#d1fae5', stroke: '#065f46' },
+    { y: 135, fill: '#dbeafe', stroke: '#1e40af' },
+    { y: 158, fill: '#ede9fe', stroke: '#4c1d95' },
+  ]
+  // Each stratum: arch UP at x=90 (anticline), dip DOWN at x=210 (syncline)
+  const path = (y) =>
+    `M10,${y} C35,${y} 65,${y - 44} 90,${y - 48} C115,${y - 44} 140,${y} 160,${y} C180,${y} 195,${y + 44} 210,${y + 48} C225,${y + 44} 250,${y} 275,${y}`
+  return (
+    <S w={285} h={220} caption={caption}>
+      {/* Ground shading */}
+      <rect x="0" y="170" width="285" height="50" fill="#fef3c7" opacity="0.4" />
+      {/* Strata layers */}
+      {strata.map((s, i) => (
+        <path key={i} d={path(s.y)} fill={s.fill} stroke={s.stroke}
+          strokeWidth="1.5" opacity="0.9" />
+      ))}
+      {/* Anticline axis — dashed vertical at x=90 */}
+      <line x1="90" y1="8" x2="90" y2="178" stroke="#cc0000" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* Syncline axis — dashed vertical at x=210 */}
+      <line x1="210" y1="8" x2="210" y2="178" stroke="#003399" strokeWidth="1.5" strokeDasharray="5 3" />
+      {/* X label (Anticline) */}
+      <rect x="76" y="1" width="28" height="15" rx="3" fill="white" stroke="#cc0000" strokeWidth="1" />
+      <text x="90" y="12" fontSize="11" fill="#cc0000" textAnchor="middle" fontFamily="serif" fontWeight="bold">X</text>
+      {/* Y label (Syncline) */}
+      <rect x="196" y="1" width="28" height="15" rx="3" fill="white" stroke="#003399" strokeWidth="1" />
+      <text x="210" y="12" fontSize="11" fill="#003399" textAnchor="middle" fontFamily="serif" fontWeight="bold">Y</text>
+      {/* Anticline upward arrow */}
+      <polygon points="90,20 85,32 95,32" fill="#cc0000" />
+      {/* Syncline downward arrow */}
+      <polygon points="210,165 205,153 215,153" fill="#003399" />
+      {/* Legend */}
+      <rect x="8" y="182" width="130" height="16" rx="3" fill="white" stroke="#cc0000" strokeWidth="1" />
+      <text x="73" y="194" fontSize="9" fill="#cc0000" textAnchor="middle" fontFamily="serif">X = Anticline axis</text>
+      <rect x="147" y="182" width="130" height="16" rx="3" fill="white" stroke="#003399" strokeWidth="1" />
+      <text x="212" y="194" fontSize="9" fill="#003399" textAnchor="middle" fontFamily="serif">Y = Syncline axis</text>
+    </S>
+  )
+}
+
+// ── GEOGRAPHY: Composite Volcano cross-section ────────────────────────────────
+const CompositeVolcano = ({ params = {}, caption }) => {
+  const parts = params.labelledParts || [
+    { label: 'A', x: 140, y: 175, desc: 'Magma Chamber' },
+    { label: 'B', x: 140, y: 60,  desc: 'Crater' },
+    { label: 'C', x: 80,  y: 110, desc: 'Lava/Ash Layers' },
+    { label: 'D', x: 140, y: 130, desc: 'Main Vent' },
+  ]
+  return (
+    <S w={285} h={220} caption={caption}>
+      {/* Sky */}
+      <rect x="0" y="0" width="285" height="155" fill="#e0f2fe" opacity="0.5" />
+      {/* Ground base */}
+      <rect x="0" y="155" width="285" height="65" fill="#fef3c7" />
+      {/* Volcano cone — left slope */}
+      <polygon points="10,155 142,20 142,155" fill="#d1d5db" stroke="#374151" strokeWidth="1.5" />
+      {/* Volcano cone — right slope */}
+      <polygon points="274,155 142,20 142,155" fill="#9ca3af" stroke="#374151" strokeWidth="1.5" />
+      {/* Alternating lava/ash layers inside left cone */}
+      {[0,1,2,3,4].map(i => {
+        const y1 = 145 - i * 23
+        const xSpread = 120 - i * 22
+        const fillColor = i % 2 === 0 ? '#fca5a5' : '#e5e7eb'
+        return (
+          <path key={i}
+            d={`M${142 - xSpread},${y1} Q142,${y1 - 8} ${142 + xSpread},${y1} L${142 + xSpread - 5},${y1 + 8} Q142,${y1 + 4} ${142 - xSpread + 5},${y1 + 8} Z`}
+            fill={fillColor} stroke="#9ca3af" strokeWidth="0.8" opacity="0.85" />
+        )
+      })}
+      {/* Central vent */}
+      <rect x="135" y="30" width="14" height="130" fill="#ef4444" opacity="0.7" />
+      {/* Magma chamber */}
+      <ellipse cx="142" cy="185" rx="55" ry="22" fill="#fca5a5" stroke="#cc0000" strokeWidth="2" />
+      <text x="142" y="188" fontSize="9" fill="#9b1c1c" textAnchor="middle" fontFamily="serif">Magma</text>
+      {/* Crater at top */}
+      <path d="M128,30 Q136,22 142,20 Q148,22 156,30" fill="none" stroke="#374151" strokeWidth="2" />
+      {/* Lava/ash emission lines */}
+      <path d="M136,22 Q120,5 105,2" fill="none" stroke="#ef4444" strokeWidth="2" />
+      <path d="M148,22 Q162,5 178,2" fill="none" stroke="#9ca3af" strokeWidth="2" />
+      {/* Labelled parts */}
+      {parts.map((p, i) => {
+        const right = p.x > 142
+        const lx = right ? p.x + 16 : p.x - 16
+        const lbx = right ? p.x + 18 : p.x - 68
+        return (
+          <g key={i}>
+            <line x1={p.x} y1={p.y} x2={lx} y2={p.y} stroke="#1e3a5f" strokeWidth="1" />
+            <rect x={lbx} y={p.y - 9} width="22" height="16" fill="white" stroke="#1e3a5f" strokeWidth="1" rx="3" />
+            <text x={lbx + 11} y={p.y + 3} fontSize="11" fill="#1e3a5f" textAnchor="middle" fontFamily="serif" fontWeight="bold">{p.label}</text>
+          </g>
+        )
+      })}
+      {/* Cone outline */}
+      <polyline points="10,155 142,20 274,155" fill="none" stroke="#374151" strokeWidth="2" />
+    </S>
+  )
+}
+
+// ── GEOGRAPHY: Contour Map extract ───────────────────────────────────────────
+const ContourMap = ({ params = {}, caption }) => {
+  // Concentric ovals representing a hill — tighter on left side (steep slope)
+  // Contour values from 1200 (outermost) to 1400 (innermost)
+  const contours = [
+    { rx: 110, ry: 72, cx: 142, cy: 118, val: '1200m', valX: 20,  valY: 118 },
+    { rx: 88,  ry: 56, cx: 142, cy: 115, val: '1250m', valX: 32,  valY: 110 },
+    { rx: 66,  ry: 41, cx: 142, cy: 112, val: '1300m', valX: 52,  valY: 103 },
+    { rx: 44,  ry: 27, cx: 142, cy: 109, val: '1350m', valX: 74,  valY: 97  },
+    { rx: 22,  ry: 13, cx: 142, cy: 106, val: '1400m', valX: 108, valY: 99  },
+  ]
+  return (
+    <S w={285} h={220} caption={caption}>
+      {/* Light background */}
+      <rect x="0" y="0" width="285" height="220" fill="#f0fdf4" />
+      {/* Contour ellipses */}
+      {contours.map((c, i) => (
+        <g key={i}>
+          <ellipse cx={c.cx} cy={c.cy} rx={c.rx} ry={c.ry}
+            fill="none" stroke="#16a34a" strokeWidth={i === 0 ? 2 : 1.5} />
+          <text x={c.valX} y={c.valY} fontSize="9" fill="#15803d" fontFamily="serif">{c.val}</text>
+        </g>
+      ))}
+      {/* Summit point */}
+      <circle cx="142" cy="106" r="3" fill="#cc0000" />
+      <text x="148" y="104" fontSize="9" fill="#cc0000" fontFamily="serif">Summit</text>
+      {/* Steep slope indicator (left side — close spacing) */}
+      <text x="14" y="142" fontSize="8" fill="#555" fontFamily="serif" fontStyle="italic">← Steep</text>
+      {/* Gentle slope indicator (right side — wide spacing) */}
+      <text x="232" y="125" fontSize="8" fill="#555" fontFamily="serif" fontStyle="italic">Gentle →</text>
+      {/* North arrow */}
+      <g transform="translate(250, 20)">
+        <polygon points="0,-16 -6,0 0,-4 6,0" fill="#1e3a5f" />
+        <polygon points="0,-4 -6,0 0,16 6,0" fill="#9ca3af" />
+        <text x="0" y="-19" fontSize="10" fill="#1e3a5f" textAnchor="middle" fontFamily="serif" fontWeight="bold">N</text>
+      </g>
+      {/* Scale bar */}
+      <line x1="10" y1="205" x2="90" y2="205" stroke="#374151" strokeWidth="2" />
+      <line x1="10" y1="200" x2="10" y2="210" stroke="#374151" strokeWidth="1.5" />
+      <line x1="90" y1="200" x2="90" y2="210" stroke="#374151" strokeWidth="1.5" />
+      <text x="50" y="216" fontSize="8" fill="#374151" textAnchor="middle" fontFamily="serif">0         1 km</text>
+      {/* Border */}
+      <rect x="1" y="1" width="283" height="218" fill="none" stroke="#374151" strokeWidth="1.5" />
+    </S>
+  )
+}
+
+// ── GEOGRAPHY: Earthquake Waves ───────────────────────────────────────────────
+const EarthquakeWaves = ({ params = {}, caption }) => (
+  <S w={285} h={210} caption={caption}>
+    {/* Earth cross-section — half circle */}
+    <path d="M10,145 A130,130 0 0 1 275,145" fill="#fef9c3" stroke="#374151" strokeWidth="2" />
+    {/* Earth interior layers */}
+    <path d="M50,145 A100,100 0 0 1 235,145" fill="#fde68a" stroke="#92400e" strokeWidth="1" strokeDasharray="3 2" />
+    <path d="M90,145 A60,60 0 0 1 195,145" fill="#fca5a5" stroke="#cc0000" strokeWidth="1" strokeDasharray="3 2" />
+    {/* Surface line */}
+    <line x1="10" y1="145" x2="275" y2="145" stroke="#374151" strokeWidth="2" />
+    {/* Focus (hypocenter) — inside earth */}
+    <circle cx="142" cy="100" r="6" fill="#cc0000" />
+    <text x="152" y="97" fontSize="9" fill="#cc0000" fontFamily="serif" fontWeight="bold">Focus</text>
+    {/* Epicentre — on surface */}
+    <line x1="142" y1="100" x2="142" y2="145" stroke="#cc0000" strokeWidth="1.5" strokeDasharray="4 2" />
+    <circle cx="142" cy="145" r="5" fill="#cc0000" />
+    <text x="148" y="142" fontSize="9" fill="#cc0000" fontFamily="serif" fontWeight="bold">Epicentre</text>
+    {/* P waves — solid lines radiating outward */}
+    <line x1="142" y1="100" x2="36" y2="145" stroke="#003399" strokeWidth="1.5" />
+    <line x1="142" y1="100" x2="248" y2="145" stroke="#003399" strokeWidth="1.5" />
+    <line x1="142" y1="100" x2="80" y2="145" stroke="#003399" strokeWidth="1.5" />
+    <line x1="142" y1="100" x2="204" y2="145" stroke="#003399" strokeWidth="1.5" />
+    {/* S waves — dashed lines */}
+    <line x1="142" y1="100" x2="22" y2="130" stroke="#16a34a" strokeWidth="1.5" strokeDasharray="4 2" />
+    <line x1="142" y1="100" x2="262" y2="130" stroke="#16a34a" strokeWidth="1.5" strokeDasharray="4 2" />
+    {/* Seismograph stations on surface */}
+    {[36, 80, 204, 248].map((x, i) => (
+      <g key={i}>
+        <rect x={x - 5} y={137} width="10" height="8" fill="#374151" />
+      </g>
+    ))}
+    {/* Legend */}
+    <rect x="8" y="155" width="270" height="48" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+    <line x1="16" y1="168" x2="40" y2="168" stroke="#003399" strokeWidth="2" />
+    <text x="44" y="172" fontSize="9" fill="#003399" fontFamily="serif">P waves (Primary — travel through solids and liquids)</text>
+    <line x1="16" y1="185" x2="40" y2="185" stroke="#16a34a" strokeWidth="2" strokeDasharray="4 2" />
+    <text x="44" y="189" fontSize="9" fill="#16a34a" fontFamily="serif">S waves (Secondary — travel through solids only)</text>
+  </S>
+)
+
 // ── Generic Labeled Placeholder ───────────────────────────────────────────────
 const GenericDiagram = ({ params = {}, caption }) => (
   <S w={200} h={150} caption={caption}>
@@ -1187,6 +1379,11 @@ export default function DiagramRenderer({ diagram }) {
     // ── Geography ────────────────────────────────────────────────────────
     water_cycle: WaterCycle,
     rock_cycle: RockCycle,
+    fold_diagram: FoldDiagram,
+    composite_volcano: CompositeVolcano,
+    shield_volcano: CompositeVolcano,   // alias
+    contour_map: ContourMap,
+    earthquake_waves: EarthquakeWaves,
     // ── Utility ──────────────────────────────────────────────────────────
     data_table: DataTable,
   }
