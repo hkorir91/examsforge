@@ -179,7 +179,7 @@ async function processExamJob(jobId, params, user) {
     let prompt;
     if (isHybrid) {
       const { sectionA: sectionASeeds, sectionB: sectionBSeeds, sectionC: sectionCSeeds } =
-        selectBalancedQuestions(questionPool, totalMarks, totalQuestions);
+        selectBalancedQuestions(questionPool, totalMarks, totalQuestions, sectionCount);
 
       prompt = buildHybridExamPrompt({
         grade, subject, strands, substrands, examType, term, year,
