@@ -629,13 +629,29 @@ ${questionFormats}
 
 ${isGeography ? `
 GEOGRAPHY DIAGRAM INSTRUCTIONS:
-When generating questions about:
-- Folding → add "diagram": {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
-- Vulcanicity → add "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
-- Rocks → add "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}
-- Map Reading → add "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
-- Earthquakes → add "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Wave Propagation"}
-Only include diagram field when it genuinely helps the student understand the question.
+The following diagram types are FULLY SUPPORTED and will render as proper SVG diagrams:
+- fold_diagram → use for anticline/syncline questions
+- composite_volcano → use for composite or shield volcano cross-section questions
+- contour_map → use for map reading and contour interpretation questions
+- earthquake_waves → use for earthquake/seismic wave questions
+- rock_cycle → use for rock formation and rock cycle questions
+- water_cycle → use for hydrological cycle questions
+
+CRITICAL RULES FOR DIAGRAMS:
+1. When a diagram is needed, add a "diagram" JSON field to the question object — NOTHING ELSE.
+2. NEVER write diagram descriptions in brackets like "[Diagram shows an anticline and syncline]" — this is STRICTLY FORBIDDEN. It looks unprofessional in printed exams.
+3. NEVER describe what the diagram contains in the question text body.
+4. In the question text, reference the diagram ONLY as: "Study Figure 1 below." or "Refer to the diagram below." — then ask the question.
+5. The diagram JSON field format is: {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
+
+WHEN to add diagram JSON field:
+- Folding question → add "diagram": {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
+- Vulcanicity/volcano question → add "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
+- Rocks question → add "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}
+- Map reading/contours question → add "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
+- Earthquake/seismic waves question → add "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Wave Propagation"}
+
+Only include a diagram field when it genuinely helps the student understand or answer the question.
 ` : ''}
 
 Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
