@@ -60,6 +60,8 @@ export default function GeneratorPage() {
         school: form.school,
         sectionCount: form.sectionCount,
         showStrand: form.showStrand,
+        // BUG 6 FIX: include includePractical in the API payload
+        includePractical: form.includePractical,
       })
 
       setExam(data.exam)
@@ -76,6 +78,7 @@ export default function GeneratorPage() {
         school: form.school,
         sectionCount: form.sectionCount,
         showStrand: form.showStrand,
+        includePractical: form.includePractical,
       })
 
       await refreshUser()
