@@ -312,19 +312,69 @@ Section C (Extended — 10–15 marks):
   return formats[type] || formats.humanities;
 }
 
+// ── Validate exam params ─────────────────────────────────
+function validateExamParams(params) {
+  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
+
+  if (!grade) return 'Grade is required.';
+  if (!['Grade 10', 'Grade 11', 'Grade 12'].includes(grade)) {
+    return 'Grade must be Grade 10, 11, or 12 (CBC Senior School).';
+  }
+  if (!subject) return 'Subject is required.';
+  if (!strands || !Array.isArray(strands) || strands.length === 0) {
+    return 'At least one strand must be selected.';
+  }
+  if (!examType || !['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'].includes(examType)) {
+    return 'Exam type must be CAT, Midterm, End Term, Pre-Mock, or Mock.';
+  }
+  if (!term) return 'Term is required.';
+  if (!year || isNaN(year)) return 'Valid year is required.';
+  if (!totalMarks || totalMarks < 10 || totalMarks > 150) {
+    return 'Total marks must be between 10 and 150.';
+  }
+  if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
+    return 'Total questions must be between 5 and 50.';
+  }
+  if (!school || school.trim().length < 2) return 'School name is required.';
+
+  return null;
+}
+
 // ── Select balanced question set ─────────────────────────
-function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
+function selectBalancedQuestions(pool, totalMarks, totalQuestions, sectionCount = 3) {
   if (!pool || pool.length === 0) return { sectionA: [], sectionB: [], sectionC: [] };
 
-  const saCount = Math.round(totalQuestions * 0.4);
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const shuffled = shuffle(pool);
+
+  // When sectionCount === 1 (CAT), ALL questions go to Section A
+  if (sectionCount === 1) {
+    return {
+      sectionA: shuffled.slice(0, totalQuestions),
+      sectionB: [],
+      sectionC: [],
+    };
+  }
+
+  // When sectionCount === 2 (Midterm), split between A and B only
+  if (sectionCount === 2) {
+    const saCount = Math.round(totalQuestions * 0.45);
+    const sbCount = totalQuestions - saCount;
+    return {
+      sectionA: shuffled.slice(0, saCount),
+      sectionB: shuffled.slice(saCount, saCount + sbCount),
+      sectionC: [],
+    };
+  }
+
+  // sectionCount === 3: distribute across A, B, C by question type
+  const saCount  = Math.round(totalQuestions * 0.4);
   const strCount = Math.round(totalQuestions * 0.35);
-  const laCount = totalQuestions - saCount - strCount;
+  const laCount  = totalQuestions - saCount - strCount;
 
   const shortAnswer = pool.filter(q => q.marks <= 3 || q.questionType === 'short_answer');
-  const structured = pool.filter(q => (q.marks >= 4 && q.marks <= 7) || q.questionType === 'structured');
-  const longAnswer = pool.filter(q => q.marks >= 8 || q.questionType === 'long_answer' || q.questionType === 'calculation' || q.questionType === 'practical');
-
-  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const structured  = pool.filter(q => (q.marks >= 4 && q.marks <= 7) || q.questionType === 'structured');
+  const longAnswer  = pool.filter(q => q.marks >= 8 || q.questionType === 'long_answer' || q.questionType === 'calculation' || q.questionType === 'practical');
 
   const sectionA = shuffle(shortAnswer).slice(0, saCount);
   const sectionB = shuffle(structured).slice(0, strCount);
@@ -333,9 +383,9 @@ function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
   const used = new Set([...sectionA, ...sectionB, ...sectionC].map(q => q._id?.toString()));
   const remaining = shuffle(pool.filter(q => !used.has(q._id?.toString())));
 
-  const fillA = saCount - sectionA.length;
+  const fillA = saCount  - sectionA.length;
   const fillB = strCount - sectionB.length;
-  const fillC = laCount - sectionC.length;
+  const fillC = laCount  - sectionC.length;
 
   if (fillA > 0) sectionA.push(...remaining.splice(0, fillA));
   if (fillB > 0) sectionB.push(...remaining.splice(0, fillB));
@@ -358,7 +408,10 @@ function buildHybridExamPrompt({
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
   const questionFormats = getQuestionFormatRules(subject);
 
-  const saMarks = sectionASeeds.reduce((s, q) => s + (q.marks || 2), 0);
+  // When sectionCount=1, all seeds are in sectionASeeds — use totalMarks directly
+  const saMarks = sectionCount === 1
+    ? totalMarks
+    : sectionASeeds.reduce((s, q) => s + (q.marks || 2), 0);
   const sbMarks = sectionBSeeds.reduce((s, q) => s + (q.marks || 5), 0);
   const scMarks = sectionCSeeds.reduce((s, q) => s + (q.marks || 9), 0);
 
@@ -471,29 +524,13 @@ function validateExamParams(params) {
   if (!grade) return 'Grade is required.';
   if (!subject) return 'Subject is required.';
   if (!strands || strands.length === 0) return 'At least one strand must be selected.';
-  if (!examType || !['CAT', 'Midterm', 'End Term', 'End Year', 'Pre-Mock', 'Mock', 'Series'].includes(examType)) {
-    return 'Exam type must be CAT, Midterm, End Term, End Year, Pre-Mock, Mock, or Series.';
-  }
+  if (!examType) return 'Exam type is required.';
   if (!term) return 'Term is required.';
   if (!year || isNaN(year)) return 'A valid year is required.';
   if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.';
   if (!totalQuestions || totalQuestions < 2) return 'At least 2 questions are required.';
   if (!school || !school.trim()) return 'School name is required.';
   return null;
-}
-
-// ── Question bank helpers ─────────────────────────────────
-function selectBalancedQuestions(pool, totalMarks, totalQuestions) {
-  if (!pool || pool.length === 0) {
-    return { sectionA: [], sectionB: [], sectionC: [] };
-  }
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  const third = Math.ceil(shuffled.length / 3);
-  return {
-    sectionA: shuffled.slice(0, third),
-    sectionB: shuffled.slice(third, third * 2),
-    sectionC: shuffled.slice(third * 2),
-  };
 }
 
 // ── Fallback: pure AI prompt ─────────────────────────────
@@ -509,18 +546,42 @@ function buildFallbackExamPrompt({
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
   const questionFormats = getQuestionFormatRules(subject);
 
-  const saCount = Math.round(totalQuestions * 0.4);
-  const sbCount = Math.round(totalQuestions * 0.35);
-  const scCount = sectionCount >= 3 ? totalQuestions - saCount - sbCount : 0;
-  const effectiveSbCount = sectionCount >= 2 ? sbCount : totalQuestions - saCount;
+  // ── Section-aware question + mark distribution ───────────
+  // BUG FIX: when sectionCount=1, ALL questions/marks go to Section A.
+  // Old code always put 40% in A, 35% in B, 25% in C regardless of sectionCount,
+  // then the backend cleared B and C — leaving only ~40% of questions/marks.
+  let saCount, effectiveSbCount, scCount, saMarks, sbMarks, scMarks;
 
-  // Fix marks calculation — don't assume 2 marks per Section A question
-  const saMarks = Math.round(totalMarks * 0.25);
-  const sbMarks = sectionCount >= 2 ? Math.round(totalMarks * 0.40) : totalMarks - saMarks;
-  const scMarks = sectionCount >= 3 ? totalMarks - saMarks - sbMarks : 0;
-  const scPerQ = scCount > 0 ? Math.round(scMarks / scCount) : 0;
-  const saPerQ = Math.round(saMarks / saCount);
-  const sbPerQ = Math.round(sbMarks / effectiveSbCount);
+  if (sectionCount === 1) {
+    // CAT: single section — all questions and all marks in Section A
+    saCount        = totalQuestions;
+    effectiveSbCount = 0;
+    scCount        = 0;
+    saMarks        = totalMarks;
+    sbMarks        = 0;
+    scMarks        = 0;
+  } else if (sectionCount === 2) {
+    // Midterm: two sections — 40% in A, 60% in B
+    saCount        = Math.round(totalQuestions * 0.4);
+    effectiveSbCount = totalQuestions - saCount;
+    scCount        = 0;
+    saMarks        = Math.round(totalMarks * 0.35);
+    sbMarks        = totalMarks - saMarks;
+    scMarks        = 0;
+  } else {
+    // End Term / Mock / etc: three sections — 40% A, 35% B, 25% C
+    saCount          = Math.round(totalQuestions * 0.4);
+    const sbCount    = Math.round(totalQuestions * 0.35);
+    scCount          = totalQuestions - saCount - sbCount;
+    effectiveSbCount = sbCount;
+    saMarks          = Math.round(totalMarks * 0.25);
+    sbMarks          = Math.round(totalMarks * 0.40);
+    scMarks          = totalMarks - saMarks - sbMarks;
+  }
+
+  const saPerQ = saCount > 0         ? Math.round(saMarks / saCount)         : 0;
+  const sbPerQ = effectiveSbCount > 0 ? Math.round(sbMarks / effectiveSbCount) : 0;
+  const scPerQ = scCount > 0          ? Math.round(scMarks / scCount)          : 0;
 
   const isGeography = subject === 'Geography';
 
