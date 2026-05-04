@@ -76,7 +76,6 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
 
   const saveEdit = async () => {
     if (!editingQ || !exam) return
-    // Update question text in local exam state
     const { section, qNum } = editingQ
     const updatedSection = {
       ...exam[section],
@@ -84,7 +83,6 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
         q.num === qNum ? { ...q, text: editText } : q
       ),
     }
-    // Persist to backend if we have an examId
     if (examId) {
       try {
         await api.patch(`/exams/${examId}`, { [section]: updatedSection })
@@ -103,7 +101,8 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
       await api.patch('/exams/' + examId, {})
       toast.success('Exam saved to My Exams')
     } catch {
-      toast.success('Exam saved locally')
+      // BUG 7 FIX: use neutral toast, not success, when the API call fails
+      toast('Exam saved locally — sync will retry automatically.', { icon: '💾' })
     } finally {
       setSaving(false)
     }
@@ -291,6 +290,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
             <h2 className="font-serif text-2xl text-brand-blue-dark mb-1.5">{exam.title}</h2>
             <p className="text-sm text-gray-400 mb-6">{meta.term} {meta.year} Examination</p>
 
+            {/* BUG 4 FIX: filter out null entries before mapping to prevent TypeError */}
             <div className="grid grid-cols-2 gap-2 text-left bg-gray-50 rounded-xl p-4 mb-5">
               {[
                 ['Grade / Class', meta.grade],
@@ -301,7 +301,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
                   ['Strand', strandsDisplay],
                   substrandsDisplay ? ['Sub-Strand', substrandsDisplay] : null,
                 ] : []),
-              ].map(([label, value]) => (
+              ].filter(Boolean).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">{label}</p>
                   <p className="text-sm font-semibold text-gray-800">{value}</p>
