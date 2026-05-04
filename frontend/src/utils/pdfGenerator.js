@@ -32,6 +32,14 @@ export function generateExamPDF(exam, meta) {
     y += 4
   }
 
+  // BUG 1 FIX: meta.strands is an array — join it for display
+  const strandsDisplay = Array.isArray(meta.strands)
+    ? meta.strands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
+    : (meta.strand || '')
+  const substrandsDisplay = Array.isArray(meta.substrands)
+    ? meta.substrands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
+    : (meta.substrand || 'General')
+
   // ── COVER PAGE ─────────────────────────────────────
   // Kenya flag stripe at top
   const stripeH = 4
@@ -72,20 +80,21 @@ export function generateExamPDF(exam, meta) {
   doc.text(`${meta.term} ${meta.year} Examination`, pageW / 2, y, { align: 'center' })
   y += 10
 
-  // Info grid
+  // Info grid — BUG 1 FIX: use resolved strandsDisplay / substrandsDisplay
+  const infoRows = [
+    [`Grade / Class: ${meta.grade}`, `Subject: ${meta.subject}`],
+    [`Strand: ${strandsDisplay || 'General'}`, `Sub-Strand: ${substrandsDisplay || 'General'}`],
+    [`Duration: ${exam.time || exam.duration || '1 hour 30 minutes'}`, `Total Marks: ${meta.totalMarks}`],
+    [`Term: ${meta.term}`, `Year: ${meta.year}`],
+  ]
+
+  const gridH = infoRows.length * 7 + 8
   doc.setFillColor(...colors.lightGray)
-  doc.roundedRect(margin, y, contentW, 28, 3, 3, 'F')
+  doc.roundedRect(margin, y, contentW, gridH, 3, 3, 'F')
 
   const col1 = margin + 6
   const col2 = pageW / 2 + 6
   const rowH = 7
-
-  const infoRows = [
-    [`Grade / Class: ${meta.grade}`, `Subject: ${meta.subject}`],
-    [`Strand: ${meta.strand}`, `Sub-Strand: ${meta.substrand || 'General'}`],
-    [`Duration: ${exam.time || '1 hour 30 minutes'}`, `Total Marks: ${meta.totalMarks}`],
-    [`Term: ${meta.term}`, `Year: ${meta.year}`],
-  ]
 
   doc.setFontSize(9)
   infoRows.forEach((row, i) => {
@@ -95,12 +104,21 @@ export function generateExamPDF(exam, meta) {
     doc.text(row[0], col1, rowY)
     doc.text(row[1], col2, rowY)
   })
-  y += 35
+  y += gridH + 6
 
-  // Instructions box
+  // Instructions box — dynamic height based on content
+  const instructions = exam.instructions || []
+  // Pre-calculate height needed
+  let instrLines = []
+  instructions.forEach((inst, i) => {
+    const txt = `${i + 1}. ${inst}`
+    instrLines.push(...doc.splitTextToSize(txt, contentW - 10))
+  })
+  const instrBoxH = Math.max(20, instrLines.length * 5 + 14)
+
   doc.setDrawColor(...colors.red)
   doc.setLineWidth(0.5)
-  doc.roundedRect(margin, y, contentW, 38, 3, 3, 'S')
+  doc.roundedRect(margin, y, contentW, instrBoxH, 3, 3, 'S')
 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(9)
@@ -109,13 +127,14 @@ export function generateExamPDF(exam, meta) {
 
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...colors.black)
-  const instructions = exam.instructions || []
+  let instrY = y + 14
   instructions.forEach((inst, i) => {
     const txt = `${i + 1}. ${inst}`
     const lines = doc.splitTextToSize(txt, contentW - 10)
-    doc.text(lines, margin + 5, y + 14 + i * 5)
+    doc.text(lines, margin + 5, instrY)
+    instrY += lines.length * 5
   })
-  y += 45
+  y += instrBoxH + 6
 
   // ── SECTION A ──────────────────────────────────────
   if (exam.sectionA?.questions?.length) {
@@ -169,7 +188,8 @@ export function generateExamPDF(exam, meta) {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.setTextColor(...colors.white)
-    doc.text(`SECTION B — SHORT ANSWER  (${exam.sectionB.marks} marks)`, margin + 5, y + 5.5)
+    // BUG 2 FIX: Section B is STRUCTURED QUESTIONS, not SHORT ANSWER
+    doc.text(`SECTION B — STRUCTURED QUESTIONS  (${exam.sectionB.marks} marks)`, margin + 5, y + 5.5)
     y += 12
 
     doc.setFont('helvetica', 'italic')
@@ -257,6 +277,7 @@ export function generateExamPDF(exam, meta) {
   doc.text(`${meta.grade} ${meta.subject} ${meta.examType} — ${meta.term} ${meta.year} | Total: ${meta.totalMarks} marks`, pageW / 2, y, { align: 'center' })
   y += 10
 
+  // BUG 3 FIX: renderSchemeSection now handles subParts correctly
   const renderSchemeSection = (section, label) => {
     if (!section?.questions?.length) return
     checkPage(15)
@@ -267,10 +288,29 @@ export function generateExamPDF(exam, meta) {
     y += 7
 
     section.questions.forEach((q) => {
+      const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+      const qMarks = hasSubParts
+        ? q.subParts.reduce((s, sp) => s + (Number(sp.marks) || 0), 0)
+        : (Number(q.marks) || 0)
+
       checkPage(20)
+
+      // Build answer lines to render
+      let answerLines = []
+      if (hasSubParts) {
+        q.subParts.forEach(sp => {
+          const header = `(${sp.label}) [${sp.marks} ${Number(sp.marks) === 1 ? 'mark' : 'marks'}]`
+          answerLines.push(...doc.splitTextToSize(header, contentW - 30))
+          answerLines.push(...doc.splitTextToSize(sp.answer || '—', contentW - 34))
+        })
+      } else {
+        answerLines = doc.splitTextToSize(q.answer || '—', contentW - 30)
+      }
+
+      const boxH = answerLines.length * 5 + 10
+      checkPage(boxH + 4)
+
       doc.setFillColor(240, 247, 255)
-      const ansLines = doc.splitTextToSize(q.answer || '', contentW - 30)
-      const boxH = ansLines.length * 5 + 10
       doc.roundedRect(margin, y, contentW, boxH, 2, 2, 'F')
 
       doc.setFont('helvetica', 'bold')
@@ -278,22 +318,27 @@ export function generateExamPDF(exam, meta) {
       doc.setTextColor(...colors.blue)
       doc.text(`Q${q.num}`, margin + 4, y + 6)
 
-      doc.setFont('helvetica', 'normal')
-      doc.setTextColor(...colors.black)
-      doc.text(ansLines, margin + 14, y + 6)
-
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(...colors.red)
-      doc.text(`${q.marks}mk${q.marks > 1 ? 's' : ''}`, pageW - margin - 4, y + 6, { align: 'right' })
+      doc.text(`${qMarks}mk${qMarks > 1 ? 's' : ''}`, pageW - margin - 4, y + 6, { align: 'right' })
+
+      // Render answer content
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...colors.black)
+      let lineY = y + 6
+      answerLines.forEach(line => {
+        doc.text(line, margin + 14, lineY)
+        lineY += 5
+      })
 
       y += boxH + 3
     })
     y += 4
   }
 
-  renderSchemeSection(exam.sectionA, 'SECTION A — Multiple Choice')
-  renderSchemeSection(exam.sectionB, 'SECTION B — Short Answer')
-  renderSchemeSection(exam.sectionC, 'SECTION C — Structured Questions')
+  renderSchemeSection(exam.sectionA, 'SECTION A — Short Answer')
+  renderSchemeSection(exam.sectionB, 'SECTION B — Structured Questions')
+  renderSchemeSection(exam.sectionC, 'SECTION C — Extended Questions')
 
   // Footer on all pages
   const totalPages = doc.internal.getNumberOfPages()
