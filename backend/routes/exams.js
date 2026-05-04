@@ -4,6 +4,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const Exam = require('../models/Exam');
 const User = require('../models/User');
 const QuestionBank = require('../models/QuestionBank');
+const ExamJob = require('../models/ExamJob');          // ← NEW
 const { protect } = require('../middleware/auth');
 const {
   buildHybridExamPrompt,
@@ -18,10 +19,6 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ── Helpers ──────────────────────────────────────────────
 
-/**
- * Recalculates section.marks from the actual question marks.
- * Fixes the bug where AI returns 0 for section marks.
- */
 function recalculateSectionMarks(section) {
   if (!section?.questions?.length) return section;
   const calculated = section.questions.reduce((sum, q) => {
@@ -33,11 +30,9 @@ function recalculateSectionMarks(section) {
   return { ...section, marks: calculated };
 }
 
-/**
- * Returns the default section count for a given exam type.
- */
+// FIX 2: Added End Year and Series to the 3-section list
 function getDefaultSectionCount(examType) {
-  if (['End Term', 'Mock', 'Pre-Mock'].includes(examType)) return 3;
+  if (['End Term', 'End Year', 'Mock', 'Pre-Mock', 'Series'].includes(examType)) return 3;
   if (examType === 'Midterm') return 2;
   return 1; // CAT
 }
@@ -54,30 +49,29 @@ const generateLimiter = rateLimit({
 });
 
 // ── POST /api/exams/generate ─────────────────────────────
+// Returns 202 + jobId immediately. AI runs in background.
+// Frontend polls GET /api/exams/job/:jobId every 3 seconds.
 router.post('/generate', protect, generateLimiter, async (req, res) => {
-  const startTime = Date.now();
-
   try {
-    // 1. Validate input
     const {
       grade, subject, strands, substrands, examType, term, year,
       totalMarks, totalQuestions, school,
       sectionCount: requestedSectionCount,
-      showStrand,
+      showStrand, includePractical,
     } = req.body;
 
-    // Basic field check before full validation
-    if (!grade) return res.status(400).json({ error: 'Please select a Grade.', code: 'MISSING_FIELD' });
-    if (!subject) return res.status(400).json({ error: 'Please select a Subject.', code: 'MISSING_FIELD' });
-    if (!strands?.length) return res.status(400).json({ error: 'Please select at least one Strand.', code: 'MISSING_FIELD' });
-    if (!school?.trim()) return res.status(400).json({ error: 'Please enter your School Name.', code: 'MISSING_FIELD' });
+    // 1. Basic field checks
+    if (!grade)         return res.status(400).json({ error: 'Please select a Grade.',                  code: 'MISSING_FIELD' });
+    if (!subject)       return res.status(400).json({ error: 'Please select a Subject.',               code: 'MISSING_FIELD' });
+    if (!strands?.length) return res.status(400).json({ error: 'Please select at least one Strand.',  code: 'MISSING_FIELD' });
+    if (!school?.trim()) return res.status(400).json({ error: 'Please enter your School Name.',        code: 'MISSING_FIELD' });
 
     const validationError = validateExamParams(req.body);
     if (validationError) {
       return res.status(400).json({ error: validationError, code: 'VALIDATION_ERROR' });
     }
 
-    // 2. Check generation quota
+    // 2. Check quota — do this BEFORE creating a job
     const user = await User.findById(req.user._id);
     if (!user) return res.status(401).json({ error: 'Session expired. Please log in again.', code: 'AUTH_ERROR' });
 
@@ -89,10 +83,80 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
       });
     }
 
-    // Resolve sectionCount — use request value or smart default
     const sectionCount = requestedSectionCount || getDefaultSectionCount(examType);
 
-    // 3. Query question bank
+    // 3. Save pending job to MongoDB
+    const job = await ExamJob.create({
+      status: 'pending',
+      params: { ...req.body, sectionCount },
+      userId: user._id,
+    });
+
+    // 4. Respond immediately — Render's timeout never fires
+    res.status(202).json({ jobId: job._id });
+
+    // 5. Run AI generation in background (after response is sent)
+    processExamJob(job._id, { ...req.body, sectionCount }, user).catch(err => {
+      console.error('Background job unhandled error:', err);
+    });
+
+  } catch (err) {
+    console.error('Generate route error:', err);
+    res.status(500).json({ error: 'Failed to start generation. Please try again.', code: 'SERVER_ERROR' });
+  }
+});
+
+// ── GET /api/exams/job/:jobId ────────────────────────────
+// Frontend polls this every 3s until status is 'done' or 'failed'.
+// NOTE: must be defined BEFORE /:id to avoid route shadowing
+router.get('/job/:jobId', protect, async (req, res) => {
+  try {
+    const job = await ExamJob.findById(req.params.jobId);
+    if (!job) return res.status(404).json({ error: 'Job not found.' });
+
+    if (job.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Forbidden.' });
+    }
+
+    if (job.status === 'done') {
+      return res.json({
+        status: 'done',
+        exam: job.exam,
+        examId: job.examDocId,
+        message: job.message || 'Exam generated successfully!',
+      });
+    }
+
+    if (job.status === 'failed') {
+      return res.json({
+        status: 'failed',
+        code: job.errorCode || 'GENERATION_ERROR',
+        error: job.error || 'Generation failed. Please try again.',
+      });
+    }
+
+    return res.json({ status: job.status }); // pending or processing
+
+  } catch (err) {
+    console.error('Job poll error:', err);
+    res.status(500).json({ error: 'Failed to check job status.' });
+  }
+});
+
+// ── Background processor ──────────────────────────────────
+// This is the existing AI generation logic, extracted from the route handler.
+// Runs AFTER the 202 response is already sent — no HTTP timeout possible.
+async function processExamJob(jobId, params, user) {
+  const startTime = Date.now();
+  const {
+    grade, subject, strands, substrands, examType, term, year,
+    totalMarks, totalQuestions, school, sectionCount, showStrand, includePractical,
+  } = params;
+
+  await ExamJob.findByIdAndUpdate(jobId, { status: 'processing' });
+
+  try {
+    // 1. Query question bank
     let questionPool = [];
     let isHybrid = false;
     let questionBankHits = 0;
@@ -108,10 +172,10 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
       questionBankHits = questionPool.length;
       isHybrid = questionBankHits >= Math.ceil(totalQuestions * 0.5);
     } catch (bankErr) {
-      console.warn('Question bank query failed, using Machine fallback:', bankErr.message);
+      console.warn('Question bank query failed, using AI fallback:', bankErr.message);
     }
 
-    // 4. Build prompt
+    // 2. Build prompt
     let prompt;
     if (isHybrid) {
       const { sectionA: sectionASeeds, sectionB: sectionBSeeds, sectionC: sectionCSeeds } =
@@ -136,19 +200,17 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
       });
     }
 
-    // 5. Call Machine with 45-second timeout
-    const TIMEOUT_MS = 45000;
-
-    // Auto-retry once on timeout or network blip
+    // 3. Call AI — now with a generous 120s timeout (no Render deadline)
+    const TIMEOUT_MS = 120000;
     let message;
     let attempts = 0;
-    const maxAttempts = 2;
-    let lastClaudeErr = null;
+    const maxAttempts = 3; // can afford more retries since we're not blocking HTTP
+    let lastErr = null;
 
     while (attempts < maxAttempts) {
       attempts++;
       try {
-        const freshTimeout = new Promise((_, reject) =>
+        const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject({ isTimeout: true }), TIMEOUT_MS)
         );
         message = await Promise.race([
@@ -157,81 +219,57 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
             max_tokens: 6000,
             messages: [{ role: 'user', content: prompt }],
           }),
-          freshTimeout,
+          timeoutPromise,
         ]);
-        lastClaudeErr = null;
-        break; // success — exit retry loop
+        lastErr = null;
+        break;
       } catch (err) {
-        lastClaudeErr = err;
-        if (err.isTimeout || err.status === 529 || err.status === 503) {
-          if (attempts < maxAttempts) {
-            console.warn(`Attempt ${attempts} failed (${err.isTimeout ? 'timeout' : err.status}), retrying...`);
-            await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
-            continue;
-          }
+        lastErr = err;
+        const retryable = err.isTimeout || err.status === 529 || err.status === 503 || err.status === 429;
+        if (retryable && attempts < maxAttempts) {
+          const wait = attempts * 3000; // 3s, 6s between retries
+          console.warn(`AI attempt ${attempts} failed, retrying in ${wait / 1000}s...`);
+          await new Promise(r => setTimeout(r, wait));
+          continue;
         }
-        break; // non-retryable error — exit loop
+        break;
       }
     }
 
-    if (lastClaudeErr) {
-      const claudeErr = lastClaudeErr;
-      if (claudeErr.isTimeout) {
-        return res.status(504).json({
-          error: 'The Machine took too long to respond. Please try again.',
-          code: 'TIMEOUT',
-        });
-      }
-      if (claudeErr.status === 401 || claudeErr.status === 403) {
-        return res.status(500).json({
-          error: 'Machine service authentication failed. Please contact support.',
-          code: 'AUTH_ERROR',
-        });
-      }
-      if (claudeErr.status === 429) {
-        return res.status(429).json({
-          error: 'Machine is overloaded right now. Please try again in 2 minutes.',
-          code: 'RATE_LIMIT',
-        });
-      }
-      if (claudeErr.status === 529 || claudeErr.status === 503) {
-        return res.status(503).json({
-          error: 'Machine service is temporarily unavailable. Please try again shortly.',
-          code: 'SERVICE_DOWN',
-        });
-      }
-      throw claudeErr;
+    if (lastErr) {
+      if (lastErr.isTimeout)                                         throw { code: 'TIMEOUT',       msg: 'The AI took too long to respond. Please try again.' };
+      if (lastErr.status === 401 || lastErr.status === 403)         throw { code: 'AUTH_ERROR',     msg: 'AI service authentication failed. Please contact support.' };
+      if (lastErr.status === 429)                                    throw { code: 'RATE_LIMIT',     msg: 'AI is overloaded. Please try again in a few minutes.' };
+      if (lastErr.status === 529 || lastErr.status === 503)         throw { code: 'SERVICE_DOWN',   msg: 'AI service is temporarily unavailable. Please try again shortly.' };
+      throw lastErr;
     }
 
-    // 6. Parse response
-    const rawText = message.content.map((b) => b.text || '').join('');
+    // 4. Parse response
+    const rawText = message.content.map(b => b.text || '').join('');
     const cleanText = rawText.replace(/```json|```/g, '').trim();
 
     let examData;
     try {
       examData = JSON.parse(cleanText);
-    } catch (parseErr) {
-      console.error('Machine response parse error. Snippet:', rawText.substring(0, 300));
-      return res.status(500).json({
-        error: 'The Machine returned an unexpected response. Please try again.',
-        code: 'PARSE_ERROR',
-      });
+    } catch {
+      console.error('Parse error. Raw snippet:', rawText.substring(0, 300));
+      throw { code: 'PARSE_ERROR', msg: 'The AI returned an unexpected response. Please try again.' };
     }
 
-    // 7. Fix section marks (recalculate from actual question marks — fixes 0-mark bug)
+    // 5. Fix section marks
     examData.sectionA = recalculateSectionMarks(examData.sectionA);
     examData.sectionB = recalculateSectionMarks(examData.sectionB);
     examData.sectionC = recalculateSectionMarks(examData.sectionC);
 
-    // 8. Clear sections beyond sectionCount
+    // 6. Clear sections beyond sectionCount
     const empty = { questions: [], marks: 0, instruction: '' };
     if (sectionCount < 3) examData.sectionC = empty;
     if (sectionCount < 2) examData.sectionB = empty;
 
-    const generationTimeMs = Date.now() - startTime;
     const duration = getDuration(examType, totalMarks);
+    const generationTimeMs = Date.now() - startTime;
 
-    // 9. Save exam to database
+    // 7. Save exam to DB
     let exam;
     try {
       exam = await Exam.create({
@@ -263,54 +301,49 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
       });
     } catch (saveErr) {
       console.error('Exam save error:', saveErr);
-      return res.status(500).json({
-        error: 'Your exam was generated but could not be saved. Please try again.',
-        code: 'SAVE_ERROR',
-      });
+      throw { code: 'SAVE_ERROR', msg: 'Exam generated but could not be saved. Please try again.' };
     }
 
-    // 10. Update user usage counters
-    if (!user.isPremium()) {
-      user.freeGenerationsUsed += 1;
+    // 8. Increment usage — re-fetch user to avoid stale data
+    const freshUser = await User.findById(user._id);
+    if (freshUser) {
+      if (!freshUser.isPremium()) freshUser.freeGenerationsUsed += 1;
+      freshUser.totalExamsGenerated += 1;
+      await freshUser.save({ validateBeforeSave: false });
     }
-    user.totalExamsGenerated += 1;
-    await user.save({ validateBeforeSave: false });
 
-    const isHybridResult = isHybrid;
     const bankHits = questionBankHits > 0
       ? `${questionBankHits} questions sourced from question bank`
-      : 'Generated entirely by Machine';
+      : 'Generated entirely by AI';
 
-    res.status(201).json({
+    // 9. Mark job done
+    await ExamJob.findByIdAndUpdate(jobId, {
+      status: 'done',
+      exam: exam.toObject(),
+      examDocId: exam._id,
       message: `Exam generated in ${(generationTimeMs / 1000).toFixed(1)}s. ${bankHits}.`,
-      exam,
-      meta: { isHybrid: isHybridResult, questionBankHits, generationTimeMs },
-      usage: {
-        freeGenerationsUsed: user.freeGenerationsUsed,
-        freeGenerationsLeft: Math.max(0, 3 - user.freeGenerationsUsed),
-        isPremium: user.isPremium(),
-      },
     });
 
   } catch (err) {
-    console.error('Generate exam error:', err);
-    res.status(500).json({
-      error: 'Exam generation failed. Please try again.',
-      code: 'UNKNOWN',
+    console.error('processExamJob failed:', err);
+    await ExamJob.findByIdAndUpdate(jobId, {
+      status: 'failed',
+      errorCode: err.code || 'GENERATION_ERROR',
+      error: err.msg || 'Generation failed. Please try again.',
     });
   }
-});
+}
 
 // ── GET /api/exams ───────────────────────────────────────
 router.get('/', protect, async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
+    const page  = parseInt(req.query.page)  || 1;
     const limit = parseInt(req.query.limit) || 12;
-    const skip = (page - 1) * limit;
+    const skip  = (page - 1) * limit;
 
     const filter = { user: req.user._id };
-    if (req.query.grade) filter.grade = req.query.grade;
-    if (req.query.subject) filter.subject = req.query.subject;
+    if (req.query.grade)    filter.grade    = req.query.grade;
+    if (req.query.subject)  filter.subject  = req.query.subject;
     if (req.query.examType) filter.examType = req.query.examType;
 
     const [exams, total] = await Promise.all([
@@ -345,7 +378,7 @@ router.patch('/:id', protect, async (req, res) => {
   try {
     const allowed = ['title', 'instructions', 'sectionA', 'sectionB', 'sectionC'];
     const updates = {};
-    allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
+    allowed.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
     const exam = await Exam.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
