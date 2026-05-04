@@ -80,7 +80,8 @@ export function generateExamPDF(exam, meta) {
   doc.text(`${meta.term} ${meta.year} Examination`, pageW / 2, y, { align: 'center' })
   y += 10
 
-  // Info grid — BUG 1 FIX: use resolved strandsDisplay / substrandsDisplay
+  // Info grid — wraps long values (fixes Sub-Strand truncation)
+  const colW = contentW / 2 - 12  // max width per column value
   const infoRows = [
     [`Grade / Class: ${meta.grade}`, `Subject: ${meta.subject}`],
     [`Strand: ${strandsDisplay || 'General'}`, `Sub-Strand: ${substrandsDisplay || 'General'}`],
@@ -88,21 +89,31 @@ export function generateExamPDF(exam, meta) {
     [`Term: ${meta.term}`, `Year: ${meta.year}`],
   ]
 
-  const gridH = infoRows.length * 7 + 8
+  // Pre-calculate row heights accounting for text wrap
+  doc.setFontSize(9)
+  const rowHeights = infoRows.map(row => {
+    const lines0 = doc.splitTextToSize(row[0], colW)
+    const lines1 = doc.splitTextToSize(row[1], colW)
+    return Math.max(lines0.length, lines1.length) * 5.5 + 3
+  })
+  const gridH = rowHeights.reduce((s, h) => s + h, 0) + 10
+
   doc.setFillColor(...colors.lightGray)
   doc.roundedRect(margin, y, contentW, gridH, 3, 3, 'F')
 
   const col1 = margin + 6
   const col2 = pageW / 2 + 6
-  const rowH = 7
 
-  doc.setFontSize(9)
+  let rowY = y + 7
   infoRows.forEach((row, i) => {
-    const rowY = y + 6 + i * rowH
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...colors.black)
-    doc.text(row[0], col1, rowY)
-    doc.text(row[1], col2, rowY)
+    doc.setFontSize(9)
+    const lines0 = doc.splitTextToSize(row[0], colW)
+    const lines1 = doc.splitTextToSize(row[1], colW)
+    doc.text(lines0, col1, rowY)
+    doc.text(lines1, col2, rowY)
+    rowY += rowHeights[i]
   })
   y += gridH + 6
 
@@ -136,6 +147,28 @@ export function generateExamPDF(exam, meta) {
   })
   y += instrBoxH + 6
 
+  // ── Diagram placeholder helper ──────────────────────────
+  // Draws a dashed box with caption when a question has a diagram field.
+  // The web preview shows the actual SVG; PDF shows a clearly labelled placeholder.
+  const drawDiagramPlaceholder = (diagram) => {
+    if (!diagram?.type) return
+    const caption = diagram.caption || `Figure (${diagram.type.replace(/_/g, ' ')})`
+    const boxH = 36
+    checkPage(boxH + 6)
+    doc.setDrawColor(...colors.gray)
+    doc.setLineWidth(0.5)
+    doc.setLineDashPattern([3, 2], 0)
+    doc.roundedRect(margin + 10, y, contentW - 20, boxH, 2, 2, 'S')
+    doc.setLineDashPattern([], 0)
+    doc.setFont('helvetica', 'italic')
+    doc.setFontSize(8.5)
+    doc.setTextColor(...colors.gray)
+    doc.text(caption, pageW / 2, y + boxH / 2 - 2, { align: 'center' })
+    doc.setFontSize(7.5)
+    doc.text('[ Diagram visible in digital preview — draw/attach here ]', pageW / 2, y + boxH / 2 + 5, { align: 'center' })
+    y += boxH + 5
+  }
+
   // ── SECTION A ──────────────────────────────────────
   if (exam.sectionA?.questions?.length) {
     checkPage(20)
@@ -162,6 +195,9 @@ export function generateExamPDF(exam, meta) {
       const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
       doc.text(qLines, margin, y)
       y += qLines.length * 5 + 2
+
+      // Draw diagram placeholder if question has a diagram
+      if (q.diagram) drawDiagramPlaceholder(q.diagram)
 
       if (q.options) {
         const half = Math.ceil(q.options.length / 2)
@@ -210,6 +246,7 @@ export function generateExamPDF(exam, meta) {
       doc.setTextColor(...colors.gray)
       doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       y += qLines.length * 5 + 3
+      if (q.diagram) drawDiagramPlaceholder(q.diagram)
       // Answer lines
       for (let i = 0; i < 3; i++) {
         doc.setDrawColor(...colors.lightGray)
@@ -250,6 +287,7 @@ export function generateExamPDF(exam, meta) {
       doc.setFontSize(8)
       doc.setTextColor(...colors.gray)
       doc.text(`(${q.marks} marks)`, pageW - margin, y - 4, { align: 'right' })
+      if (q.diagram) drawDiagramPlaceholder(q.diagram)
       for (let i = 0; i < 6; i++) {
         doc.setDrawColor(...colors.lightGray)
         doc.line(margin, y, pageW - margin, y)
