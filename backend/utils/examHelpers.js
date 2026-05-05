@@ -109,7 +109,7 @@ ENGLISH EXAM REQUIREMENTS — CBC GRADE 10 (KLB/KICD):
 A Grade 10 English written exam has FIVE sections. Scale marks to total requested:
 
 SECTION A — READING COMPREHENSION (≈20% of total marks)
-- Include a COMPLETE prose narrative or expository passage of 300–500 words IN the paper
+- Include a COMPLETE prose narrative or expository passage of 200–300 words IN the paper
 - The passage MUST be written in full — not referenced or described
 - Passage theme must align with selected unit (Etiquette, Climate Change, AI/Healthcare, Careers, etc.)
 - Passage style: lively, literary, Kenyan setting, real names and places
@@ -125,7 +125,7 @@ SECTION A — READING COMPREHENSION (≈20% of total marks)
 - TOTAL comprehension questions: 7–8 questions
 
 SECTION B — SUMMARY WRITING (≈10% of total marks)
-- Provide a SEPARATE passage of 300–400 words (different from Section A)
+- Provide a SEPARATE passage of 200–280 words (different from Section A)
 - Give a specific summary task: "In not more than 80 words, summarise the [challenges/benefits/causes] of..."
 - State: "Use your own words as far as possible"
 - Provide a lined space labeled "Summary" after the passage
@@ -303,7 +303,7 @@ Section C (Long Answer / Extended Calculation — 10–15 marks):
 QUESTION FORMAT FOR ENGLISH (CBC Grade 10 — KLB structure):
 
 SECTION A — READING COMPREHENSION:
-  Full passage (300–500 words) followed by:
+  Full passage (200–300 words) followed by:
   Q1. What was the atmosphere/mood in [opening scene]? Use evidence. (3 marks)
   Q2. How does the writer convey [character's experience]? Refer to passage. (3 marks)
   Q3. Describe in your own words [specific event]. (3 marks)
@@ -314,7 +314,7 @@ SECTION A — READING COMPREHENSION:
   Q8. Explain the meaning: (a) "[word/phrase]" (b) "[word/phrase]" (2 marks)
 
 SECTION B — SUMMARY WRITING:
-  Separate passage (300–400 words) + instruction:
+  Separate passage (200–280 words) + instruction:
   "Read the passage carefully. In not more than 80 words, summarise [specific aspect].
    Use your own words as far as possible."
   [Leave lined space for answer]
