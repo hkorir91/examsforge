@@ -296,6 +296,10 @@ async function processExamJob(jobId, params, user) {
     if (sectionCount < 3) examData.sectionC = empty;
     if (sectionCount < 2) examData.sectionB = empty;
 
+    // 6.5 Generate AI SVG diagrams for any questions that have a diagram field.
+    // Runs in parallel — non-fatal if any fail (exam still renders without SVG).
+    await generateDiagramSVGs(examData, subject, grade);
+
     const duration = getDuration(examType, totalMarks);
     const generationTimeMs = Date.now() - startTime;
 
@@ -475,3 +479,213 @@ router.get('/bank/stats', protect, async (req, res) => {
 });
 
 module.exports = router;
+
+// ════════════════════════════════════════════════════════════════════════════
+// AI SVG DIAGRAM GENERATION
+// Called after exam JSON is parsed. For each question with a diagram field,
+// fires a focused API call that returns a raw SVG string. All diagram calls
+// run in parallel via Promise.allSettled — failure of any single diagram is
+// non-fatal; the exam renders without that diagram rather than failing.
+// ════════════════════════════════════════════════════════════════════════════
+
+async function generateDiagramSVGs(examData, subject, grade) {
+  const sections = ['sectionA', 'sectionB', 'sectionC'];
+  const jobs = [];
+
+  for (const sectionKey of sections) {
+    const section = examData[sectionKey];
+    if (!section?.questions?.length) continue;
+
+    for (const q of section.questions) {
+      // Top-level question diagram
+      if (q.diagram?.type) {
+        jobs.push(
+          generateSingleSVG(q.diagram, q.text, subject, grade)
+            .then(svg => { q.diagram.svg = svg; })
+            .catch(err => console.warn(`[SVG] Failed Q${q.num} (${q.diagram.type}): ${err.message}`))
+        );
+      }
+      // Sub-part diagrams
+      if (Array.isArray(q.subParts)) {
+        for (const sp of q.subParts) {
+          if (sp.diagram?.type) {
+            jobs.push(
+              generateSingleSVG(sp.diagram, sp.text, subject, grade)
+                .then(svg => { sp.diagram.svg = svg; })
+                .catch(err => console.warn(`[SVG] Failed sub-part (${sp.diagram.type}): ${err.message}`))
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (jobs.length === 0) return; // no diagrams in this exam
+  console.log(`[SVG] Generating ${jobs.length} diagram(s) in parallel...`);
+  const results = await Promise.allSettled(jobs);
+  const failed = results.filter(r => r.status === 'rejected').length;
+  console.log(`[SVG] Done. ${jobs.length - failed} succeeded, ${failed} failed.`);
+}
+
+// SVG generation prompt — instructs Claude to produce KNEC-exam-quality SVG
+function buildSVGPrompt(diagram, questionText, subject, grade) {
+  const { type, params = {}, caption = '' } = diagram;
+
+  // Diagram-type-specific guidance for accurate KNEC conventions
+  const typeGuide = {
+    fold_diagram: `
+Draw a cross-section showing geological fold structures. Include:
+- At least 5 parallel strata (alternating colored bands: tan, cream, green, blue, purple)
+- An ANTICLINE (arch upward) with a dashed vertical axis line labeled X
+- A SYNCLINE (trough downward) with a dashed vertical axis line labeled Y
+- Arrow on X pointing up, arrow on Y pointing down
+- Ground surface line at top
+- Clear label boxes for X and Y`,
+
+    composite_volcano: `
+Draw a cross-section of a composite (stratovolcano). Include:
+- A symmetrical cone shape filled with alternating lava (pink/red) and ash (gray) layers
+- A central vent (vertical red band through the cone center)
+- A magma chamber (oval shape below the base, filled light pink)
+- A crater at the summit (open cup shape)
+- Lava/gas emission lines from crater
+- Labeled parts: A (magma chamber), B (crater), C (alternating layers), D (central vent)
+- Ground/base line`,
+
+    shield_volcano: `
+Draw a cross-section of a shield volcano. Include:
+- A broad, gently-sloping dome shape (much wider than tall — width:height ratio ~5:1)
+- A central vent
+- A magma chamber below
+- Thin lava flows extending far from the center
+- Labeled parts: A (magma chamber), B (vent), C (lava flows)`,
+
+    contour_map: `
+Draw a topographic map extract. Include:
+- 5 concentric oval contour lines labeled 1200m, 1250m, 1300m, 1350m, 1400m
+- Lines closer together on the LEFT side (steep slope) and wider apart on RIGHT (gentle slope)
+- A summit point marked with a dot at the center
+- A north arrow (top right)
+- A simple scale bar (bottom)
+- Map border frame
+- Labels "Steep slope" (left) and "Gentle slope" (right)`,
+
+    earthquake_waves: `
+Draw a diagram showing earthquake wave propagation. Include:
+- A semicircular Earth cross-section
+- A FOCUS point (red dot) inside the earth, labeled "Focus (Hypocenter)"
+- An EPICENTRE point (red dot) on the surface directly above focus, labeled "Epicentre"
+- P waves (solid lines, blue) radiating outward from focus to surface stations
+- S waves (dashed lines, green) radiating outward from focus
+- 3-4 small seismograph station rectangles on the surface
+- A dashed vertical line from focus to epicentre
+- A legend: solid line = P waves, dashed line = S waves`,
+
+    rock_cycle: `
+Draw the rock cycle diagram. Include:
+- Three labeled rock type boxes: IGNEOUS (yellow), SEDIMENTARY (green), METAMORPHIC (purple)
+- A MAGMA oval in the center (light red)
+- Labeled arrows connecting them:
+  Igneous → Sedimentary: "Weathering & Erosion"
+  Sedimentary → Metamorphic: "Heat & Pressure"
+  Metamorphic → Magma: "Melting"
+  Magma → Igneous: "Cooling & Solidification"`,
+
+    water_cycle: `
+Draw the water/hydrological cycle. Include:
+- A water body (ocean/lake) on the left
+- Mountains/hills on the right
+- A cloud in the sky center
+- Labeled arrows: Evaporation (water → cloud), Transpiration (hills → cloud), 
+  Precipitation (cloud → ground), Surface Runoff (hills → water body), 
+  Infiltration (downward into ground), Groundwater Flow (horizontal underground)`,
+
+    drainage_pattern: `
+Draw river drainage patterns. Show TWO patterns side by side:
+- Left: DENDRITIC (tree-branch pattern, tributaries joining at acute angles)
+- Right: RADIAL (rivers flowing outward from a central high point like a hill)
+- Label each pattern clearly`,
+
+    population_pyramid: `
+Draw a population pyramid (age-sex structure). Include:
+- Horizontal bars extending left (Males) and right (Females)
+- Age groups on the vertical axis: 0-4, 5-9, 10-14 ... up to 65+
+- Make it a YOUTHFUL/EXPANSIVE pyramid (wide base, narrow top — typical developing country)
+- Label "Males" left, "Females" right, "Age" on Y axis, "Population (%)" on X axis`,
+  };
+
+  const guide = typeGuide[type] || `Draw a clear, labeled diagram of type: ${type}. Include relevant labels (A, B, C, D) and a brief title.`;
+
+  return `You are generating a diagram for a Kenya CBC ${grade} ${subject} examination paper (KNEC standard).
+
+QUESTION CONTEXT: ${questionText}
+DIAGRAM TYPE: ${type}
+${caption ? `CAPTION: ${caption}` : ''}
+${params && Object.keys(params).length > 0 ? `PARAMS: ${JSON.stringify(params)}` : ''}
+
+DRAWING INSTRUCTIONS:
+${guide}
+
+STRICT SVG REQUIREMENTS — READ CAREFULLY:
+1. Output ONLY the raw SVG element — starting with <svg and ending with </svg>
+2. NO markdown backticks, NO explanation, NO preamble, NOTHING before <svg or after </svg>
+3. viewBox="0 0 280 200" — this is non-negotiable
+4. DO NOT use: <style>, <script>, CSS classes, external references, gradients (except very simple linearGradient if needed)
+5. Colors to use:
+   - Main structures: stroke="#1e3a5f" (navy)
+   - Secondary: stroke="#374151" (dark gray)  
+   - Emphasis/labels: fill="#cc0000" (red)
+   - Fills: use light colors — #fef9c3 (cream), #dbeafe (light blue), #d1fae5 (light green), #fce7f3 (light pink), #f3e8ff (light purple)
+6. Text: fontFamily="serif" fontSize="9" or "10" — keep all text SHORT (max 20 chars per label)
+7. All labels must be INSIDE the viewBox
+8. Include a brief caption text at the bottom of the SVG (fontSize="8", fill="#6b7280")
+9. The diagram must look professional enough to appear in a printed KNEC examination paper
+
+Generate the SVG now:`;
+}
+
+async function generateSingleSVG(diagram, questionText, subject, grade) {
+  const prompt = buildSVGPrompt(diagram, questionText, subject, grade);
+
+  let attempts = 0;
+  const maxAttempts = 2;
+
+  while (attempts < maxAttempts) {
+    attempts++;
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 2000,   // SVG for a single diagram fits well within 2000 tokens
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const raw = response.content.map(b => b.text || '').join('').trim();
+
+      // Strip any accidental markdown fences
+      const clean = raw
+        .replace(/^```[\w]*\n?/m, '')
+        .replace(/```$/m, '')
+        .trim();
+
+      if (!clean.startsWith('<svg') || !clean.includes('</svg>')) {
+        throw new Error(`Response is not valid SVG. Starts with: ${clean.substring(0, 80)}`);
+      }
+
+      // Basic safety check — no scripts
+      if (clean.includes('<script') || clean.includes('javascript:')) {
+        throw new Error('SVG contains unsafe content — rejected.');
+      }
+
+      return clean;
+
+    } catch (err) {
+      if (attempts < maxAttempts) {
+        console.warn(`[SVG] Attempt ${attempts} failed for ${diagram.type}: ${err.message}. Retrying...`);
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
