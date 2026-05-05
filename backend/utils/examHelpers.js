@@ -509,7 +509,7 @@ function buildHybridExamPrompt({
   const strandList = strands.join(', ');
   const substrandList = substrands.length > 0 ? substrands.join(', ') : 'All sub-strands within selected strands';
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = getQuestionFormatRules(subject);
+  const questionFormats = (subject === 'English' || subject === 'Kiswahili') ? '' : getQuestionFormatRules(subject);
 
   // When sectionCount=1, all seeds are in sectionASeeds — use totalMarks directly
   const saMarks = sectionCount === 1
@@ -783,7 +783,7 @@ function buildFallbackExamPrompt({
   const strandList = strands.join(', ');
   const substrandList = substrands.length > 0 ? substrands.join(', ') : `All sub-strands within ${strandList}`;
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = getQuestionFormatRules(subject);
+  const questionFormats = (subject === 'English' || subject === 'Kiswahili') ? '' : getQuestionFormatRules(subject);
 
   // ── Section-aware question + mark distribution ───────────
   // BUG FIX: when sectionCount=1, ALL questions/marks go to Section A.
