@@ -64,7 +64,7 @@ const examSchema = new mongoose.Schema(
 
     examType: {
       type: String,
-      enum: ['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'],
+      enum: ['CAT', 'Midterm', 'End Term', 'End Year', 'Pre-Mock', 'Mock', 'Series'],
       required: true,
     },
     term: { type: String, required: true },
