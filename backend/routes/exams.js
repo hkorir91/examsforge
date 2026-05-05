@@ -531,8 +531,8 @@ async function generateDiagramSVGs(examData, subject, grade) {
 function buildSVGPrompt(diagram, questionText, subject, grade) {
   const { type, params = {}, caption = '' } = diagram;
 
-  // Diagram-type-specific guidance for accurate KNEC conventions
   const typeGuide = {
+    // ── Geography ────────────────────────────────────────────
     fold_diagram: `
 Draw a cross-section showing geological fold structures. Include:
 - At least 5 parallel strata (alternating colored bands: tan, cream, green, blue, purple)
@@ -612,6 +612,118 @@ Draw a population pyramid (age-sex structure). Include:
 - Age groups on the vertical axis: 0-4, 5-9, 10-14 ... up to 65+
 - Make it a YOUTHFUL/EXPANSIVE pyramid (wide base, narrow top — typical developing country)
 - Label "Males" left, "Females" right, "Age" on Y axis, "Population (%)" on X axis`,
+
+    // ── Biology ──────────────────────────────────────────────
+    plant_cell: `
+Draw a labelled plant cell diagram. Include:
+- A rectangular cell shape with rounded corners
+- Cell wall (outer thick border, light brown)
+- Cell membrane (thin line just inside cell wall)
+- Large central vacuole (light blue, takes up ~60% of cell)
+- Nucleus (dark circle with nucleolus, positioned to one side)
+- Chloroplasts (3-4 green oval shapes)
+- Mitochondria (2-3 oval shapes with inner folds)
+- Labeled parts: A (cell wall), B (cell membrane), C (nucleus), D (chloroplast), E (vacuole), F (mitochondria)`,
+
+    animal_cell: `
+Draw a labelled animal cell diagram. Include:
+- An irregular oval/rounded cell shape (no cell wall)
+- Cell membrane (thin outer boundary)
+- Large nucleus with nucleolus (centrally placed)
+- Mitochondria (3-4 sausage-shaped structures)
+- Ribosomes (tiny dots)
+- Endoplasmic reticulum (wavy lines)
+- NO cell wall, NO chloroplasts, NO large vacuole
+- Labeled parts: A (cell membrane), B (nucleus), C (mitochondria), D (cytoplasm)`,
+
+    human_heart: `
+Draw a front-view cross-section of the human heart. Include:
+- Four chambers: Left Atrium (top left), Right Atrium (top right), Left Ventricle (bottom left, thicker walls), Right Ventricle (bottom right)
+- Septum (dividing wall between left and right sides)
+- Aorta (large vessel leaving top of left ventricle, arching left)
+- Pulmonary artery (leaving right ventricle, going to lungs)
+- Vena cava (entering right atrium, one superior top-right, one inferior bottom-right)
+- Pulmonary veins (entering left atrium from left)
+- Tricuspid valve (between right chambers) and Bicuspid/Mitral valve (between left chambers)
+- Labeled parts: A (right atrium), B (left atrium), C (right ventricle), D (left ventricle), E (aorta)`,
+
+    digestive_system: `
+Draw the human digestive system (front view, simplified). Include in order from top to bottom:
+- Mouth/Oral cavity (top)
+- Oesophagus (narrow tube going down)
+- Stomach (J-shaped bag on left side)
+- Small intestine (coiled tube in center, labeled "Small intestine")
+- Large intestine/Colon (wider tube framing the outside)
+- Rectum and Anus (bottom)
+- Liver (large organ top right, light brown)
+- Pancreas (behind stomach, light pink)
+- Labeled parts: A (mouth), B (oesophagus), C (stomach), D (liver), E (small intestine), F (large intestine)`,
+
+    respiratory_system: `
+Draw the human respiratory system (front view). Include:
+- Nasal cavity and mouth (top)
+- Trachea (windpipe, rings visible, going down center)
+- Two bronchi branching left and right
+- Two lungs (large pink/light red shapes on either side)
+- Bronchioles (smaller branches inside lungs)
+- Alveoli cluster (small bubbles at ends, labeled)
+- Diaphragm (dome-shaped muscle at base)
+- Labeled parts: A (trachea), B (bronchus), C (lung), D (alveoli), E (diaphragm)`,
+
+    flower: `
+Draw a half-section (longitudinal section) of a flower. Include:
+- Petals (coloured, 2-3 visible)
+- Sepals (green, at base of petals)
+- Stamen: filament (stalk) + anther (top, pollen-producing)
+- Pistil/Carpel: stigma (sticky top), style (tube), ovary (base with ovule inside)
+- Receptacle (base of flower)
+- Peduncle/flower stalk
+- Labeled parts: A (petal), B (sepal), C (stamen/anther), D (stigma), E (style), F (ovary)`,
+
+    food_web: `
+Draw a food web with at least 6 organisms in a Kenyan ecosystem. Include:
+- Producers (grass, acacia tree) at the bottom
+- Primary consumers (zebra, gazelle, grasshopper) in the middle
+- Secondary consumers (lion, cheetah, eagle) at the top
+- Arrows pointing FROM prey TO predator (showing energy flow)
+- Clear labels for each organism
+- At least 8 arrows showing feeding relationships`,
+
+    nephron: `
+Draw a labelled nephron (kidney tubule) diagram. Include:
+- Bowman's capsule (cup-shaped, at top)
+- Glomerulus (tight ball of capillaries inside Bowman's capsule, red)
+- Proximal convoluted tubule (coiled tube, green)
+- Loop of Henle (hairpin loop going down, blue)
+- Distal convoluted tubule (coiled tube, purple)
+- Collecting duct (straight tube going down, orange)
+- Blood vessels (afferent and efferent arterioles)
+- Labeled parts: A (Bowman's capsule), B (glomerulus), C (proximal tubule), D (loop of Henle), E (distal tubule), F (collecting duct)`,
+
+    // ── Physics ──────────────────────────────────────────────
+    ray_diagram: `
+Draw a ray diagram for a convex lens forming a real image. Include:
+- A horizontal principal axis (long horizontal line)
+- A convex lens (double-curved shape at center, vertical)
+- Focal points F marked on both sides of lens (equidistant)
+- An upright object arrow to the left of the lens (beyond 2F)
+- THREE standard rays:
+  1. Ray parallel to axis → refracts through far focal point
+  2. Ray through optical center → passes straight through
+  3. Ray through near focal point → refracts parallel to axis
+- A real, inverted image arrow to the right of lens
+- Labels: F (focal points), 2F, Object, Image, Principal axis`,
+
+    series_parallel_circuit: `
+Draw an electric circuit showing BOTH series and parallel connections. Include:
+- A battery/cell on the left (two parallel lines, short and long)
+- A switch (gap with line at angle)
+- In series section: two resistors (rectangular boxes) connected end to end
+- In parallel section: two resistors side by side (branching wires)
+- Connecting wires (straight lines with right-angle corners)
+- Ammeter (circle with A) measuring current
+- Voltmeter (circle with V) across parallel section
+- Labeled components: R1, R2, R3, A (ammeter), V (voltmeter)`,
   };
 
   const guide = typeGuide[type] || `Draw a clear, labeled diagram of type: ${type}. Include relevant labels (A, B, C, D) and a brief title.`;
