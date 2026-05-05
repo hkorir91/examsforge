@@ -72,8 +72,8 @@ export const CBC_CURRICULUM = {
       'English': [
         'Listening and Speaking',
         'Reading',
-        'Grammar in Use',
         'Writing',
+        'Language Use',
         'Literature',
       ],
       'Kiswahili': [
@@ -417,8 +417,8 @@ export const CBC_CURRICULUM = {
       'English': [
         'Listening and Speaking',
         'Reading',
-        'Grammar in Use',
         'Writing',
+        'Language Use',
         'Literature',
       ],
       'Kiswahili': [
@@ -764,11 +764,11 @@ export const CBC_CURRICULUM = {
         'Personal Financial Management',
       ],
       'English': [
-        'Listening and Speaking',
-        'Reading',
-        'Grammar in Use',
-        'Writing',
-        'Literature',
+        'Advanced Listening and Speaking',
+        'Critical Reading',
+        'Advanced Writing',
+        'Language and Style',
+        'Literature and Criticism',
       ],
       'Kiswahili': [
         'Mawasiliano ya Hali ya Juu',
@@ -1064,121 +1064,12 @@ export const SUBSTRANDS = {
   'Number and Operations': ['Whole Numbers and Integers', 'Fractions and Decimals', 'Percentages', 'Ratios and Proportions'],
   'Data Handling': ['Data Collection', 'Tables and Charts', 'Measures of Central Tendency', 'Interpretation of Data'],
 
-  // English — Official KICD/KLB Grade 10 Strands & Sub-strands
-  // Source: KLB Grade 10 English Teacher's Guide + Term 1 & 2 Schemes of Work
-  'Listening and Speaking': [
-    // Unit 1: Etiquette: Social
-    'Extensive Listening',
-    'Speaking: Etiquette and Telephone Conversations',
-    // Unit 2: Environment: Climate Change
-    'Critical Listening',
-    'Conversational Skills: Discourse Markers',
-    // Unit 3: AI and Society: Healthcare
-    'Intensive Listening: Note Taking',
-    'Speaking Fluency: Public Speaking',
-    // Unit 4: Travel: Adventure
-    'Selective Listening',
-    'Conversational Skills: Speaking Fluency',
-    // Unit 5: Careers: Public Sector
-    'Interactive Listening',
-    'Conversational Skills: Meetings and Debates',
-    // Unit 6: Culture: Values and Beliefs
-    'Responsive Listening',
-    'Speaking Fluency: Pronunciation and Enunciation',
-    // Unit 7: Sports and Games
-    'Critical Listening: Facts and Opinions',
-    // Unit 8: Health and Safety
-    'Intensive Listening: Using Visuals',
-    // Unit 9: Incomes: Types and Sources
-    'Selective Listening: Filtering and Extracting Information',
-    'Speaking to Inform',
-  ],
-  'Reading': [
-    // Unit 1: Etiquette: Social
-    'Reading Fluency: Previewing',
-    'Reading Fluency: Skimming',
-    'Reading Fluency: Scanning',
-    'Reading Fluency: Collocations',
-    // Unit 2: Environment: Climate Change
-    'Extensive Reading',
-    // Unit 3: AI and Society: Healthcare
-    'Extensive Reading: Reference Materials',
-    // Unit 4: Travel: Adventure
-    'Study Skills: Library Skills',
-    // Unit 5: Careers: Public Sector
-    'Intensive Reading: Comprehension',
-    // Unit 6: Culture: Values and Beliefs
-    'Reading Fluency',
-    // Unit 7: Sports and Games
-    'Intensive Reading: Comprehension',
-    // Unit 8: Health and Safety
-    'Study Skills',
-    // Unit 9: Incomes: Types and Sources
-    'Critical/Close Reading',
-  ],
-  'Grammar in Use': [
-    // Unit 1: Etiquette: Social
-    'Word Classes: Nouns — Count and Non-count',
-    'Word Classes: Nouns — Common and Proper',
-    'Word Classes: Pronouns — Personal, Reflexive, Emphatic, Reciprocal',
-    'Word Classes: Determiners',
-    // Unit 2: Environment: Climate Change
-    'Word Classes: Main and Primary Auxiliary Verbs',
-    'Word Classes: Tense and Aspect',
-    'Word Classes: Adverbs — Time, Place and Manner',
-    'Word Classes: Adverbs — Gradable and Non-gradable',
-    // Unit 3: AI and Society: Healthcare
-    'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
-    'Word Classes: Prepositions — Place, Time, Direction',
-    // Unit 4: Travel: Adventure
-    'Word Classes: Determiners, Noun Phrases and Verb Phrases',
-    // Unit 5: Careers: Public Sector
-    'Phrases: Adjective Phrases',
-    'Phrases: Adverb Phrases',
-    'Phrases: Prepositional Phrases',
-    // Unit 6: Culture: Values and Beliefs
-    'Word Classes: Relative Pronouns',
-    'Relative Clauses',
-    // Unit 7: Sports and Games
-    'Clauses: Relative and Adverbial',
-    // Unit 8: Health and Safety
-    'Clause Patterns',
-    // Unit 9: Incomes: Types and Sources
-    'Sentences — Types and Structures',
-  ],
-  'Writing': [
-    // Unit 1: Etiquette: Social
-    'Sentence Fluency: Comma Splices and Run-on Sentences',
-    // Unit 2: Environment: Climate Change
-    'Mechanics of Writing: Spelling and Commonly Confused Words',
-    'Mechanics of Writing: Abbreviations and Acronyms',
-    'Mechanics of Writing: Affixes',
-    // Unit 3: AI and Society: Healthcare
-    'Paragraphing Skills',
-    // Unit 4: Travel: Adventure
-    'Mechanics of Writing: Punctuation and Capitalisation',
-    // Unit 5: Careers: Public Sector
-    'Functional Writing: Memos',
-    'Functional Writing: Diary and Journal Entries',
-    // Unit 6: Culture: Values and Beliefs
-    'Creative Writing: Narrative and Descriptive Essays',
-    // Unit 7: Sports and Games
-    'Functional Writing: Emails, Letters of Apology, Appreciation and Acceptance',
-    // Unit 8: Health and Safety
-    'Creative Writing: Argumentative and Expository Essays',
-    // Unit 9: Incomes: Types and Sources
-    'Functional Writing: Reminders, Short Reports and Questionnaires',
-    // Topical — used across units
-    'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
-    'Functional Writing: Meetings — Notice, Agenda and Minutes',
-  ],
-  'Literature': [
-    'Prose Analysis',
-    'Drama Analysis',
-    'Poetry Analysis',
-    'Literary Devices and Techniques',
-    'Oral Literature',
-  ],
+  // English
+  'Listening and Speaking': ['Oral Presentation', 'Listening Comprehension', 'Discussion and Debate', 'Public Speaking'],
+  'Reading': ['Comprehension Skills', 'Skimming and Scanning', 'Inference and Deduction', 'Critical Reading'],
+  'Writing': ['Composition Writing', 'Summary Writing', 'Letter and Report Writing', 'Creative Writing'],
+  'Language Use': ['Grammar and Syntax', 'Vocabulary Development', 'Punctuation', 'Style and Register'],
+  'Literature': ['Prose Analysis', 'Drama Analysis', 'Poetry Analysis', 'Literary Devices'],
 
   // Kiswahili
   'Kusikiliza na Kuzungumza': ['Uwasiliano wa Mdomo', 'Mazungumzo na Mijadala', 'Hotuba na Uwasilishaji', 'Kusikiliza kwa Makini'],
@@ -1368,8 +1259,8 @@ export const CAT_MARKS_OPTIONS = [20, 25, 30, 40]
 const SUBJECT_EXAM_MARKS = {
   'Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'Essential Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
-  'English': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
-  'Kiswahili': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'English': { 'CAT': 30, 'Midterm': 50, 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Kiswahili': { 'CAT': 30, 'Midterm': 50, 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Biology': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Chemistry': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Physics': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
