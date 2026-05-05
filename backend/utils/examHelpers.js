@@ -533,6 +533,142 @@ function validateExamParams(params) {
   return null;
 }
 
+// ── Diagram instructions by subject ─────────────────────
+// Tells the AI which diagram types are available, when to use them,
+// and strictly forbids bracket descriptions like [Diagram shows...].
+function buildDiagramInstructions(subject) {
+  const subjectType = getSubjectType(subject);
+
+  const COMMON_RULES = `
+CRITICAL DIAGRAM RULES — APPLY TO EVERY SUBJECT:
+1. When a diagram is needed, add a "diagram" JSON field to the question object — that is ALL.
+2. NEVER write bracket descriptions like "[Diagram shows a plant cell]" — STRICTLY FORBIDDEN.
+3. NEVER describe the diagram contents in the question text body.
+4. Reference a diagram in question text ONLY as: "Study Figure 1 below." or "Refer to the diagram below."
+5. Diagram JSON format: {"type": "plant_cell", "params": {}, "caption": "Figure 1: Structure of a Plant Cell"}
+6. Only add a diagram when it genuinely helps the student answer — do NOT add diagrams to every question.`;
+
+  const diagramMaps = {
+    science: {
+      Biology: `
+BIOLOGY DIAGRAM INSTRUCTIONS:
+These diagram types render as proper labelled SVG diagrams — use them:
+- plant_cell → cell structure questions with cell wall, chloroplast, vacuole
+- animal_cell → animal cell questions with nucleus, mitochondria, ribosomes
+- human_heart → heart structure and blood circulation questions
+- digestive_system → digestion and nutrition questions
+- respiratory_system → breathing, gas exchange, lung structure questions
+- flower → pollination, reproduction, floral structure questions
+- food_web → ecosystem, feeding relationships, energy flow questions
+- nephron → excretion, kidney tubule, osmoregulation questions
+- microscope → practical microscopy, cell observation questions
+- soil_profile → soil horizons, soil formation questions
+
+WHEN to use:
+- Cell structure question → "diagram": {"type": "plant_cell", "params": {}, "caption": "Figure 1: Structure of a Plant Cell"}
+- Heart/circulation question → "diagram": {"type": "human_heart", "params": {}, "caption": "Figure 1: Structure of the Human Heart"}
+- Digestion question → "diagram": {"type": "digestive_system", "params": {}, "caption": "Figure 1: The Human Digestive System"}
+- Breathing question → "diagram": {"type": "respiratory_system", "params": {}, "caption": "Figure 1: The Human Respiratory System"}
+- Food web question → "diagram": {"type": "food_web", "params": {}, "caption": "Figure 1: A Food Web"}
+- Flower/reproduction → "diagram": {"type": "flower", "params": {}, "caption": "Figure 1: Structure of a Flower"}
+- Excretion/kidney → "diagram": {"type": "nephron", "params": {}, "caption": "Figure 1: Structure of a Nephron"}`,
+
+      Chemistry: `
+CHEMISTRY DIAGRAM INSTRUCTIONS:
+These diagram types render as proper labelled SVG diagrams — use them:
+- beaker → laboratory setup, titration, heating experiments
+- bar_chart → comparison of reaction rates, yield percentages
+- line_graph → temperature-time graphs, concentration-time graphs
+- data_table → results tables for experiments
+
+WHEN to use:
+- Lab apparatus question → "diagram": {"type": "beaker", "params": {}, "caption": "Figure 1: Laboratory Setup"}
+- Reaction rate graph → "diagram": {"type": "line_graph", "params": {"title": "Rate of Reaction vs Temperature"}, "caption": "Figure 1: Rate of Reaction Graph"}
+- Comparison question → "diagram": {"type": "bar_chart", "params": {"title": "Comparison"}, "caption": "Figure 1: Bar Chart"}`,
+
+      Physics: `
+PHYSICS DIAGRAM INSTRUCTIONS:
+These diagram types render as proper labelled SVG diagrams — use them:
+- ray_diagram → light, reflection, refraction, lenses, mirrors
+- series_parallel_circuit → electric circuits, resistance, current
+- cylinder → volume calculation practical problems
+- cone → volume and surface area problems
+- sphere → volume and density problems
+- line_graph → distance-time, velocity-time, force-extension graphs
+- bar_chart → comparison of physical quantities
+
+WHEN to use:
+- Ray/optics question → "diagram": {"type": "ray_diagram", "params": {}, "caption": "Figure 1: Ray Diagram"}
+- Circuit question → "diagram": {"type": "series_parallel_circuit", "params": {}, "caption": "Figure 1: Electric Circuit"}
+- Distance-time graph → "diagram": {"type": "line_graph", "params": {"title": "Distance-Time Graph"}, "caption": "Figure 1: Distance-Time Graph"}`,
+    },
+
+    mathematics: `
+MATHEMATICS DIAGRAM INSTRUCTIONS:
+These diagram types render as proper labelled SVG diagrams — use them:
+- triangle → triangle problems, Pythagoras, trigonometry, area
+- right_triangle → right-angle problems, SOH-CAH-TOA
+- circle → circle theorems, arc length, sector area
+- cylinder → volume/surface area of cylinders
+- cone → volume/surface area of cones
+- sphere → volume/surface area of spheres
+- coordinate_grid → plotting points, straight lines, curves
+- bearing → compass bearings, directions, navigation problems
+- number_line → inequalities, number sets
+- bar_chart → statistics questions with comparative data
+- pie_chart → statistics questions with proportional data
+- histogram → frequency distribution, grouped data
+- line_graph → trend data, conversion graphs
+- venn_diagram → set theory, probability problems
+
+WHEN to use:
+- Triangle/trig question → "diagram": {"type": "triangle", "params": {"a": 6, "b": 8, "c": 10}, "caption": "Figure 1"}
+- Circle theorem → "diagram": {"type": "circle", "params": {}, "caption": "Figure 1"}
+- Bearing question → "diagram": {"type": "bearing", "params": {"bearing": 65}, "caption": "Figure 1"}
+- Statistics comparison → "diagram": {"type": "bar_chart", "params": {"title": "Sales Data"}, "caption": "Figure 1"}
+- Venn/sets question → "diagram": {"type": "venn_diagram", "params": {}, "caption": "Figure 1"}`,
+
+    geography: `
+GEOGRAPHY DIAGRAM INSTRUCTIONS:
+These diagram types render as proper labelled SVG diagrams — use them:
+- fold_diagram → anticline/syncline, folding, fold mountains
+- composite_volcano → composite/stratovolcano cross-section
+- shield_volcano → shield volcano cross-section
+- contour_map → topographic map extract, contour interpretation
+- earthquake_waves → seismic waves, focus, epicentre
+- rock_cycle → rock formation, rock types and transformations
+- water_cycle → hydrological cycle, precipitation, evaporation
+
+WHEN to use:
+- Folding question → "diagram": {"type": "fold_diagram", "params": {}, "caption": "Figure 1: Types of Folds"}
+- Volcano question → "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
+- Map reading/contours → "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
+- Earthquake question → "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Waves"}
+- Rock cycle question → "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}`,
+  };
+
+  // Look up diagram map for this subject
+  let diagramInstructions = '';
+  if (subjectType === 'science') {
+    diagramInstructions = diagramMaps.science[subject] || diagramMaps.science.Biology;
+  } else if (subjectType === 'mathematics') {
+    diagramInstructions = diagramMaps.mathematics;
+  } else if (subject === 'Geography') {
+    diagramInstructions = diagramMaps.geography;
+  } else {
+    // Humanities, languages, technical — minimal diagram guidance
+    diagramInstructions = `
+DIAGRAM INSTRUCTIONS:
+If a diagram would genuinely help a question, add a "diagram" JSON field.
+Available types: bar_chart, pie_chart, line_graph, data_table.
+Reference it in question text as "Study Figure 1 below." — never describe it in brackets.`;
+  }
+
+  return `${diagramInstructions}
+
+${COMMON_RULES}`;
+}
+
 // ── Fallback: pure AI prompt ─────────────────────────────
 function buildFallbackExamPrompt({
   grade, subject, strands, substrands, examType, term, year,
@@ -583,8 +719,6 @@ function buildFallbackExamPrompt({
   const sbPerQ = effectiveSbCount > 0 ? Math.round(sbMarks / effectiveSbCount) : 0;
   const scPerQ = scCount > 0          ? Math.round(scMarks / scCount)          : 0;
 
-  const isGeography = subject === 'Geography';
-
   return `You are a highly experienced Kenyan CBC curriculum specialist and senior examiner for ${subject} at ${gradeContext}.
 
 Generate a COMPLETE, PROFESSIONAL ${examType} examination paper that meets Kenya national exam standards.
@@ -627,32 +761,7 @@ CRITICAL CBC REQUIREMENTS:
 ${subjectInstructions}
 ${questionFormats}
 
-${isGeography ? `
-GEOGRAPHY DIAGRAM INSTRUCTIONS:
-The following diagram types are FULLY SUPPORTED and will render as proper SVG diagrams:
-- fold_diagram → use for anticline/syncline questions
-- composite_volcano → use for composite or shield volcano cross-section questions
-- contour_map → use for map reading and contour interpretation questions
-- earthquake_waves → use for earthquake/seismic wave questions
-- rock_cycle → use for rock formation and rock cycle questions
-- water_cycle → use for hydrological cycle questions
-
-CRITICAL RULES FOR DIAGRAMS:
-1. When a diagram is needed, add a "diagram" JSON field to the question object — NOTHING ELSE.
-2. NEVER write diagram descriptions in brackets like "[Diagram shows an anticline and syncline]" — this is STRICTLY FORBIDDEN. It looks unprofessional in printed exams.
-3. NEVER describe what the diagram contains in the question text body.
-4. In the question text, reference the diagram ONLY as: "Study Figure 1 below." or "Refer to the diagram below." — then ask the question.
-5. The diagram JSON field format is: {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
-
-WHEN to add diagram JSON field:
-- Folding question → add "diagram": {"type": "fold_diagram", "params": {"foldType": "anticline_syncline"}, "caption": "Figure 1: Types of Folds"}
-- Vulcanicity/volcano question → add "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
-- Rocks question → add "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}
-- Map reading/contours question → add "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
-- Earthquake/seismic waves question → add "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Wave Propagation"}
-
-Only include a diagram field when it genuinely helps the student understand or answer the question.
-` : ''}
+${buildDiagramInstructions(subject)}
 
 Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
 
