@@ -38,8 +38,10 @@ const SUBJECT_TYPES = {
   science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
   // Mathematics — require working shown, calculations, proofs
   mathematics: ['Mathematics', 'Essential Mathematics'],
-  // Languages — require comprehension passages, grammar, composition
-  language: ['English', 'Kiswahili', 'Arabic', 'French', 'German', 'Chinese',
+  // English — has comprehensive 5-section CBC structure
+  english: ['English'],
+  // Other languages — comprehension passage, grammar, composition
+  language: ['Kiswahili', 'Arabic', 'French', 'German', 'Chinese',
     'Indigenous Languages', 'Literature in English', 'Fasihi ya Kiswahili',
     'Sign Language', 'Kenyan Sign Language'],
   // Humanities — require case studies, source analysis, essays
@@ -100,18 +102,96 @@ MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
 - Include at least one geometry/construction question with measurements
 - SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with marks`,
 
-    language: `
-LANGUAGE-SPECIFIC REQUIREMENTS:
-- Section A: Grammar, vocabulary, and language use questions (fill gaps, identify errors, explain usage)
-- Section B: Comprehension questions based on a SHORT passage (4–6 sentences) set in Kenyan context
-  * Include: main idea, inference, vocabulary in context, and language feature questions
-  * Passage MUST be included in the question text itself
-- Section C: Composition/essay question with clear instructions
-  * Give learners a choice of TWO topics (they answer ONE)
-  * Topics must be relevant to Kenyan senior school learners
-- For Kiswahili: use Kiswahili throughout — all questions, answers, instructions
-- For Arabic: include Arabic script where appropriate
-- Avoid testing memorisation — test understanding and application`,
+    english: `
+ENGLISH EXAM REQUIREMENTS — CBC GRADE 10 (KLB/KICD):
+
+━━━ EXAM STRUCTURE ━━━
+A Grade 10 English written exam has FIVE sections. Scale marks to total requested:
+
+SECTION A — READING COMPREHENSION (≈20% of total marks)
+- Include a COMPLETE prose narrative or expository passage of 300–500 words IN the paper
+- The passage MUST be written in full — not referenced or described
+- Passage theme must align with selected unit (Etiquette, Climate Change, AI/Healthcare, Careers, etc.)
+- Passage style: lively, literary, Kenyan setting, real names and places
+- Questions must test (allocate marks as shown):
+  * Atmosphere/mood — "What was the atmosphere...? Use evidence from the text." (3 marks)
+  * Characterisation — "How does the writer convey...? Refer to the passage." (3 marks)
+  * Paraphrase — "Describe in your own words..." (3 marks)
+  * Multiple examples — "Give THREE examples of... from the passage." (3 marks)
+  * Figurative language — "What does the phrase '...' tell you about...?" (2 marks)
+  * Irony/literary device — "Explain the irony in..." (2 marks)
+  * Significance — "Comment on the significance of..." (2 marks)
+  * Vocabulary in context — "(a) explain '...' (b) explain '...'" (2 marks)
+- TOTAL comprehension questions: 7–8 questions
+
+SECTION B — SUMMARY WRITING (≈10% of total marks)
+- Provide a SEPARATE passage of 300–400 words (different from Section A)
+- Give a specific summary task: "In not more than 80 words, summarise the [challenges/benefits/causes] of..."
+- State: "Use your own words as far as possible"
+- Provide a lined space labeled "Summary" after the passage
+
+SECTION C — GRAMMAR IN USE (≈25% of total marks)
+- Test grammar ALWAYS in context — never in isolation
+- Each question MUST embed the grammar point in a sentence or short paragraph
+- Question types (mix these):
+  * Fill in the gap: "Complete the sentence with the correct word: Amina took a deep ___ (breath/breathe)"
+  * Identify and correct: "Identify the error in this sentence and rewrite it correctly: She go to school everyday."
+  * Rewrite/transform: "Rewrite in the correct tense: By tomorrow, she ___ (complete) the project."
+  * Identify and label: "Underline all the nouns in: The teacher asked Wanjiku to read the letter aloud."
+  * Spelling: "Identify the correctly spelled word: necessary / necessery / neccesary"
+  * Homophones: "Circle the correct word: The farmer's field was (bear/bare) after the drought."
+  * Sentence correction: "Rewrite the following run-on sentence correctly: The rain fell hard it flooded the streets."
+  * Pronunciation: "Provide a word with a different vowel sound that rhymes with: stock → stork"
+- Grammar topics by unit (match to selected strands):
+  Unit 1 → Nouns (count/non-count, common/proper), Pronouns, Determiners
+  Unit 2 → Verbs/Tense/Aspect, Adverbs (time/place/manner)
+  Unit 3 → Adjectives (order, comparative, superlative), Prepositions
+  Unit 4 → Noun Phrases, Verb Phrases, Determiners
+  Unit 5 → Phrases (adjective, adverb, prepositional), Adverbs
+  Unit 6 → Relative Pronouns, Relative Clauses
+  Unit 7 → Clauses (relative, adverbial)
+  Unit 8 → Clause Patterns
+  Unit 9 → Sentence Types and Structures
+
+SECTION D — WRITING COMPOSITION (≈35% of total marks)
+- Give a choice of TWO topics — learner answers ONE
+- Writing type must match selected Writing strand:
+  FUNCTIONAL WRITING:
+    * Formal letter: "Write a letter to the Principal of your school requesting..."
+    * Email: "Write an email to your friend describing..."
+    * Memo: "Write a memo from the School Captain to all students about..."
+    * Report: "Write a short report on the recent sports day held at your school..."
+    * Apology letter: "Write a letter of apology to your teacher for..."
+    * Notice: "Write a notice to be posted on the school notice board about..."
+    * Minutes: "Write the minutes of a meeting held by the school Environmental Club..."
+  CREATIVE WRITING:
+    * Narrative: "Write a story beginning with: The day I discovered the old photograph..."
+    * Descriptive: "Describe a busy market scene in your town on a Saturday morning."
+    * Argumentative: "Write a speech arguing for OR against: Social media does more harm than good."
+    * Expository: "Write an article explaining the importance of career planning for young people in Kenya."
+- Always include: "Your composition will be marked on: Content (10 marks), Organisation (10 marks), Language (10 marks), Mechanics (5 marks)"
+- For functional writing specify EXACTLY: format required (letter heading, date, salutation, body, sign-off)
+- Word count guidance: compositions 250–350 words, letters/memos 150–200 words
+
+SECTION E — LISTENING AND SPEAKING ORAL (assessed separately — do NOT include in written paper)
+- This strand is tested orally by the teacher
+- Do NOT include listening and speaking questions in the written exam JSON
+
+━━━ KENYAN CONTEXT RULES ━━━
+- Comprehension passages must feature Kenyan settings, names, institutions
+- Names: Amina, Wanjiku, Kipchoge, Baraka, Njeri, Otieno, Fatuma, Mwangi, Chebet, Kamau, Achieng, Moraa
+- Institutions: Ministry of Health, Kenya Wildlife Service, Safaricom, Kenya Power, county governments, KNEC, hospitals, schools
+- Places: Nairobi, Mombasa, Kisumu, Nakuru, Eldoret, Nyeri, Garissa, Kericho, Thika, Kisii, Athi River
+- Current Kenyan issues: climate change, career choices, AI in healthcare, etiquette, sports, incomes
+- CBC Competencies to embed: Critical Thinking, Communication, Citizenship, Creativity, Self-Efficacy
+
+━━━ CRITICAL RULES ━━━
+- Comprehension passage MUST appear in full in the exam — not "read the passage on page 3"
+- Grammar questions must ALWAYS give a sentence/context first, then ask
+- Never test grammar by asking "define a noun" — always embed in context
+- Summary must specify a word limit (80 words) and a specific focus aspect
+- Writing task must specify: audience, purpose, format, and marking rubric
+- Use KNEC-style marking language: "Award 1 mark for each correct point. Accept any reasonable answer."`,
 
     humanities: `
 HUMANITIES-SPECIFIC REQUIREMENTS:
@@ -179,7 +259,7 @@ ARTS AND PHYSICAL EDUCATION REQUIREMENTS:
 - Include questions that reference Kenyan cultural arts, sports personalities, or local events`,
   };
 
-  return base[type] || base.humanities;
+  return base[type] || base[subject === 'English' ? 'english' : 'humanities'];
 }
 
 // ── Subject-specific question format rules ───────────────
@@ -219,21 +299,44 @@ Section C (Long Answer / Extended Calculation — 10–15 marks):
   - Proof or derivation questions
   - Applied problems requiring interpretation`,
 
-    language: `
-QUESTION FORMAT FOR LANGUAGE:
-Section A (Language Use — 2 marks each):
-  - Grammar identification, correction, or completion
-  - Vocabulary in context
-  - Language feature identification
+    english: `
+QUESTION FORMAT FOR ENGLISH (CBC Grade 10 — KLB structure):
 
-Section B (Comprehension — structured around a passage):
-  - Provide a 4–6 sentence passage in Kenyan context
-  - Questions: main idea, inference, vocabulary, language feature
+SECTION A — READING COMPREHENSION:
+  Full passage (300–500 words) followed by:
+  Q1. What was the atmosphere/mood in [opening scene]? Use evidence. (3 marks)
+  Q2. How does the writer convey [character's experience]? Refer to passage. (3 marks)
+  Q3. Describe in your own words [specific event]. (3 marks)
+  Q4. What [pressures/reasons/examples] are given? State THREE. (3 marks)
+  Q5. What does the phrase "[figurative phrase]" tell you about [subject]? (2 marks)
+  Q6. Explain the [irony/contrast/significance] of [event]. (2 marks)
+  Q7. Comment on the significance of [character's/narrator's action]. (2 marks)
+  Q8. Explain the meaning: (a) "[word/phrase]" (b) "[word/phrase]" (2 marks)
 
-Section C (Composition / Essay):
-  - Provide TWO topic choices — learner answers ONE
-  - Clear word count or length guidance
-  - Mark allocation: Content, Organisation, Language use`,
+SECTION B — SUMMARY WRITING:
+  Separate passage (300–400 words) + instruction:
+  "Read the passage carefully. In not more than 80 words, summarise [specific aspect].
+   Use your own words as far as possible."
+  [Leave lined space for answer]
+
+SECTION C — GRAMMAR IN USE (in-context only):
+  Fill gap: "Complete with correct word: She could not ___ (accept/except) the terms."
+  Identify/correct: "Identify and correct the error: The boys has left the classroom."
+  Rewrite/transform: "Rewrite in reported speech: She said, 'I will return tomorrow.'"
+  Underline: "Underline the relative clause: The man who spoke yesterday is my uncle."
+  Spelling: "Circle the correctly spelled word: committee / comittee / commitee"
+  Homophones: "Choose correct word: The (weather/whether) in Nairobi was unpredictable."
+  Run-on/splice: "Rewrite as two correct sentences: The learners were tired, they kept studying."
+
+SECTION D — WRITING COMPOSITION:
+  Functional writing task:
+    "You are the Secretary of Thika High School Environmental Club.
+     Write a MEMO to all club members about a tree-planting day next Saturday.
+     Your memo should include: date, venue, time, and what to bring.
+     (Your writing will be marked on: Content 10 marks, Organisation 10 marks,
+      Language 10 marks, Mechanics 5 marks)"
+  OR Creative writing task:
+    "Write a story that begins: The envelope had been sitting on the table for three days..."`,
 
     humanities: `
 QUESTION FORMAT FOR HUMANITIES:
