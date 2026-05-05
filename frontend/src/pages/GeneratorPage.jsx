@@ -132,7 +132,8 @@ export default function GeneratorPage() {
             return
           }
 
-          const { data: job } = await api.get(`/exams/job/${jobId}`)
+          // _t param busts browser/CDN cache — prevents 304s masking status changes
+          const { data: job } = await api.get(`/exams/job/${jobId}?_t=${Date.now()}`)
 
           if (job.status === 'done') {
             stopAll()
