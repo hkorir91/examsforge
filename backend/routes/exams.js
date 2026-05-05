@@ -1,959 +1,807 @@
-/**
- * ExamsForge by SmartSchool Digital
- * examHelpers.js — Phase 2: Subject-Aware Hybrid Generation Pipeline
- *
- * Architecture:
- * 1. Retrieve question pool from bank (QuestionBank model)
- * 2. Select balanced set to fit marks/questions requested
- * 3. Build subject-specific AI prompt with correct question formats
- * 4. AI transforms seed questions with Kenyan context
- * 5. Build full exam JSON with marking scheme
- */
-
-// ── Grade context ────────────────────────────────────────
-function getGradeContext(grade) {
-  const contexts = {
-    'Grade 10': 'CBC Senior School — Grade 10 (Age 15–16)',
-    'Grade 11': 'CBC Senior School — Grade 11 (Age 16–17)',
-    'Grade 12': 'CBC Senior School — Grade 12 (Age 17–18)',
-  };
-  return contexts[grade] || grade;
-}
-
-function getDuration(examType, marks) {
-  if (examType === 'CAT') {
-    if (marks <= 20) return '30 minutes';
-    if (marks <= 30) return '45 minutes';
-    return '1 hour';
-  }
-  if (examType === 'Midterm') return marks <= 50 ? '1 hour 30 minutes' : '2 hours';
-  if (examType === 'End Year') return marks >= 100 ? '2 hours 30 minutes' : '2 hours';
-  if (examType === 'Pre-Mock' || examType === 'Mock' || examType === 'Series') return marks >= 100 ? '2 hours 30 minutes' : '2 hours';
-  return marks >= 100 ? '2 hours 30 minutes' : '2 hours'; // End Term
-}
-
-// ── Subject classification ───────────────────────────────
-const SUBJECT_TYPES = {
-  // Sciences — require calculations, experiments, diagrams
-  science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
-  // Mathematics — require working shown, calculations, proofs
-  mathematics: ['Mathematics', 'Essential Mathematics'],
-  // English — has comprehensive 5-section CBC structure
-  english: ['English'],
-  // Other languages — comprehension passage, grammar, composition
-  language: ['Kiswahili', 'Arabic', 'French', 'German', 'Chinese',
-    'Indigenous Languages', 'Literature in English', 'Fasihi ya Kiswahili',
-    'Sign Language', 'Kenyan Sign Language'],
-  // Humanities — require case studies, source analysis, essays
-  humanities: ['History and Citizenship', 'CRE', 'IRE', 'HRE',
-    'Business Studies', 'Life Skills Education', 'Community Service Learning'],
-  // Geography — has its own specific rules
-  geography: ['Geography'],
-  // Technical — require practical procedures, tools, safety
-  technical: ['Agriculture', 'Computer Studies', 'Home Science', 'Aviation',
-    'Building and Construction', 'Electricity', 'Drawing and Design',
-    'Marine and Fisheries', 'Metalwork', 'Power Mechanics', 'Woodwork',
-    'Media Technology'],
-  // Arts & Sports — require practical knowledge, performance, technique
-  arts: ['Art and Design', 'Music and Dance', 'Theatre and Film', 'Fine Arts',
-    'Sports and Recreation', 'Physical Education'],
-};
-
-function getSubjectType(subject) {
-  for (const [type, subjects] of Object.entries(SUBJECT_TYPES)) {
-    if (subjects.includes(subject)) return type;
-  }
-  return 'humanities';
-}
-
-// ── Subject-specific instructions ───────────────────────
-function getSubjectInstructions(subject, examType, totalMarks) {
-  const type = getSubjectType(subject);
-
-  const base = {
-    science: `
-SCIENCE-SPECIFIC REQUIREMENTS — CRITICAL:
-- EVERY science question MUST contain specific, actual content — not vague descriptions
-- For Chemistry: write actual equations e.g. "Balance: Fe + O₂ → Fe₂O₃" not "balance an equation"
-- For Physics: write actual values e.g. "A car moves at 20m/s for 5 seconds, calculate distance" not "calculate distance for a moving car"
-- For Biology: write specific organism names, organs, processes — not "a certain organism"
-- Include at least ONE question requiring a labelled diagram or description of experimental apparatus
-- Include questions on safety precautions where relevant
-- For Chemistry: include at least one balanced equation or stoichiometry calculation
-- For Biology: include questions on structure and function with specific named structures
-- For Physics: include at least one calculation showing formula, substitution, and answer with units
-- Practical questions should ask learners to describe procedures step by step
-- Use data/results tables where appropriate for analysis questions`,
-
-    mathematics: `
-MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
-- EVERY mathematics question MUST contain ACTUAL numbers, expressions, equations or values
-- DO NOT write "Wanjiku encounters expressions to simplify" without giving the actual expression
-- ALWAYS write the full mathematical content: e.g. "Simplify: (2³ × 2⁵) ÷ 2⁴" not "simplify an expression"
-- ALWAYS write actual equations: e.g. "Solve: x² – 5x – 6 = 0" not "solve a quadratic equation"
-- ALWAYS include specific measurements: e.g. "A rectangle has length (x+5)cm and width (x-2)cm" not "a rectangle"
-- For logarithms: write "Evaluate: log₁₀ 1000" not "evaluate a logarithm"
-- For geometry: write actual coordinates, angles, lengths — e.g. "Triangle ABC where A(1,2) B(3,4) C(5,2)"
-- For bearings: write actual bearing values — e.g. "on a bearing of 070°" not "on some bearing"
-- ALL calculation questions must show: state formula → substitute values → solve → state answer with units
-- Include questions from Number/Algebra, Geometry, Statistics — balanced coverage
-- Section C must include multi-step problems requiring 3+ calculation steps
-- Answers must show complete working — method marks awarded even if final answer is wrong
-- Include at least one geometry/construction question with measurements
-- SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with marks`,
-
-    english: `
-ENGLISH EXAM REQUIREMENTS — CBC GRADE 10 (KLB/KICD):
-
-━━━ EXAM STRUCTURE ━━━
-A Grade 10 English written exam has FIVE sections. Scale marks to total requested:
-
-SECTION A — READING COMPREHENSION (≈20% of total marks)
-- Include a COMPLETE prose narrative or expository passage of 200–300 words IN the paper
-- The passage MUST be written in full — not referenced or described
-- Passage theme must align with selected unit (Etiquette, Climate Change, AI/Healthcare, Careers, etc.)
-- Passage style: lively, literary, Kenyan setting, real names and places
-- Questions must test (allocate marks as shown):
-  * Atmosphere/mood — "What was the atmosphere...? Use evidence from the text." (3 marks)
-  * Characterisation — "How does the writer convey...? Refer to the passage." (3 marks)
-  * Paraphrase — "Describe in your own words..." (3 marks)
-  * Multiple examples — "Give THREE examples of... from the passage." (3 marks)
-  * Figurative language — "What does the phrase '...' tell you about...?" (2 marks)
-  * Irony/literary device — "Explain the irony in..." (2 marks)
-  * Significance — "Comment on the significance of..." (2 marks)
-  * Vocabulary in context — "(a) explain '...' (b) explain '...'" (2 marks)
-- TOTAL comprehension questions: 7–8 questions
-
-SECTION B — SUMMARY WRITING (≈10% of total marks)
-- Provide a SEPARATE passage of 200–280 words (different from Section A)
-- Give a specific summary task: "In not more than 80 words, summarise the [challenges/benefits/causes] of..."
-- State: "Use your own words as far as possible"
-- Provide a lined space labeled "Summary" after the passage
-
-SECTION C — GRAMMAR IN USE (≈25% of total marks)
-- Test grammar ALWAYS in context — never in isolation
-- Each question MUST embed the grammar point in a sentence or short paragraph
-- Question types (mix these):
-  * Fill in the gap: "Complete the sentence with the correct word: Amina took a deep ___ (breath/breathe)"
-  * Identify and correct: "Identify the error in this sentence and rewrite it correctly: She go to school everyday."
-  * Rewrite/transform: "Rewrite in the correct tense: By tomorrow, she ___ (complete) the project."
-  * Identify and label: "Underline all the nouns in: The teacher asked Wanjiku to read the letter aloud."
-  * Spelling: "Identify the correctly spelled word: necessary / necessery / neccesary"
-  * Homophones: "Circle the correct word: The farmer's field was (bear/bare) after the drought."
-  * Sentence correction: "Rewrite the following run-on sentence correctly: The rain fell hard it flooded the streets."
-  * Pronunciation: "Provide a word with a different vowel sound that rhymes with: stock → stork"
-- Grammar topics by unit (match to selected strands):
-  Unit 1 → Nouns (count/non-count, common/proper), Pronouns, Determiners
-  Unit 2 → Verbs/Tense/Aspect, Adverbs (time/place/manner)
-  Unit 3 → Adjectives (order, comparative, superlative), Prepositions
-  Unit 4 → Noun Phrases, Verb Phrases, Determiners
-  Unit 5 → Phrases (adjective, adverb, prepositional), Adverbs
-  Unit 6 → Relative Pronouns, Relative Clauses
-  Unit 7 → Clauses (relative, adverbial)
-  Unit 8 → Clause Patterns
-  Unit 9 → Sentence Types and Structures
-
-SECTION D — WRITING COMPOSITION (≈35% of total marks)
-- Give a choice of TWO topics — learner answers ONE
-- Writing type must match selected Writing strand:
-  FUNCTIONAL WRITING:
-    * Formal letter: "Write a letter to the Principal of your school requesting..."
-    * Email: "Write an email to your friend describing..."
-    * Memo: "Write a memo from the School Captain to all students about..."
-    * Report: "Write a short report on the recent sports day held at your school..."
-    * Apology letter: "Write a letter of apology to your teacher for..."
-    * Notice: "Write a notice to be posted on the school notice board about..."
-    * Minutes: "Write the minutes of a meeting held by the school Environmental Club..."
-  CREATIVE WRITING:
-    * Narrative: "Write a story beginning with: The day I discovered the old photograph..."
-    * Descriptive: "Describe a busy market scene in your town on a Saturday morning."
-    * Argumentative: "Write a speech arguing for OR against: Social media does more harm than good."
-    * Expository: "Write an article explaining the importance of career planning for young people in Kenya."
-- Always include: "Your composition will be marked on: Content (10 marks), Organisation (10 marks), Language (10 marks), Mechanics (5 marks)"
-- For functional writing specify EXACTLY: format required (letter heading, date, salutation, body, sign-off)
-- Word count guidance: compositions 250–350 words, letters/memos 150–200 words
-
-SECTION E — LISTENING AND SPEAKING ORAL (assessed separately — do NOT include in written paper)
-- This strand is tested orally by the teacher
-- Do NOT include listening and speaking questions in the written exam JSON
-
-━━━ KENYAN CONTEXT RULES ━━━
-- Comprehension passages must feature Kenyan settings, names, institutions
-- Names: Amina, Wanjiku, Kipchoge, Baraka, Njeri, Otieno, Fatuma, Mwangi, Chebet, Kamau, Achieng, Moraa
-- Institutions: Ministry of Health, Kenya Wildlife Service, Safaricom, Kenya Power, county governments, KNEC, hospitals, schools
-- Places: Nairobi, Mombasa, Kisumu, Nakuru, Eldoret, Nyeri, Garissa, Kericho, Thika, Kisii, Athi River
-- Current Kenyan issues: climate change, career choices, AI in healthcare, etiquette, sports, incomes
-- CBC Competencies to embed: Critical Thinking, Communication, Citizenship, Creativity, Self-Efficacy
-
-━━━ CRITICAL RULES ━━━
-- Comprehension passage MUST appear in full in the exam — not "read the passage on page 3"
-- Grammar questions must ALWAYS give a sentence/context first, then ask
-- Never test grammar by asking "define a noun" — always embed in context
-- Summary must specify a word limit (80 words) and a specific focus aspect
-- Writing task must specify: audience, purpose, format, and marking rubric
-- Use KNEC-style marking language: "Award 1 mark for each correct point. Accept any reasonable answer."`,
-
-    humanities: `
-HUMANITIES-SPECIFIC REQUIREMENTS:
-- Include at least ONE source-based or data-based question (map extract, graph, table, photograph description, quote)
-- Geography: include map work / sketch map question in at least one section
-- History: include a source analysis question with a short extract followed by questions
-- Business Studies: use Kenyan business examples (M-Pesa, Equity Bank, Safaricom, Nakumatt, local markets)
-- CRE/IRE/HRE: questions must test understanding and application of values, not just recitation
-- Avoid pure recall questions — test application, analysis, and evaluation
-- Essays in Section C must have clear marking criteria with awarded marks per point`,
-
-    geography: `
-GEOGRAPHY-SPECIFIC REQUIREMENTS — CRITICAL:
-
-STRAND COVERAGE — questions MUST cover these official KICD Grade 10 Geography strands:
-1. Practical Geography: Introduction to Geography, Map Reading and Interpretation, Statistical Methods, GIS
-2. Natural Systems and Processes: Rocks, Earth Movements, Folding, Vulcanicity, Earthquakes
-3. Human and Economic Activities: Agriculture, Mining, Energy, Industry
-
-QUESTION CONTENT RULES:
-- EVERY question must be specific — name actual landforms, processes, places, data
-- Map Reading: reference actual Kenyan topographic maps, grid references, contour lines
-- Statistical Methods: include actual data tables or graphs for interpretation
-- Rocks: name specific rock types (granite, limestone, sandstone, basalt) and their formation
-- Vulcanicity: name actual Kenyan/African volcanoes (Mt Kenya, Mt Kilimanjaro, Longonot, Suswa)
-- Earthquakes: reference actual earthquake zones in East Africa (Great Rift Valley)
-- Folding: name types (anticline, syncline, monocline) with diagrams
-- Agriculture: reference Kenyan farming regions, crops, and methods
-- Mining: reference actual Kenyan minerals (soda ash, fluorspar, gold, limestone, titanium)
-- Energy: reference Kenyan energy sources (geothermal at Olkaria, hydroelectric at Masinga/Gitaru/Kiambere, wind at Ngong/Lake Turkana)
-- Industry: reference actual Kenyan industries (EPZ, KICOMI, Bamburi Cement, East African Breweries)
-
-DIAGRAM REQUIREMENTS:
-- Vulcanicity question: include diagram field with type "composite_volcano" or "shield_volcano"
-- Folding question: include diagram field with type "fold_diagram"
-- Rock cycle question: include diagram field with type "rock_cycle"
-- Map reading question: include diagram field with type "contour_map"
-- Statistical question: describe a data table or graph in the question text
-
-KENYAN GEOGRAPHY CONTEXT:
-- Always use real Kenyan examples: Rift Valley, Lake Victoria, Mt Kenya, Indian Ocean coast
-- Reference real counties: Narok, Nakuru, Turkana, Mombasa, Kisumu, Kilifi
-- Use real distances, populations, production figures where relevant
-- Section C essays must reference specific Kenyan geographical features and problems`,
-
-    technical: `
-TECHNICAL SUBJECT REQUIREMENTS:
-- Include questions on tools, materials, and equipment used in the subject
-- Include safety precautions and procedures
-- Agriculture: include questions on specific crops/livestock common in Kenya (maize, beans, dairy cattle, poultry)
-- Computer Studies: include programming logic, flowcharts, or pseudocode questions
-- Home Science: include nutrition calculations, meal planning, or garment construction questions
-- Aviation/Electricity/Power Mechanics: include questions on regulations, safety standards, and calculations
-- Include at least one question requiring a step-by-step procedure or process description
-- Use Kenyan industry examples and local context throughout`,
-
-    arts: `
-ARTS AND PHYSICAL EDUCATION REQUIREMENTS:
-- Music and Dance: include music notation, theory questions, AND performance technique
-- Theatre and Film: include script analysis, staging, or character development questions
-- Art and Design: include questions on techniques, elements of art, and Kenyan/African art traditions
-- Physical Education: include fitness principles, rules of games, health concepts
-- Sports and Recreation: include biomechanics, training methods, sports psychology basics
-- Questions must test both knowledge AND practical understanding
-- Include questions that reference Kenyan cultural arts, sports personalities, or local events`,
-  };
-
-  return base[type] || base[subject === 'English' ? 'english' : 'humanities'];
-}
-
-// ── Subject-specific question format rules ───────────────
-function getQuestionFormatRules(subject) {
-  const type = getSubjectType(subject);
-
-  const formats = {
-    science: `
-QUESTION FORMAT FOR SCIENCE:
-Section A (Short Answer — 2 marks each):
-  - "Define the term ___" or "State TWO functions of ___"
-  - "Give TWO differences between ___ and ___"
-  - "Name the instrument used to ___"
-
-Section B (Structured — 5–8 marks, multi-part):
-  - (a) Describe the structure of ___ (2 marks)
-  - (b) Explain how ___ works (3 marks)
-  - (c) State ONE safety precaution when handling ___ (1 mark)
-
-Section C (Long Answer — 10–15 marks):
-  - Extended experiment/calculation question
-  - Include data table, graph interpretation, or multi-step calculation
-  - Must include: observation → analysis → conclusion format for practicals`,
-
-    mathematics: `
-QUESTION FORMAT FOR MATHEMATICS:
-Section A (Short Answer — 2–3 marks each):
-  - Direct calculation questions
-  - "Simplify", "Evaluate", "Solve for x"
-
-Section B (Structured — 5–8 marks, multi-part):
-  - Multi-step problems with labelled sub-parts (a), (b), (c)
-  - Word problems in Kenyan context
-
-Section C (Long Answer / Extended Calculation — 10–15 marks):
-  - Complex multi-step problems
-  - Proof or derivation questions
-  - Applied problems requiring interpretation`,
-
-    english: `
-QUESTION FORMAT FOR ENGLISH (CBC Grade 10 — KLB structure):
-
-SECTION A — READING COMPREHENSION:
-  Full passage (200–300 words) followed by:
-  Q1. What was the atmosphere/mood in [opening scene]? Use evidence. (3 marks)
-  Q2. How does the writer convey [character's experience]? Refer to passage. (3 marks)
-  Q3. Describe in your own words [specific event]. (3 marks)
-  Q4. What [pressures/reasons/examples] are given? State THREE. (3 marks)
-  Q5. What does the phrase "[figurative phrase]" tell you about [subject]? (2 marks)
-  Q6. Explain the [irony/contrast/significance] of [event]. (2 marks)
-  Q7. Comment on the significance of [character's/narrator's action]. (2 marks)
-  Q8. Explain the meaning: (a) "[word/phrase]" (b) "[word/phrase]" (2 marks)
-
-SECTION B — SUMMARY WRITING:
-  Separate passage (200–280 words) + instruction:
-  "Read the passage carefully. In not more than 80 words, summarise [specific aspect].
-   Use your own words as far as possible."
-  [Leave lined space for answer]
-
-SECTION C — GRAMMAR IN USE (in-context only):
-  Fill gap: "Complete with correct word: She could not ___ (accept/except) the terms."
-  Identify/correct: "Identify and correct the error: The boys has left the classroom."
-  Rewrite/transform: "Rewrite in reported speech: She said, 'I will return tomorrow.'"
-  Underline: "Underline the relative clause: The man who spoke yesterday is my uncle."
-  Spelling: "Circle the correctly spelled word: committee / comittee / commitee"
-  Homophones: "Choose correct word: The (weather/whether) in Nairobi was unpredictable."
-  Run-on/splice: "Rewrite as two correct sentences: The learners were tired, they kept studying."
-
-SECTION D — WRITING COMPOSITION:
-  Functional writing task:
-    "You are the Secretary of Thika High School Environmental Club.
-     Write a MEMO to all club members about a tree-planting day next Saturday.
-     Your memo should include: date, venue, time, and what to bring.
-     (Your writing will be marked on: Content 10 marks, Organisation 10 marks,
-      Language 10 marks, Mechanics 5 marks)"
-  OR Creative writing task:
-    "Write a story that begins: The envelope had been sitting on the table for three days..."`,
-
-    humanities: `
-QUESTION FORMAT FOR HUMANITIES:
-Section A (Short Answer — 2 marks each):
-  - "Define", "State", "Identify", "Give ONE example of"
-  - Data/map/source reference questions
-
-Section B (Structured — 5–8 marks):
-  - Multi-part questions with source, map, or data stimulus
-  - (a) From the source/map, identify ___ (2 marks)
-  - (b) Explain ___ (3 marks)
-  - (c) Suggest how ___ (2 marks)
-
-Section C (Essay / Extended Response — 10–15 marks):
-  - "Discuss", "Analyse", "Evaluate", "Examine"
-  - Clear marking guide: 1 mark per valid point, up to maximum
-  - Introduction, body points, conclusion expected`,
-
-    geography: `
-QUESTION FORMAT FOR GEOGRAPHY:
-Section A (Short Answer — 2 marks each):
-  - "Define the term ___" (1+1 marks for definition + example)
-  - "State TWO characteristics of ___" (1 mark each)
-  - "Name TWO types of ___" (1 mark each)
-  - "Differentiate between ___ and ___" (2 marks)
-  - "Give the function of ___ as shown in the map extract" (2 marks)
-
-Section B (Structured — 5–10 marks, multi-part WITH scenario):
-  - Must include a stimulus: data table, map description, photograph description, or diagram
-  - (a) i) Identify ___ from the diagram/map (1 mark) ii) State the function of ___ (2 marks)
-  - (b) Explain THREE ways ___ affects ___ (3 marks)
-  - (c) Suggest how Kenya can improve ___ (2 marks)
-  - Include at least ONE question with a diagram field (fold, volcano, rock cycle, map)
-
-Section C (Essay — 10–15 marks):
-  - Extended questions: "Discuss", "Examine", "Analyse", "Evaluate"
-  - Must reference specific Kenyan examples and case studies
-  - Mark allocation: 1 mark per valid point clearly stated
-  - End with: "any other relevant point (1 mark)" to show flexibility
-  - Include at least one sketch map or diagram instruction within question`,
-
-    technical: `
-QUESTION FORMAT FOR TECHNICAL SUBJECTS:
-Section A (Short Answer — 2 marks each):
-  - "Name", "State", "List TWO"
-  - Tool/material identification
-  - Safety rule questions
-
-Section B (Structured — 5–8 marks):
-  - Process/procedure questions with steps
-  - Diagram labelling or description
-  - Calculation questions (where applicable)
-
-Section C (Extended / Project — 10–15 marks):
-  - Design a solution to a given problem
-  - Plan a project or procedure step-by-step
-  - Evaluate advantages and disadvantages of a method`,
-
-    arts: `
-QUESTION FORMAT FOR ARTS AND PE:
-Section A (Short Answer — 2 marks each):
-  - "Define", "Name", "State TWO rules of"
-  - Identify elements/principles/techniques
-
-Section B (Structured — 5–8 marks):
-  - Analysis of a technique, performance, or artwork
-  - Describe how to perform/create ___
-  - Compare two styles/techniques
-
-Section C (Extended — 10–15 marks):
-  - "Describe in detail how you would prepare for/perform/create ___"
-  - Analysis of a Kenyan cultural art form or sport
-  - Planning/choreography/composition question`,
-  };
-
-  return formats[type] || formats.humanities;
-}
-
-// ── Validate exam params ─────────────────────────────────
-function validateExamParams(params) {
-  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
-
-  if (!grade) return 'Grade is required.';
-  if (!['Grade 10', 'Grade 11', 'Grade 12'].includes(grade)) {
-    return 'Grade must be Grade 10, 11, or 12 (CBC Senior School).';
-  }
-  if (!subject) return 'Subject is required.';
-  if (!strands || !Array.isArray(strands) || strands.length === 0) {
-    return 'At least one strand must be selected.';
-  }
-  if (!examType || !['CAT', 'Midterm', 'End Term', 'Pre-Mock', 'Mock'].includes(examType)) {
-    return 'Exam type must be CAT, Midterm, End Term, Pre-Mock, or Mock.';
-  }
-  if (!term) return 'Term is required.';
-  if (!year || isNaN(year)) return 'Valid year is required.';
-  if (!totalMarks || totalMarks < 10 || totalMarks > 150) {
-    return 'Total marks must be between 10 and 150.';
-  }
-  if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
-    return 'Total questions must be between 5 and 50.';
-  }
-  if (!school || school.trim().length < 2) return 'School name is required.';
-
-  return null;
-}
-
-// ── Select balanced question set ─────────────────────────
-function selectBalancedQuestions(pool, totalMarks, totalQuestions, sectionCount = 3) {
-  if (!pool || pool.length === 0) return { sectionA: [], sectionB: [], sectionC: [] };
-
-  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-  const shuffled = shuffle(pool);
-
-  // When sectionCount === 1 (CAT), ALL questions go to Section A
-  if (sectionCount === 1) {
-    return {
-      sectionA: shuffled.slice(0, totalQuestions),
-      sectionB: [],
-      sectionC: [],
-    };
-  }
-
-  // When sectionCount === 2 (Midterm), split between A and B only
-  if (sectionCount === 2) {
-    const saCount = Math.round(totalQuestions * 0.45);
-    const sbCount = totalQuestions - saCount;
-    return {
-      sectionA: shuffled.slice(0, saCount),
-      sectionB: shuffled.slice(saCount, saCount + sbCount),
-      sectionC: [],
-    };
-  }
-
-  // sectionCount === 3: distribute across A, B, C by question type
-  const saCount  = Math.round(totalQuestions * 0.4);
-  const strCount = Math.round(totalQuestions * 0.35);
-  const laCount  = totalQuestions - saCount - strCount;
-
-  const shortAnswer = pool.filter(q => q.marks <= 3 || q.questionType === 'short_answer');
-  const structured  = pool.filter(q => (q.marks >= 4 && q.marks <= 7) || q.questionType === 'structured');
-  const longAnswer  = pool.filter(q => q.marks >= 8 || q.questionType === 'long_answer' || q.questionType === 'calculation' || q.questionType === 'practical');
-
-  const sectionA = shuffle(shortAnswer).slice(0, saCount);
-  const sectionB = shuffle(structured).slice(0, strCount);
-  const sectionC = shuffle(longAnswer).slice(0, laCount);
-
-  const used = new Set([...sectionA, ...sectionB, ...sectionC].map(q => q._id?.toString()));
-  const remaining = shuffle(pool.filter(q => !used.has(q._id?.toString())));
-
-  const fillA = saCount  - sectionA.length;
-  const fillB = strCount - sectionB.length;
-  const fillC = laCount  - sectionC.length;
-
-  if (fillA > 0) sectionA.push(...remaining.splice(0, fillA));
-  if (fillB > 0) sectionB.push(...remaining.splice(0, fillB));
-  if (fillC > 0) sectionC.push(...remaining.splice(0, fillC));
-
-  return { sectionA, sectionB, sectionC };
-}
-
-// ── Build hybrid prompt ──────────────────────────────────
-function buildHybridExamPrompt({
-  grade, subject, strands, substrands, examType, term, year,
-  totalMarks, totalQuestions, school,
-  sectionASeeds, sectionBSeeds, sectionCSeeds,
-  sectionCount = 3,
-}) {
-  const gradeContext = getGradeContext(grade);
-  const duration = getDuration(examType, totalMarks);
-  const strandList = strands.join(', ');
-  const substrandList = substrands.length > 0 ? substrands.join(', ') : 'All sub-strands within selected strands';
-  const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = getQuestionFormatRules(subject);
-
-  // When sectionCount=1, all seeds are in sectionASeeds — use totalMarks directly
-  const saMarks = sectionCount === 1
-    ? totalMarks
-    : sectionASeeds.reduce((s, q) => s + (q.marks || 2), 0);
-  const sbMarks = sectionBSeeds.reduce((s, q) => s + (q.marks || 5), 0);
-  const scMarks = sectionCSeeds.reduce((s, q) => s + (q.marks || 9), 0);
-
-  const formatSeeds = (seeds) =>
-    seeds.map((q, i) => `  Q${i + 1} [${q.marks || '?'} marks, ${q.difficulty || 'medium'}, type: ${q.questionType || 'structured'}]:
-    Original text: "${q.questionText}"
-    Answer guide: "${q.answerGuide}"`).join('\n');
-
-  const hasSectionA = sectionASeeds.length > 0;
-  const hasSectionB = sectionBSeeds.length > 0;
-  const hasSectionC = sectionCSeeds.length > 0 && sectionCount >= 3;
-
-  return `You are a senior Kenyan CBC curriculum examiner specialising in ${subject} for ${gradeContext}.
-
-Your task is to TRANSFORM the provided seed questions into a complete, professional ${subject} exam paper.
-
-CRITICAL RULES — AI GUARDRAILS:
-1. ONLY transform the provided seed questions. Do NOT invent entirely new topics.
-2. You MUST rephrase every question — change wording, names, values, contexts, scenarios.
-3. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Aisha, Linet, Mwangi, Chebet
-4. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Garissa, Kitale, Kakamega
-5. Preserve each question's learning objective, curriculum strand, and approximate difficulty.
-6. Preserve approximate mark weight — do not significantly change marks allocation.
-7. ABSOLUTELY NO multiple choice questions anywhere in the paper.
-8. Use competency-based CBC action verbs: Analyse, Evaluate, Explain, Calculate, Describe, Justify, Differentiate, Assess, Examine, Outline
-9. Output must be teacher-ready, professional, and match Kenya national exam standards.
-10. NEVER write vague question descriptions — always include ACTUAL numbers, expressions, equations, measurements
-11. Include learner details section (Name, Admission No., Class, Date, Signature) in instructions
-
-EXAM SPECIFICATIONS:
-- School: ${school}
-- Grade: ${grade} (${gradeContext})
-- Subject: ${subject}
-- Strand(s): ${strandList}
-- Sub-strand(s): ${substrandList}
-- Exam Type: ${examType}
-- Term: ${term}, ${year}
-- Total Marks: ${totalMarks}
-- Duration: ${duration}
-- Total Questions: ${totalQuestions}
-- Number of Sections: ${sectionCount}
-${subjectInstructions}
-${questionFormats}
-
-SEED QUESTIONS TO TRANSFORM:
-${hasSectionA ? `\nSECTION A SEEDS (Short Answer, ~${saMarks} marks total):\n${formatSeeds(sectionASeeds)}` : ''}
-${hasSectionB ? `\nSECTION B SEEDS (Structured Questions, ~${sbMarks} marks total):\n${formatSeeds(sectionBSeeds)}` : ''}
-${hasSectionC ? `\nSECTION C SEEDS (Long Answer / Calculations, ~${scMarks} marks total):\n${formatSeeds(sectionCSeeds)}` : ''}
-
-OUTPUT FORMAT — Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
-
-{
-  "title": "${grade} ${subject} ${examType} Examination",
-  "time": "${duration}",
-  "instructions": [
-    "Write your name, admission number, and class clearly at the top of the answer booklet.",
-    "Answer ALL questions in each section.",
-    "In Section A, write concise answers in the spaces provided.",
-    "In Sections B and C, show all working clearly where calculations are involved.",
-    "All answers must be written in the answer booklet provided.",
-    "Mobile phones and electronic devices are NOT permitted in the examination room."
-  ],
-  "sectionA": {
-    "marks": ${saMarks || Math.round(totalMarks * 0.3)},
-    "instruction": "Answer ALL questions in this section. Write your answers concisely in the spaces provided.",
-    "questions": [
-      {
-        "num": 1,
-        "text": "Transformed question text in Kenyan CBC context",
-        "marks": 2,
-        "questionType": "short_answer",
-        "answer": "Model answer: Main point (1 mark). Supporting detail (1 mark)."
-      }
-    ]
-  },
-  "sectionB": {
-    "marks": ${sbMarks || Math.round(totalMarks * 0.4)},
-    "instruction": "Answer ALL questions in this section. Show your working clearly where applicable.",
-    "questions": [
-      {
-        "num": ${sectionASeeds.length + 1},
-        "text": "Structured question:\\n(a) First part (2 marks)\\n(b) Second part (3 marks)",
-        "marks": 5,
-        "questionType": "structured",
-        "answer": "(a) Answer part a — 2 marks: [answer]\\n(b) Answer part b — 3 marks: [answer]"
-      }
-    ]
-  },
-  "sectionC": {
-    "marks": ${scMarks || Math.round(totalMarks * 0.3)},
-    "instruction": "Answer ALL questions in this section. Show all working clearly. Marks are awarded for correct method as well as correct answers.",
-    "questions": [
-      {
-        "num": ${sectionASeeds.length + sectionBSeeds.length + 1},
-        "text": "Extended question:\\n(a) Part a (3 marks)\\n(b) Part b (3 marks)\\n(c) Part c (4 marks)",
-        "marks": 10,
-        "questionType": "long_answer",
-        "answer": "(a) Answer — 3 marks: [detailed]\\n(b) Answer — 3 marks: [detailed]\\n(c) Answer — 4 marks: [detailed]"
-      }
-    ]
-  }
-}
-
-Transform ALL ${totalQuestions} seed questions now. Ensure JSON is complete and valid.`;
-}
-
-// ── Param validation ──────────────────────────────────────
-function validateExamParams(params) {
-  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
-  if (!grade) return 'Grade is required.';
-  if (!subject) return 'Subject is required.';
-  if (!strands || strands.length === 0) return 'At least one strand must be selected.';
-  if (!examType) return 'Exam type is required.';
-  if (!term) return 'Term is required.';
-  if (!year || isNaN(year)) return 'A valid year is required.';
-  if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.';
-  if (!totalQuestions || totalQuestions < 2) return 'At least 2 questions are required.';
-  if (!school || !school.trim()) return 'School name is required.';
-  return null;
-}
-
-// ── Diagram instructions by subject ─────────────────────
-// Tells the AI which diagram types are available, when to use them,
-// and strictly forbids bracket descriptions like [Diagram shows...].
-function buildDiagramInstructions(subject) {
-  const subjectType = getSubjectType(subject);
-
-  const COMMON_RULES = `
-CRITICAL DIAGRAM RULES — APPLY TO EVERY SUBJECT:
-1. When a diagram is needed, add a "diagram" JSON field to the question object — that is ALL.
-2. NEVER write bracket descriptions like "[Diagram shows a plant cell]" — STRICTLY FORBIDDEN.
-3. NEVER describe the diagram contents in the question text body.
-4. Reference a diagram in question text ONLY as: "Study Figure 1 below." or "Refer to the diagram below."
-5. Diagram JSON format: {"type": "plant_cell", "params": {}, "caption": "Figure 1: Structure of a Plant Cell"}
-6. Only add a diagram when it genuinely helps the student answer — do NOT add diagrams to every question.`;
-
-  const diagramMaps = {
-    science: {
-      Biology: `
-BIOLOGY DIAGRAM INSTRUCTIONS:
-These diagram types render as proper labelled SVG diagrams — use them:
-- plant_cell → cell structure questions with cell wall, chloroplast, vacuole
-- animal_cell → animal cell questions with nucleus, mitochondria, ribosomes
-- human_heart → heart structure and blood circulation questions
-- digestive_system → digestion and nutrition questions
-- respiratory_system → breathing, gas exchange, lung structure questions
-- flower → pollination, reproduction, floral structure questions
-- food_web → ecosystem, feeding relationships, energy flow questions
-- nephron → excretion, kidney tubule, osmoregulation questions
-- microscope → practical microscopy, cell observation questions
-- soil_profile → soil horizons, soil formation questions
-
-WHEN to use:
-- Cell structure question → "diagram": {"type": "plant_cell", "params": {}, "caption": "Figure 1: Structure of a Plant Cell"}
-- Heart/circulation question → "diagram": {"type": "human_heart", "params": {}, "caption": "Figure 1: Structure of the Human Heart"}
-- Digestion question → "diagram": {"type": "digestive_system", "params": {}, "caption": "Figure 1: The Human Digestive System"}
-- Breathing question → "diagram": {"type": "respiratory_system", "params": {}, "caption": "Figure 1: The Human Respiratory System"}
-- Food web question → "diagram": {"type": "food_web", "params": {}, "caption": "Figure 1: A Food Web"}
-- Flower/reproduction → "diagram": {"type": "flower", "params": {}, "caption": "Figure 1: Structure of a Flower"}
-- Excretion/kidney → "diagram": {"type": "nephron", "params": {}, "caption": "Figure 1: Structure of a Nephron"}`,
-
-      Chemistry: `
-CHEMISTRY DIAGRAM INSTRUCTIONS:
-These diagram types render as proper labelled SVG diagrams — use them:
-- beaker → laboratory setup, titration, heating experiments
-- bar_chart → comparison of reaction rates, yield percentages
-- line_graph → temperature-time graphs, concentration-time graphs
-- data_table → results tables for experiments
-
-WHEN to use:
-- Lab apparatus question → "diagram": {"type": "beaker", "params": {}, "caption": "Figure 1: Laboratory Setup"}
-- Reaction rate graph → "diagram": {"type": "line_graph", "params": {"title": "Rate of Reaction vs Temperature"}, "caption": "Figure 1: Rate of Reaction Graph"}
-- Comparison question → "diagram": {"type": "bar_chart", "params": {"title": "Comparison"}, "caption": "Figure 1: Bar Chart"}`,
-
-      Physics: `
-PHYSICS DIAGRAM INSTRUCTIONS:
-These diagram types render as proper labelled SVG diagrams — use them:
-- ray_diagram → light, reflection, refraction, lenses, mirrors
-- series_parallel_circuit → electric circuits, resistance, current
-- cylinder → volume calculation practical problems
-- cone → volume and surface area problems
-- sphere → volume and density problems
-- line_graph → distance-time, velocity-time, force-extension graphs
-- bar_chart → comparison of physical quantities
-
-WHEN to use:
-- Ray/optics question → "diagram": {"type": "ray_diagram", "params": {}, "caption": "Figure 1: Ray Diagram"}
-- Circuit question → "diagram": {"type": "series_parallel_circuit", "params": {}, "caption": "Figure 1: Electric Circuit"}
-- Distance-time graph → "diagram": {"type": "line_graph", "params": {"title": "Distance-Time Graph"}, "caption": "Figure 1: Distance-Time Graph"}`,
-    },
-
-    mathematics: `
-MATHEMATICS DIAGRAM INSTRUCTIONS:
-These diagram types render as proper labelled SVG diagrams — use them:
-- triangle → triangle problems, Pythagoras, trigonometry, area
-- right_triangle → right-angle problems, SOH-CAH-TOA
-- circle → circle theorems, arc length, sector area
-- cylinder → volume/surface area of cylinders
-- cone → volume/surface area of cones
-- sphere → volume/surface area of spheres
-- coordinate_grid → plotting points, straight lines, curves
-- bearing → compass bearings, directions, navigation problems
-- number_line → inequalities, number sets
-- bar_chart → statistics questions with comparative data
-- pie_chart → statistics questions with proportional data
-- histogram → frequency distribution, grouped data
-- line_graph → trend data, conversion graphs
-- venn_diagram → set theory, probability problems
-
-WHEN to use:
-- Triangle/trig question → "diagram": {"type": "triangle", "params": {"a": 6, "b": 8, "c": 10}, "caption": "Figure 1"}
-- Circle theorem → "diagram": {"type": "circle", "params": {}, "caption": "Figure 1"}
-- Bearing question → "diagram": {"type": "bearing", "params": {"bearing": 65}, "caption": "Figure 1"}
-- Statistics comparison → "diagram": {"type": "bar_chart", "params": {"title": "Sales Data"}, "caption": "Figure 1"}
-- Venn/sets question → "diagram": {"type": "venn_diagram", "params": {}, "caption": "Figure 1"}`,
-
-    geography: `
-GEOGRAPHY DIAGRAM INSTRUCTIONS:
-These diagram types render as proper labelled SVG diagrams — use them:
-- fold_diagram → anticline/syncline, folding, fold mountains
-- composite_volcano → composite/stratovolcano cross-section
-- shield_volcano → shield volcano cross-section
-- contour_map → topographic map extract, contour interpretation
-- earthquake_waves → seismic waves, focus, epicentre
-- rock_cycle → rock formation, rock types and transformations
-- water_cycle → hydrological cycle, precipitation, evaporation
-
-WHEN to use:
-- Folding question → "diagram": {"type": "fold_diagram", "params": {}, "caption": "Figure 1: Types of Folds"}
-- Volcano question → "diagram": {"type": "composite_volcano", "params": {}, "caption": "Figure 1: Cross-section of a Composite Volcano"}
-- Map reading/contours → "diagram": {"type": "contour_map", "params": {}, "caption": "Figure 1: Topographic Map Extract"}
-- Earthquake question → "diagram": {"type": "earthquake_waves", "params": {}, "caption": "Figure 1: Earthquake Waves"}
-- Rock cycle question → "diagram": {"type": "rock_cycle", "params": {}, "caption": "Figure 1: The Rock Cycle"}`,
-  };
-
-  // Look up diagram map for this subject
-  let diagramInstructions = '';
-  if (subjectType === 'science') {
-    diagramInstructions = diagramMaps.science[subject] || diagramMaps.science.Biology;
-  } else if (subjectType === 'mathematics') {
-    diagramInstructions = diagramMaps.mathematics;
-  } else if (subject === 'Geography') {
-    diagramInstructions = diagramMaps.geography;
-  } else {
-    // Humanities, languages, technical — minimal diagram guidance
-    diagramInstructions = `
-DIAGRAM INSTRUCTIONS:
-If a diagram would genuinely help a question, add a "diagram" JSON field.
-Available types: bar_chart, pie_chart, line_graph, data_table.
-Reference it in question text as "Study Figure 1 below." — never describe it in brackets.`;
-  }
-
-  return `${diagramInstructions}
-
-${COMMON_RULES}`;
-}
-
-// ── Fallback: pure AI prompt ─────────────────────────────
-function buildFallbackExamPrompt({
-  grade, subject, strands, substrands, examType, term, year,
-  totalMarks, totalQuestions, school,
-  sectionCount = 3,
-}) {
-  const gradeContext = getGradeContext(grade);
-  const duration = getDuration(examType, totalMarks);
-  const strandList = strands.join(', ');
-  const substrandList = substrands.length > 0 ? substrands.join(', ') : `All sub-strands within ${strandList}`;
-  const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = getQuestionFormatRules(subject);
-
-  // ── Section-aware question + mark distribution ───────────
-  // BUG FIX: when sectionCount=1, ALL questions/marks go to Section A.
-  // Old code always put 40% in A, 35% in B, 25% in C regardless of sectionCount,
-  // then the backend cleared B and C — leaving only ~40% of questions/marks.
-  let saCount, effectiveSbCount, scCount, saMarks, sbMarks, scMarks;
-
-  if (sectionCount === 1) {
-    // CAT: single section — all questions and all marks in Section A
-    saCount        = totalQuestions;
-    effectiveSbCount = 0;
-    scCount        = 0;
-    saMarks        = totalMarks;
-    sbMarks        = 0;
-    scMarks        = 0;
-  } else if (sectionCount === 2) {
-    // Midterm: two sections — 40% in A, 60% in B
-    saCount        = Math.round(totalQuestions * 0.4);
-    effectiveSbCount = totalQuestions - saCount;
-    scCount        = 0;
-    saMarks        = Math.round(totalMarks * 0.35);
-    sbMarks        = totalMarks - saMarks;
-    scMarks        = 0;
-  } else {
-    // End Term / Mock / etc: three sections — 40% A, 35% B, 25% C
-    saCount          = Math.round(totalQuestions * 0.4);
-    const sbCount    = Math.round(totalQuestions * 0.35);
-    scCount          = totalQuestions - saCount - sbCount;
-    effectiveSbCount = sbCount;
-    saMarks          = Math.round(totalMarks * 0.25);
-    sbMarks          = Math.round(totalMarks * 0.40);
-    scMarks          = totalMarks - saMarks - sbMarks;
-  }
-
-  const saPerQ = saCount > 0         ? Math.round(saMarks / saCount)         : 0;
-  const sbPerQ = effectiveSbCount > 0 ? Math.round(sbMarks / effectiveSbCount) : 0;
-  const scPerQ = scCount > 0          ? Math.round(scMarks / scCount)          : 0;
-
-  return `You are a highly experienced Kenyan CBC curriculum specialist and senior examiner for ${subject} at ${gradeContext}.
-
-Generate a COMPLETE, PROFESSIONAL ${examType} examination paper that meets Kenya national exam standards.
-Every single question MUST be fully written out — NO placeholder text, NO vague descriptions.
-
-EXAMINATION DETAILS:
-- School: ${school}
-- Grade/Class: ${grade} (${gradeContext})
-- Subject: ${subject}
-- Strand(s): ${strandList}
-- Sub-Strand(s): ${substrandList}
-- Exam Type: ${examType}
-- Term: ${term}, ${year}
-- Total Marks: ${totalMarks}
-- Duration: ${duration}
-- Total Questions: ${totalQuestions}
-- Number of Sections: ${sectionCount}
-
-QUESTION DISTRIBUTION:
-- Section A (Short Answer): ${saCount} questions totalling ${saMarks} marks (~${saPerQ} marks each)
-${sectionCount >= 2 ? `- Section B (Structured): ${effectiveSbCount} questions totalling ${sbMarks} marks (~${sbPerQ} marks each)` : ''}
-${sectionCount >= 3 ? `- Section C (Long Answer): ${scCount} questions totalling ${scMarks} marks (~${scPerQ} marks each)` : ''}
-GRAND TOTAL: EXACTLY ${totalMarks} marks
-
-CRITICAL CBC REQUIREMENTS:
-1. ALL questions must align with Kenya CBC Senior School competency-based approach
-2. ABSOLUTELY NO multiple choice questions — structured, short answer, and long answer ONLY
-3. EVERY question must contain the COMPLETE, ACTUAL question — not a description of a question
-4. Use Kenyan names: Amina, Wanjiku, Kipchoge, Otieno, Njeri, Baraka, Fatuma, Kamau, Mwangi, Chebet
-5. Use Kenyan places: Nairobi, Kisumu, Mombasa, Nakuru, Eldoret, Kisii, Thika, Nyeri, Kitale, Garissa
-6. Use CBC action verbs matching mark allocations:
-   - 1-2 marks: State, Name, Identify, Give, Define, List
-   - 3-4 marks: Explain, Describe, Outline, Differentiate
-   - 5+ marks: Discuss, Analyse, Evaluate, Examine, Justify
-7. Distribute difficulty: 30% foundational, 50% developing, 20% extending
-8. Marking scheme: specific per-mark breakdown for EVERY question and sub-part
-9. Every question directly maps to the specified strands: ${strandList}
-10. Question numbers must be CONTINUOUS across all sections (1, 2, 3... not restarting)
-11. Sub-parts use: a) b) c) at first level, i) ii) iii) at second level
-${subjectInstructions}
-${questionFormats}
-
-${buildDiagramInstructions(subject)}
-
-Return ONLY a valid JSON object. No explanation, no markdown, no text outside the JSON.
-
-{
-  "title": "${grade} ${subject} ${examType} Examination",
-  "time": "${duration}",
-  "instructions": [
-    "Write your name, admission number, and class clearly at the top of the answer booklet.",
-    "Answer ALL questions in each section.",
-    "In Section A, write concise answers in the spaces provided.",
-    "In Sections B and C, show all working clearly where calculations are involved.",
-    "All answers must be written in the answer booklet provided.",
-    "Mobile phones and electronic devices are NOT permitted in the examination room."
-  ],
-  "sectionA": {
-    "marks": ${saMarks},
-    "instruction": "Answer ALL ${saCount} questions in this section. Write your answers concisely in the spaces provided.",
-    "questions": [
-      {
-        "num": 1,
-        "text": "[COMPLETE question text here — Kenyan scenario + actual question with specific content]",
-        "marks": ${saPerQ},
-        "questionType": "short_answer",
-        "subParts": [
-          {"label": "a", "text": "a) [Complete sub-question] (1 mark)", "marks": 1, "answer": "[Model answer — 1 mark]"},
-          {"label": "b", "text": "b) [Complete sub-question] (1 mark)", "marks": 1, "answer": "[Model answer — 1 mark]"}
-        ],
-        "answer": ""
-      }
-    ]
-  },
-  "sectionB": {
-    "marks": ${sbMarks},
-    "instruction": "Answer ALL ${effectiveSbCount} questions in this section. Marks are allocated as shown.",
-    "questions": [
-      {
-        "num": ${saCount + 1},
-        "text": "[COMPLETE scenario — specific Kenyan context with all data needed to answer the question]",
-        "marks": ${sbPerQ},
-        "questionType": "structured",
-        "subParts": [
-          {"label": "a", "text": "a) i) [Sub-question] (X marks)\\n   ii) [Sub-question] (X marks)", "marks": 0, "answer": "i) [Model answer] (X marks).\\nii) [Model answer] (X marks)."},
-          {"label": "b", "text": "b) [Sub-question] (X marks)", "marks": 0, "answer": "[Model answer with point-by-point breakdown]"}
-        ],
-        "answer": ""
-      }
-    ]
-  }${sectionCount >= 3 ? `,
-  "sectionC": {
-    "marks": ${scMarks},
-    "instruction": "Answer ALL ${scCount} questions in this section. Show all working clearly.",
-    "questions": [
-      {
-        "num": ${saCount + effectiveSbCount + 1},
-        "text": "[COMPLETE scenario with all data, map description, or source material needed]",
-        "marks": ${scPerQ},
-        "questionType": "long_answer",
-        "subParts": [
-          {"label": "a", "text": "a) [Extended question requiring detailed answer] (X marks)", "marks": 0, "answer": "[Comprehensive model answer — point 1 (1 mark), point 2 (1 mark)...]"},
-          {"label": "b", "text": "b) [Further sub-question] (X marks)", "marks": 0, "answer": "[Model answer]"},
-          {"label": "c", "text": "c) [Final sub-question] (X marks)", "marks": 0, "answer": "[Model answer]"}
-        ],
-        "answer": ""
-      }
-    ]
-  }` : ''}
-}
-
-FINAL CHECK BEFORE RETURNING:
-✓ Section A has EXACTLY ${saCount} questions totalling EXACTLY ${saMarks} marks?
-${sectionCount >= 2 ? `✓ Section B has EXACTLY ${effectiveSbCount} questions totalling EXACTLY ${sbMarks} marks?` : ''}
-${sectionCount >= 3 ? `✓ Section C has EXACTLY ${scCount} questions totalling EXACTLY ${scMarks} marks?` : ''}
-✓ Grand total equals EXACTLY ${totalMarks} marks?
-✓ Every question has COMPLETE, actual content — no placeholders?
-✓ Every sub-part has a model answer in the marking scheme?
-✓ Question numbers are continuous across all sections?
-✓ All questions reference the specified strands: ${strandList}?
-
-Generate all ${totalQuestions} questions now. Ensure JSON is complete and valid.`;
-}
-
-module.exports = {
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const Anthropic = require('@anthropic-ai/sdk');
+const Exam = require('../models/Exam');
+const User = require('../models/User');
+const QuestionBank = require('../models/QuestionBank');
+const ExamJob = require('../models/ExamJob');          // ← NEW
+const { protect } = require('../middleware/auth');
+const {
   buildHybridExamPrompt,
   buildFallbackExamPrompt,
   validateExamParams,
   selectBalancedQuestions,
   getDuration,
-  getGradeContext,
-  getSubjectType,
-  getSubjectInstructions,
-  getQuestionFormatRules,
-};
+} = require('../utils/examHelpers');
+
+const router = express.Router();
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// ── Helpers ──────────────────────────────────────────────
+
+function recalculateSectionMarks(section) {
+  if (!section?.questions?.length) return section;
+  const calculated = section.questions.reduce((sum, q) => {
+    if (Array.isArray(q.subParts) && q.subParts.length > 0) {
+      return sum + q.subParts.reduce((s, sp) => s + (Number(sp.marks) || 0), 0);
+    }
+    return sum + (Number(q.marks) || 0);
+  }, 0);
+  return { ...section, marks: calculated };
+}
+
+// FIX 2: Added End Year and Series to the 3-section list
+function getDefaultSectionCount(examType) {
+  if (['End Term', 'End Year', 'Mock', 'Pre-Mock', 'Series'].includes(examType)) return 3;
+  if (examType === 'Midterm') return 2;
+  return 1; // CAT
+}
+
+// ── Rate limit ───────────────────────────────────────────
+const generateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  keyGenerator: (req) => req.user?._id?.toString() || req.ip,
+  message: {
+    error: 'Generation limit reached. Please wait before generating more exams.',
+    code: 'RATE_LIMIT',
+  },
+});
+
+// ── POST /api/exams/generate ─────────────────────────────
+// Returns 202 + jobId immediately. AI runs in background.
+// Frontend polls GET /api/exams/job/:jobId every 3 seconds.
+router.post('/generate', protect, generateLimiter, async (req, res) => {
+  try {
+    const {
+      grade, subject, strands, substrands, examType, term, year,
+      totalMarks, totalQuestions, school,
+      sectionCount: requestedSectionCount,
+      showStrand, includePractical,
+    } = req.body;
+
+    // 1. Basic field checks
+    if (!grade)         return res.status(400).json({ error: 'Please select a Grade.',                  code: 'MISSING_FIELD' });
+    if (!subject)       return res.status(400).json({ error: 'Please select a Subject.',               code: 'MISSING_FIELD' });
+    if (!strands?.length) return res.status(400).json({ error: 'Please select at least one Strand.',  code: 'MISSING_FIELD' });
+    if (!school?.trim()) return res.status(400).json({ error: 'Please enter your School Name.',        code: 'MISSING_FIELD' });
+
+    const validationError = validateExamParams(req.body);
+    if (validationError) {
+      return res.status(400).json({ error: validationError, code: 'VALIDATION_ERROR' });
+    }
+
+    // 2. Check quota — do this BEFORE creating a job
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(401).json({ error: 'Session expired. Please log in again.', code: 'AUTH_ERROR' });
+
+    if (!user.canGenerate()) {
+      return res.status(403).json({
+        error: 'You have used all your free exams. Upgrade to Premium to continue generating.',
+        code: 'QUOTA_EXCEEDED',
+        upgradeRequired: true,
+      });
+    }
+
+    const sectionCount = requestedSectionCount || getDefaultSectionCount(examType);
+
+    // 3. Save pending job to MongoDB
+    const job = await ExamJob.create({
+      status: 'pending',
+      params: { ...req.body, sectionCount },
+      userId: user._id,
+    });
+
+    // 4. Respond immediately — Render's timeout never fires
+    res.status(202).json({ jobId: job._id });
+
+    // 5. Run AI generation in background (after response is sent)
+    processExamJob(job._id, { ...req.body, sectionCount }, user).catch(err => {
+      console.error('Background job unhandled error:', err);
+    });
+
+  } catch (err) {
+    console.error('Generate route error:', err);
+    res.status(500).json({ error: 'Failed to start generation. Please try again.', code: 'SERVER_ERROR' });
+  }
+});
+
+// ── GET /api/exams/job/:jobId ────────────────────────────
+// Frontend polls this every 3s until status is 'done' or 'failed'.
+// NOTE: must be defined BEFORE /:id to avoid route shadowing
+router.get('/job/:jobId', protect, async (req, res) => {
+  // CRITICAL: prevent Cloudflare/browser from caching poll responses.
+  // Without this, status transitions (processing→done, processing→failed)
+  // are invisible to the frontend — it keeps seeing the cached "processing" 304.
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store',
+  });
+
+  try {
+    const job = await ExamJob.findById(req.params.jobId);
+    if (!job) return res.status(404).json({ error: 'Job not found.' });
+
+    if (job.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Forbidden.' });
+    }
+
+    if (job.status === 'done') {
+      return res.json({
+        status: 'done',
+        exam: job.exam,
+        examId: job.examDocId,
+        message: job.message || 'Exam generated successfully!',
+      });
+    }
+
+    if (job.status === 'failed') {
+      return res.json({
+        status: 'failed',
+        code: job.errorCode || 'GENERATION_ERROR',
+        error: job.error || 'Generation failed. Please try again.',
+      });
+    }
+
+    return res.json({ status: job.status }); // pending or processing
+
+  } catch (err) {
+    console.error('Job poll error:', err);
+    res.status(500).json({ error: 'Failed to check job status.' });
+  }
+});
+
+// ── Background processor ──────────────────────────────────
+// This is the existing AI generation logic, extracted from the route handler.
+// Runs AFTER the 202 response is already sent — no HTTP timeout possible.
+async function processExamJob(jobId, params, user) {
+  const startTime = Date.now();
+  const {
+    grade, subject, strands, substrands, examType, term, year,
+    totalMarks, totalQuestions, school, sectionCount, showStrand, includePractical,
+  } = params;
+
+  await ExamJob.findByIdAndUpdate(jobId, { status: 'processing' });
+
+  try {
+    // 1. Query question bank
+    let questionPool = [];
+    let isHybrid = false;
+    let questionBankHits = 0;
+
+    try {
+      questionPool = await QuestionBank.getPoolForGeneration({
+        grade, subject,
+        strands: strands || [],
+        substrands: substrands || [],
+        totalMarks,
+        totalQuestions,
+      });
+      questionBankHits = questionPool.length;
+      isHybrid = questionBankHits >= Math.ceil(totalQuestions * 0.5);
+    } catch (bankErr) {
+      console.warn('Question bank query failed, using AI fallback:', bankErr.message);
+    }
+
+    // 2. Build prompt
+    let prompt;
+    if (isHybrid) {
+      const { sectionA: sectionASeeds, sectionB: sectionBSeeds, sectionC: sectionCSeeds } =
+        selectBalancedQuestions(questionPool, totalMarks, totalQuestions, sectionCount);
+
+      prompt = buildHybridExamPrompt({
+        grade, subject, strands, substrands, examType, term, year,
+        totalMarks, totalQuestions, school, sectionCount,
+        sectionASeeds, sectionBSeeds, sectionCSeeds,
+      });
+
+      const usedIds = [...sectionASeeds, ...sectionBSeeds, ...sectionCSeeds]
+        .map(q => q._id).filter(Boolean);
+      if (usedIds.length > 0) {
+        QuestionBank.updateMany({ _id: { $in: usedIds } }, { $inc: { timesUsed: 1 } })
+          .catch(err => console.warn('Failed to update timesUsed:', err.message));
+      }
+    } else {
+      prompt = buildFallbackExamPrompt({
+        grade, subject, strands, substrands, examType, term, year,
+        totalMarks, totalQuestions, school, sectionCount,
+      });
+    }
+
+    // 3. Call AI
+    // max_tokens is adaptive by subject AND marks.
+    // English needs the most tokens — full comprehension passage (500 words) +
+    // summary passage (400 words) + grammar + writing task = 12,000+ tokens easily.
+    // Geography/Science at 80 marks needs ~8000.
+    // Small CATs need ~6000.
+    const maxTokens = subject === 'English' || subject === 'Kiswahili'
+      ? (totalMarks >= 70 ? 12000 : totalMarks >= 50 ? 10000 : 8000)
+      : totalMarks >= 70
+      ? 8000
+      : totalMarks >= 50
+      ? 7000
+      : 6000
+
+    const TIMEOUT_MS = 120000;
+    let message;
+    let attempts = 0;
+    const maxAttempts = 3;
+    let lastErr = null;
+
+    while (attempts < maxAttempts) {
+      attempts++;
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject({ isTimeout: true }), TIMEOUT_MS)
+        );
+        message = await Promise.race([
+          anthropic.messages.create({
+            model: 'claude-sonnet-4-5',
+            max_tokens: maxTokens,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+          timeoutPromise,
+        ]);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        const retryable = err.isTimeout || err.status === 529 || err.status === 503 || err.status === 429;
+        if (retryable && attempts < maxAttempts) {
+          const wait = attempts * 3000; // 3s, 6s between retries
+          console.warn(`AI attempt ${attempts} failed, retrying in ${wait / 1000}s...`);
+          await new Promise(r => setTimeout(r, wait));
+          continue;
+        }
+        break;
+      }
+    }
+
+    if (lastErr) {
+      if (lastErr.isTimeout)                                         throw { code: 'TIMEOUT',       msg: 'The AI took too long to respond. Please try again.' };
+      if (lastErr.status === 401 || lastErr.status === 403)         throw { code: 'AUTH_ERROR',     msg: 'AI service authentication failed. Please contact support.' };
+      if (lastErr.status === 429)                                    throw { code: 'RATE_LIMIT',     msg: 'AI is overloaded. Please try again in a few minutes.' };
+      if (lastErr.status === 529 || lastErr.status === 503)         throw { code: 'SERVICE_DOWN',   msg: 'AI service is temporarily unavailable. Please try again shortly.' };
+      throw lastErr;
+    }
+
+    // 4. Parse response
+    const rawText = message.content.map(b => b.text || '').join('');
+    const cleanText = rawText.replace(/```json|```/g, '').trim();
+
+    // Log stop_reason — if it's 'max_tokens' the response was truncated
+    const stopReason = message.stop_reason;
+    if (stopReason === 'max_tokens') {
+      console.error(`[PARSE] AI hit max_tokens limit (${maxTokens}) for ${grade} ${subject} ${examType} ${totalMarks}mks. Response truncated — increase maxTokens.`);
+      console.error(`[PARSE] Truncated at: ...${rawText.slice(-200)}`);
+      throw { code: 'PARSE_ERROR', msg: 'Exam too large to generate in one pass. Please reduce marks or questions and try again.' };
+    }
+
+    let examData;
+    try {
+      examData = JSON.parse(cleanText);
+    } catch (parseErr) {
+      console.error(`[PARSE] JSON.parse failed for ${grade} ${subject} ${examType}.`);
+      console.error(`[PARSE] stop_reason: ${stopReason} | tokens used: ${message.usage?.output_tokens}`);
+      console.error(`[PARSE] First 400 chars: ${rawText.substring(0, 400)}`);
+      console.error(`[PARSE] Last 200 chars: ${rawText.slice(-200)}`);
+      throw { code: 'PARSE_ERROR', msg: 'The AI returned an unexpected response. Please try again.' };
+    }
+
+    // 5. Fix section marks
+    examData.sectionA = recalculateSectionMarks(examData.sectionA);
+    examData.sectionB = recalculateSectionMarks(examData.sectionB);
+    examData.sectionC = recalculateSectionMarks(examData.sectionC);
+
+    // 6. Clear sections beyond sectionCount
+    const empty = { questions: [], marks: 0, instruction: '' };
+    if (sectionCount < 3) examData.sectionC = empty;
+    if (sectionCount < 2) examData.sectionB = empty;
+
+    // 6.5 Generate AI SVG diagrams for any questions that have a diagram field.
+    // Runs in parallel — non-fatal if any fail (exam still renders without SVG).
+    await generateDiagramSVGs(examData, subject, grade);
+
+    const duration = getDuration(examType, totalMarks);
+    const generationTimeMs = Date.now() - startTime;
+
+    // 7. Save exam to DB
+    let exam;
+    try {
+      exam = await Exam.create({
+        user: user._id,
+        title: examData.title || `${grade} ${subject} ${examType}`,
+        school,
+        grade,
+        subject,
+        strands: strands || [],
+        substrands: substrands || [],
+        strand: strands?.[0] || '',
+        substrand: substrands?.[0] || '',
+        examType,
+        term,
+        year: String(year),
+        totalMarks,
+        totalQuestions,
+        duration: examData.time || duration,
+        instructions: examData.instructions || [],
+        sectionA: examData.sectionA || {},
+        sectionB: examData.sectionB || {},
+        sectionC: examData.sectionC || {},
+        showStrand: showStrand !== undefined ? showStrand : true,
+        sectionCount,
+        isHybrid,
+        questionBankHits,
+        aiModel: 'claude-sonnet-4-5',
+        generationTimeMs,
+      });
+    } catch (saveErr) {
+      console.error('Exam save error:', saveErr);
+      throw { code: 'SAVE_ERROR', msg: 'Exam generated but could not be saved. Please try again.' };
+    }
+
+    // 8. Increment usage — re-fetch user to avoid stale data
+    const freshUser = await User.findById(user._id);
+    if (freshUser) {
+      if (!freshUser.isPremium()) freshUser.freeGenerationsUsed += 1;
+      freshUser.totalExamsGenerated += 1;
+      await freshUser.save({ validateBeforeSave: false });
+    }
+
+    const bankHits = questionBankHits > 0
+      ? `${questionBankHits} questions sourced from question bank`
+      : 'Generated entirely by AI';
+
+    // 9. Mark job done
+    await ExamJob.findByIdAndUpdate(jobId, {
+      status: 'done',
+      exam: exam.toObject(),
+      examDocId: exam._id,
+      message: `Exam generated in ${(generationTimeMs / 1000).toFixed(1)}s. ${bankHits}.`,
+    });
+
+  } catch (err) {
+    console.error('processExamJob failed:', err);
+    await ExamJob.findByIdAndUpdate(jobId, {
+      status: 'failed',
+      errorCode: err.code || 'GENERATION_ERROR',
+      error: err.msg || 'Generation failed. Please try again.',
+    });
+  }
+}
+
+// ── GET /api/exams ───────────────────────────────────────
+router.get('/', protect, async (req, res) => {
+  try {
+    const page  = parseInt(req.query.page)  || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip  = (page - 1) * limit;
+
+    const filter = { user: req.user._id };
+    if (req.query.grade)    filter.grade    = req.query.grade;
+    if (req.query.subject)  filter.subject  = req.query.subject;
+    if (req.query.examType) filter.examType = req.query.examType;
+
+    const [exams, total] = await Promise.all([
+      Exam.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('-sectionA.questions.answer -sectionB.questions.answer -sectionC.questions.answer'),
+      Exam.countDocuments(filter),
+    ]);
+
+    res.json({ exams, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+  } catch (err) {
+    console.error('List exams error:', err);
+    res.status(500).json({ error: 'Could not retrieve exams. Please try again.' });
+  }
+});
+
+// ── GET /api/exams/:id ───────────────────────────────────
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const exam = await Exam.findOne({ _id: req.params.id, user: req.user._id });
+    if (!exam) return res.status(404).json({ error: 'Exam not found.' });
+    res.json({ exam });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not retrieve exam.' });
+  }
+});
+
+// ── PATCH /api/exams/:id ─────────────────────────────────
+router.patch('/:id', protect, async (req, res) => {
+  try {
+    const allowed = ['title', 'instructions', 'sectionA', 'sectionB', 'sectionC'];
+    const updates = {};
+    allowed.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
+
+    const exam = await Exam.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      updates,
+      { new: true }
+    );
+    if (!exam) return res.status(404).json({ error: 'Exam not found.' });
+    res.json({ message: 'Exam updated.', exam });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not update exam.' });
+  }
+});
+
+// ── DELETE /api/exams/:id ────────────────────────────────
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const exam = await Exam.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+    if (!exam) return res.status(404).json({ error: 'Exam not found.' });
+    res.json({ message: 'Exam deleted.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not delete exam.' });
+  }
+});
+
+// ── POST /api/exams/:id/download ─────────────────────────
+router.post('/:id/download', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user.isPremium()) {
+      return res.status(403).json({
+        error: 'PDF download requires a Premium subscription.',
+        code: 'UPGRADE_REQUIRED',
+      });
+    }
+    await Exam.findByIdAndUpdate(req.params.id, { $inc: { downloadCount: 1 } });
+    res.json({ message: 'Download recorded.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not process download.' });
+  }
+});
+
+// ── GET /api/exams/bank/stats ─────────────────────────────
+router.get('/bank/stats', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required.' });
+    }
+    const stats = await QuestionBank.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: { grade: '$grade', subject: '$subject' },
+          count: { $sum: 1 },
+          avgMarks: { $avg: '$marks' },
+        }
+      },
+      { $sort: { '_id.grade': 1, '_id.subject': 1 } },
+    ]);
+    const total = await QuestionBank.countDocuments({ isActive: true });
+    res.json({ total, breakdown: stats });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not fetch bank stats.' });
+  }
+});
+
+module.exports = router;
+
+// ════════════════════════════════════════════════════════════════════════════
+// AI SVG DIAGRAM GENERATION
+// Called after exam JSON is parsed. For each question with a diagram field,
+// fires a focused API call that returns a raw SVG string. All diagram calls
+// run in parallel via Promise.allSettled — failure of any single diagram is
+// non-fatal; the exam renders without that diagram rather than failing.
+// ════════════════════════════════════════════════════════════════════════════
+
+async function generateDiagramSVGs(examData, subject, grade) {
+  const sections = ['sectionA', 'sectionB', 'sectionC'];
+  const jobs = [];
+
+  for (const sectionKey of sections) {
+    const section = examData[sectionKey];
+    if (!section?.questions?.length) continue;
+
+    for (const q of section.questions) {
+      // Top-level question diagram
+      if (q.diagram?.type) {
+        jobs.push(
+          generateSingleSVG(q.diagram, q.text, subject, grade)
+            .then(svg => { q.diagram.svg = svg; })
+            .catch(err => console.warn(`[SVG] Failed Q${q.num} (${q.diagram.type}): ${err.message}`))
+        );
+      }
+      // Sub-part diagrams
+      if (Array.isArray(q.subParts)) {
+        for (const sp of q.subParts) {
+          if (sp.diagram?.type) {
+            jobs.push(
+              generateSingleSVG(sp.diagram, sp.text, subject, grade)
+                .then(svg => { sp.diagram.svg = svg; })
+                .catch(err => console.warn(`[SVG] Failed sub-part (${sp.diagram.type}): ${err.message}`))
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (jobs.length === 0) return; // no diagrams in this exam
+  console.log(`[SVG] Generating ${jobs.length} diagram(s) in parallel...`);
+  const results = await Promise.allSettled(jobs);
+  const failed = results.filter(r => r.status === 'rejected').length;
+  console.log(`[SVG] Done. ${jobs.length - failed} succeeded, ${failed} failed.`);
+}
+
+// SVG generation prompt — instructs Claude to produce KNEC-exam-quality SVG
+function buildSVGPrompt(diagram, questionText, subject, grade) {
+  const { type, params = {}, caption = '' } = diagram;
+
+  const typeGuide = {
+    // ── Geography ────────────────────────────────────────────
+    fold_diagram: `
+Draw a cross-section showing geological fold structures. Include:
+- At least 5 parallel strata (alternating colored bands: tan, cream, green, blue, purple)
+- An ANTICLINE (arch upward) with a dashed vertical axis line labeled X
+- A SYNCLINE (trough downward) with a dashed vertical axis line labeled Y
+- Arrow on X pointing up, arrow on Y pointing down
+- Ground surface line at top
+- Clear label boxes for X and Y`,
+
+    composite_volcano: `
+Draw a cross-section of a composite (stratovolcano). Include:
+- A symmetrical cone shape filled with alternating lava (pink/red) and ash (gray) layers
+- A central vent (vertical red band through the cone center)
+- A magma chamber (oval shape below the base, filled light pink)
+- A crater at the summit (open cup shape)
+- Lava/gas emission lines from crater
+- Labeled parts: A (magma chamber), B (crater), C (alternating layers), D (central vent)
+- Ground/base line`,
+
+    shield_volcano: `
+Draw a cross-section of a shield volcano. Include:
+- A broad, gently-sloping dome shape (much wider than tall — width:height ratio ~5:1)
+- A central vent
+- A magma chamber below
+- Thin lava flows extending far from the center
+- Labeled parts: A (magma chamber), B (vent), C (lava flows)`,
+
+    contour_map: `
+Draw a topographic map extract. Include:
+- 5 concentric oval contour lines labeled 1200m, 1250m, 1300m, 1350m, 1400m
+- Lines closer together on the LEFT side (steep slope) and wider apart on RIGHT (gentle slope)
+- A summit point marked with a dot at the center
+- A north arrow (top right)
+- A simple scale bar (bottom)
+- Map border frame
+- Labels "Steep slope" (left) and "Gentle slope" (right)`,
+
+    earthquake_waves: `
+Draw a diagram showing earthquake wave propagation. Include:
+- A semicircular Earth cross-section
+- A FOCUS point (red dot) inside the earth, labeled "Focus (Hypocenter)"
+- An EPICENTRE point (red dot) on the surface directly above focus, labeled "Epicentre"
+- P waves (solid lines, blue) radiating outward from focus to surface stations
+- S waves (dashed lines, green) radiating outward from focus
+- 3-4 small seismograph station rectangles on the surface
+- A dashed vertical line from focus to epicentre
+- A legend: solid line = P waves, dashed line = S waves`,
+
+    rock_cycle: `
+Draw the rock cycle diagram. Include:
+- Three labeled rock type boxes: IGNEOUS (yellow), SEDIMENTARY (green), METAMORPHIC (purple)
+- A MAGMA oval in the center (light red)
+- Labeled arrows connecting them:
+  Igneous → Sedimentary: "Weathering & Erosion"
+  Sedimentary → Metamorphic: "Heat & Pressure"
+  Metamorphic → Magma: "Melting"
+  Magma → Igneous: "Cooling & Solidification"`,
+
+    water_cycle: `
+Draw the water/hydrological cycle. Include:
+- A water body (ocean/lake) on the left
+- Mountains/hills on the right
+- A cloud in the sky center
+- Labeled arrows: Evaporation (water → cloud), Transpiration (hills → cloud), 
+  Precipitation (cloud → ground), Surface Runoff (hills → water body), 
+  Infiltration (downward into ground), Groundwater Flow (horizontal underground)`,
+
+    drainage_pattern: `
+Draw river drainage patterns. Show TWO patterns side by side:
+- Left: DENDRITIC (tree-branch pattern, tributaries joining at acute angles)
+- Right: RADIAL (rivers flowing outward from a central high point like a hill)
+- Label each pattern clearly`,
+
+    population_pyramid: `
+Draw a population pyramid (age-sex structure). Include:
+- Horizontal bars extending left (Males) and right (Females)
+- Age groups on the vertical axis: 0-4, 5-9, 10-14 ... up to 65+
+- Make it a YOUTHFUL/EXPANSIVE pyramid (wide base, narrow top — typical developing country)
+- Label "Males" left, "Females" right, "Age" on Y axis, "Population (%)" on X axis`,
+
+    // ── Biology ──────────────────────────────────────────────
+    plant_cell: `
+Draw a labelled plant cell diagram. Include:
+- A rectangular cell shape with rounded corners
+- Cell wall (outer thick border, light brown)
+- Cell membrane (thin line just inside cell wall)
+- Large central vacuole (light blue, takes up ~60% of cell)
+- Nucleus (dark circle with nucleolus, positioned to one side)
+- Chloroplasts (3-4 green oval shapes)
+- Mitochondria (2-3 oval shapes with inner folds)
+- Labeled parts: A (cell wall), B (cell membrane), C (nucleus), D (chloroplast), E (vacuole), F (mitochondria)`,
+
+    animal_cell: `
+Draw a labelled animal cell diagram. Include:
+- An irregular oval/rounded cell shape (no cell wall)
+- Cell membrane (thin outer boundary)
+- Large nucleus with nucleolus (centrally placed)
+- Mitochondria (3-4 sausage-shaped structures)
+- Ribosomes (tiny dots)
+- Endoplasmic reticulum (wavy lines)
+- NO cell wall, NO chloroplasts, NO large vacuole
+- Labeled parts: A (cell membrane), B (nucleus), C (mitochondria), D (cytoplasm)`,
+
+    human_heart: `
+Draw a front-view cross-section of the human heart. Include:
+- Four chambers: Left Atrium (top left), Right Atrium (top right), Left Ventricle (bottom left, thicker walls), Right Ventricle (bottom right)
+- Septum (dividing wall between left and right sides)
+- Aorta (large vessel leaving top of left ventricle, arching left)
+- Pulmonary artery (leaving right ventricle, going to lungs)
+- Vena cava (entering right atrium, one superior top-right, one inferior bottom-right)
+- Pulmonary veins (entering left atrium from left)
+- Tricuspid valve (between right chambers) and Bicuspid/Mitral valve (between left chambers)
+- Labeled parts: A (right atrium), B (left atrium), C (right ventricle), D (left ventricle), E (aorta)`,
+
+    digestive_system: `
+Draw the human digestive system (front view, simplified). Include in order from top to bottom:
+- Mouth/Oral cavity (top)
+- Oesophagus (narrow tube going down)
+- Stomach (J-shaped bag on left side)
+- Small intestine (coiled tube in center, labeled "Small intestine")
+- Large intestine/Colon (wider tube framing the outside)
+- Rectum and Anus (bottom)
+- Liver (large organ top right, light brown)
+- Pancreas (behind stomach, light pink)
+- Labeled parts: A (mouth), B (oesophagus), C (stomach), D (liver), E (small intestine), F (large intestine)`,
+
+    respiratory_system: `
+Draw the human respiratory system (front view). Include:
+- Nasal cavity and mouth (top)
+- Trachea (windpipe, rings visible, going down center)
+- Two bronchi branching left and right
+- Two lungs (large pink/light red shapes on either side)
+- Bronchioles (smaller branches inside lungs)
+- Alveoli cluster (small bubbles at ends, labeled)
+- Diaphragm (dome-shaped muscle at base)
+- Labeled parts: A (trachea), B (bronchus), C (lung), D (alveoli), E (diaphragm)`,
+
+    flower: `
+Draw a half-section (longitudinal section) of a flower. Include:
+- Petals (coloured, 2-3 visible)
+- Sepals (green, at base of petals)
+- Stamen: filament (stalk) + anther (top, pollen-producing)
+- Pistil/Carpel: stigma (sticky top), style (tube), ovary (base with ovule inside)
+- Receptacle (base of flower)
+- Peduncle/flower stalk
+- Labeled parts: A (petal), B (sepal), C (stamen/anther), D (stigma), E (style), F (ovary)`,
+
+    food_web: `
+Draw a food web with at least 6 organisms in a Kenyan ecosystem. Include:
+- Producers (grass, acacia tree) at the bottom
+- Primary consumers (zebra, gazelle, grasshopper) in the middle
+- Secondary consumers (lion, cheetah, eagle) at the top
+- Arrows pointing FROM prey TO predator (showing energy flow)
+- Clear labels for each organism
+- At least 8 arrows showing feeding relationships`,
+
+    nephron: `
+Draw a labelled nephron (kidney tubule) diagram. Include:
+- Bowman's capsule (cup-shaped, at top)
+- Glomerulus (tight ball of capillaries inside Bowman's capsule, red)
+- Proximal convoluted tubule (coiled tube, green)
+- Loop of Henle (hairpin loop going down, blue)
+- Distal convoluted tubule (coiled tube, purple)
+- Collecting duct (straight tube going down, orange)
+- Blood vessels (afferent and efferent arterioles)
+- Labeled parts: A (Bowman's capsule), B (glomerulus), C (proximal tubule), D (loop of Henle), E (distal tubule), F (collecting duct)`,
+
+    // ── Physics ──────────────────────────────────────────────
+    ray_diagram: `
+Draw a ray diagram for a convex lens forming a real image. Include:
+- A horizontal principal axis (long horizontal line)
+- A convex lens (double-curved shape at center, vertical)
+- Focal points F marked on both sides of lens (equidistant)
+- An upright object arrow to the left of the lens (beyond 2F)
+- THREE standard rays:
+  1. Ray parallel to axis → refracts through far focal point
+  2. Ray through optical center → passes straight through
+  3. Ray through near focal point → refracts parallel to axis
+- A real, inverted image arrow to the right of lens
+- Labels: F (focal points), 2F, Object, Image, Principal axis`,
+
+    series_parallel_circuit: `
+Draw an electric circuit showing BOTH series and parallel connections. Include:
+- A battery/cell on the left (two parallel lines, short and long)
+- A switch (gap with line at angle)
+- In series section: two resistors (rectangular boxes) connected end to end
+- In parallel section: two resistors side by side (branching wires)
+- Connecting wires (straight lines with right-angle corners)
+- Ammeter (circle with A) measuring current
+- Voltmeter (circle with V) across parallel section
+- Labeled components: R1, R2, R3, A (ammeter), V (voltmeter)`,
+  };
+
+  const guide = typeGuide[type] || `Draw a clear, labeled diagram of type: ${type}. Include relevant labels (A, B, C, D) and a brief title.`;
+
+  return `You are generating a diagram for a Kenya CBC ${grade} ${subject} examination paper (KNEC standard).
+
+QUESTION CONTEXT: ${questionText}
+DIAGRAM TYPE: ${type}
+${caption ? `CAPTION: ${caption}` : ''}
+${params && Object.keys(params).length > 0 ? `PARAMS: ${JSON.stringify(params)}` : ''}
+
+DRAWING INSTRUCTIONS:
+${guide}
+
+STRICT SVG REQUIREMENTS — READ CAREFULLY:
+1. Output ONLY the raw SVG element — starting with <svg and ending with </svg>
+2. NO markdown backticks, NO explanation, NO preamble, NOTHING before <svg or after </svg>
+3. viewBox="0 0 280 200" — this is non-negotiable
+4. DO NOT use: <style>, <script>, CSS classes, external references, gradients (except very simple linearGradient if needed)
+5. Colors to use:
+   - Main structures: stroke="#1e3a5f" (navy)
+   - Secondary: stroke="#374151" (dark gray)  
+   - Emphasis/labels: fill="#cc0000" (red)
+   - Fills: use light colors — #fef9c3 (cream), #dbeafe (light blue), #d1fae5 (light green), #fce7f3 (light pink), #f3e8ff (light purple)
+6. Text: fontFamily="serif" fontSize="9" or "10" — keep all text SHORT (max 20 chars per label)
+7. All labels must be INSIDE the viewBox
+8. Include a brief caption text at the bottom of the SVG (fontSize="8", fill="#6b7280")
+9. The diagram must look professional enough to appear in a printed KNEC examination paper
+
+Generate the SVG now:`;
+}
+
+async function generateSingleSVG(diagram, questionText, subject, grade) {
+  const prompt = buildSVGPrompt(diagram, questionText, subject, grade);
+
+  let attempts = 0;
+  const maxAttempts = 2;
+
+  while (attempts < maxAttempts) {
+    attempts++;
+    try {
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 2000,   // SVG for a single diagram fits well within 2000 tokens
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const raw = response.content.map(b => b.text || '').join('').trim();
+
+      // Strip any accidental markdown fences
+      const clean = raw
+        .replace(/^```[\w]*\n?/m, '')
+        .replace(/```$/m, '')
+        .trim();
+
+      if (!clean.startsWith('<svg') || !clean.includes('</svg>')) {
+        throw new Error(`Response is not valid SVG. Starts with: ${clean.substring(0, 80)}`);
+      }
+
+      // Basic safety check — no scripts
+      if (clean.includes('<script') || clean.includes('javascript:')) {
+        throw new Error('SVG contains unsafe content — rejected.');
+      }
+
+      return clean;
+
+    } catch (err) {
+      if (attempts < maxAttempts) {
+        console.warn(`[SVG] Attempt ${attempts} failed for ${diagram.type}: ${err.message}. Retrying...`);
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
