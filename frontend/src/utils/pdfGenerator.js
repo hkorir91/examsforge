@@ -7,25 +7,30 @@ import autoTable from 'jspdf-autotable'
 function svgToDataUrl(svgString, widthPx = 280, heightPx = 200) {
   return new Promise((resolve) => {
     try {
-      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
-      const url  = URL.createObjectURL(blob)
-      const img  = new Image()
+      // Use base64 data URL instead of Blob URL.
+      // Blob URLs are blocked by some browsers when drawing to canvas (tainted canvas),
+      // causing img.onerror to fire silently. Data URLs always work.
+      const encoded = btoa(unescape(encodeURIComponent(svgString)))
+      const dataUrl = `data:image/svg+xml;base64,${encoded}`
+
+      const img = new Image()
       img.onload = () => {
-        const canvas = document.createElement('canvas')
-        // 2× for retina-quality in PDF
-        canvas.width  = widthPx * 2
-        canvas.height = heightPx * 2
-        const ctx = canvas.getContext('2d')
-        // White background — SVG may have transparent background, PDF needs white
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.scale(2, 2)
-        ctx.drawImage(img, 0, 0, widthPx, heightPx)
-        URL.revokeObjectURL(url)
-        resolve(canvas.toDataURL('image/png'))
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width  = widthPx * 2   // 2× for retina-quality in PDF
+          canvas.height = heightPx * 2
+          const ctx = canvas.getContext('2d')
+          ctx.fillStyle = '#ffffff'     // white background — SVG may be transparent
+          ctx.fillRect(0, 0, canvas.width, canvas.height)
+          ctx.scale(2, 2)
+          ctx.drawImage(img, 0, 0, widthPx, heightPx)
+          resolve(canvas.toDataURL('image/png'))
+        } catch {
+          resolve(null)
+        }
       }
-      img.onerror = () => { URL.revokeObjectURL(url); resolve(null) }
-      img.src = url
+      img.onerror = () => resolve(null)
+      img.src = dataUrl
     } catch {
       resolve(null)
     }
@@ -243,11 +248,19 @@ export async function generateExamPDF(exam, meta) {
 
     for (const q of exam.sectionA.questions) {
       checkPage(30)
+      const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
       const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
       doc.text(qLines, margin, y)
+      if (!hasSubParts) {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(8)
+        doc.setTextColor(...colors.gray)
+        doc.text(`(${q.marks} mark${Number(q.marks) === 1 ? '' : 's'})`, pageW - margin, y, { align: 'right' })
+      }
       y += qLines.length * 5 + 2
 
       if (q.diagram) await drawDiagram(q.diagram)
@@ -262,7 +275,38 @@ export async function generateExamPDF(exam, meta) {
           doc.text(opt, col, optY)
         })
         y += half * 5 + 4
+      } else if (hasSubParts) {
+        for (const sp of q.subParts) {
+          checkPage(20)
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(9)
+          doc.setTextColor(...colors.black)
+          const spLines = doc.splitTextToSize(sp.text, contentW - 25)
+          doc.text(spLines, margin + 8, y)
+          doc.setFontSize(8)
+          doc.setTextColor(...colors.gray)
+          doc.text(`(${sp.marks} mark${Number(sp.marks) === 1 ? '' : 's'})`, pageW - margin, y, { align: 'right' })
+          y += spLines.length * 5 + 2
+          const lineCount = Math.min(Math.max(Number(sp.marks) * 2, 2), 6)
+          for (let i = 0; i < lineCount; i++) {
+            doc.setDrawColor(...colors.lightGray)
+            doc.setLineWidth(0.3)
+            doc.line(margin + 8, y, pageW - margin, y)
+            y += 5
+          }
+          y += 2
+        }
+      } else {
+        // Simple answer lines for flat questions
+        const lineCount = Math.min(Math.max(Number(q.marks) * 2, 2), 6)
+        for (let i = 0; i < lineCount; i++) {
+          doc.setDrawColor(...colors.lightGray)
+          doc.setLineWidth(0.3)
+          doc.line(margin, y, pageW - margin, y)
+          y += 5
+        }
       }
+      y += 4
     }
   }
 
@@ -289,24 +333,53 @@ export async function generateExamPDF(exam, meta) {
 
     for (const q of exam.sectionB.questions) {
       checkPage(35)
+      const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
       const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
       doc.text(qLines, margin, y)
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(8)
-      doc.setTextColor(...colors.gray)
-      doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
-      y += qLines.length * 5 + 3
-      if (q.diagram) await drawDiagram(q.diagram)
-      for (let i = 0; i < 3; i++) {
-        doc.setDrawColor(...colors.lightGray)
-        doc.setLineWidth(0.3)
-        doc.line(margin, y, pageW - margin, y)
-        y += 6
+      if (!hasSubParts) {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(8)
+        doc.setTextColor(...colors.gray)
+        doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       }
-      y += 3
+      y += qLines.length * 5 + 3
+
+      if (q.diagram) await drawDiagram(q.diagram)
+
+      if (hasSubParts) {
+        for (const sp of q.subParts) {
+          checkPage(25)
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(9)
+          doc.setTextColor(...colors.black)
+          const spLines = doc.splitTextToSize(sp.text, contentW - 25)
+          doc.text(spLines, margin + 8, y)
+          doc.setFontSize(8)
+          doc.setTextColor(...colors.gray)
+          doc.text(`(${sp.marks} mark${Number(sp.marks) === 1 ? '' : 's'})`, pageW - margin, y, { align: 'right' })
+          y += spLines.length * 5 + 2
+          const lineCount = Math.min(Math.max(Number(sp.marks) * 2, 2), 8)
+          for (let i = 0; i < lineCount; i++) {
+            doc.setDrawColor(...colors.lightGray)
+            doc.setLineWidth(0.3)
+            doc.line(margin + 8, y, pageW - margin, y)
+            y += 6
+          }
+          y += 3
+        }
+      } else {
+        for (let i = 0; i < 3; i++) {
+          doc.setDrawColor(...colors.lightGray)
+          doc.setLineWidth(0.3)
+          doc.line(margin, y, pageW - margin, y)
+          y += 6
+        }
+      }
+      y += 4
     }
   }
 
@@ -326,26 +399,61 @@ export async function generateExamPDF(exam, meta) {
 
     for (const q of exam.sectionC.questions) {
       checkPage(50)
+      const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
+
+      // Question number + stem text (same pattern as Sections A and B)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
-      const parts = q.text.split('\n')
-      parts.forEach((part) => {
-        const lines = doc.splitTextToSize(part, contentW - 15)
-        doc.text(lines, margin, y)
-        y += lines.length * 5 + 1
-      })
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(8)
-      doc.setTextColor(...colors.gray)
-      doc.text(`(${q.marks} marks)`, pageW - margin, y - 4, { align: 'right' })
-      if (q.diagram) await drawDiagram(q.diagram)
-      for (let i = 0; i < 6; i++) {
-        doc.setDrawColor(...colors.lightGray)
-        doc.line(margin, y, pageW - margin, y)
-        y += 7
+      const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
+      doc.text(qLines, margin, y)
+
+      // Marks indicator (top-right, only if no sub-parts — otherwise sub-parts carry marks)
+      if (!hasSubParts) {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(8)
+        doc.setTextColor(...colors.gray)
+        doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       }
-      y += 4
+      y += qLines.length * 5 + 3
+
+      // Diagram (below stem, above sub-parts)
+      if (q.diagram) await drawDiagram(q.diagram)
+
+      // Sub-parts (a, b, c...)
+      if (hasSubParts) {
+        for (const sp of q.subParts) {
+          checkPage(30)
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(9)
+          doc.setTextColor(...colors.black)
+          const spLines = doc.splitTextToSize(sp.text, contentW - 25)
+          doc.text(spLines, margin + 8, y)
+          doc.setFontSize(8)
+          doc.setTextColor(...colors.gray)
+          doc.text(`(${sp.marks} mark${Number(sp.marks) === 1 ? '' : 's'})`, pageW - margin, y, { align: 'right' })
+          y += spLines.length * 5 + 2
+          // Answer lines per sub-part (2 lines per mark, min 2, max 8)
+          const lineCount = Math.min(Math.max(Number(sp.marks) * 2, 2), 8)
+          for (let i = 0; i < lineCount; i++) {
+            doc.setDrawColor(...colors.lightGray)
+            doc.setLineWidth(0.3)
+            doc.line(margin + 8, y, pageW - margin, y)
+            y += 6
+          }
+          y += 3
+        }
+      } else {
+        // No sub-parts — draw answer lines based on total marks
+        const lineCount = Math.min(Math.max(Number(q.marks) * 2, 6), 14)
+        for (let i = 0; i < lineCount; i++) {
+          doc.setDrawColor(...colors.lightGray)
+          doc.setLineWidth(0.3)
+          doc.line(margin, y, pageW - margin, y)
+          y += 7
+        }
+      }
+      y += 5
     }
   }
 
