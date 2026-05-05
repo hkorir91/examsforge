@@ -110,6 +110,16 @@ router.post('/generate', protect, generateLimiter, async (req, res) => {
 // Frontend polls this every 3s until status is 'done' or 'failed'.
 // NOTE: must be defined BEFORE /:id to avoid route shadowing
 router.get('/job/:jobId', protect, async (req, res) => {
+  // CRITICAL: prevent Cloudflare/browser from caching poll responses.
+  // Without this, status transitions (processing→done, processing→failed)
+  // are invisible to the frontend — it keeps seeing the cached "processing" 304.
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store',
+  });
+
   try {
     const job = await ExamJob.findById(req.params.jobId);
     if (!job) return res.status(404).json({ error: 'Job not found.' });
@@ -200,11 +210,20 @@ async function processExamJob(jobId, params, user) {
       });
     }
 
-    // 3. Call AI — now with a generous 120s timeout (no Render deadline)
+    // 3. Call AI
+    // max_tokens is adaptive: large exams (80+ marks, many questions) need more tokens
+    // to fit the full JSON with all questions + sub-parts + marking scheme.
+    // 6000 is enough for a CAT; End Term/Mock at 80+ marks needs 8000.
+    const maxTokens = totalMarks >= 70
+      ? 8000
+      : totalMarks >= 50
+      ? 7000
+      : 6000
+
     const TIMEOUT_MS = 120000;
     let message;
     let attempts = 0;
-    const maxAttempts = 3; // can afford more retries since we're not blocking HTTP
+    const maxAttempts = 3;
     let lastErr = null;
 
     while (attempts < maxAttempts) {
@@ -216,7 +235,7 @@ async function processExamJob(jobId, params, user) {
         message = await Promise.race([
           anthropic.messages.create({
             model: 'claude-sonnet-4-5',
-            max_tokens: 6000,
+            max_tokens: maxTokens,
             messages: [{ role: 'user', content: prompt }],
           }),
           timeoutPromise,
@@ -248,11 +267,22 @@ async function processExamJob(jobId, params, user) {
     const rawText = message.content.map(b => b.text || '').join('');
     const cleanText = rawText.replace(/```json|```/g, '').trim();
 
+    // Log stop_reason — if it's 'max_tokens' the response was truncated
+    const stopReason = message.stop_reason;
+    if (stopReason === 'max_tokens') {
+      console.error(`[PARSE] AI hit max_tokens limit (${maxTokens}) for ${grade} ${subject} ${examType} ${totalMarks}mks. Response truncated — increase maxTokens.`);
+      console.error(`[PARSE] Truncated at: ...${rawText.slice(-200)}`);
+      throw { code: 'PARSE_ERROR', msg: 'Exam too large to generate in one pass. Please reduce marks or questions and try again.' };
+    }
+
     let examData;
     try {
       examData = JSON.parse(cleanText);
-    } catch {
-      console.error('Parse error. Raw snippet:', rawText.substring(0, 300));
+    } catch (parseErr) {
+      console.error(`[PARSE] JSON.parse failed for ${grade} ${subject} ${examType}.`);
+      console.error(`[PARSE] stop_reason: ${stopReason} | tokens used: ${message.usage?.output_tokens}`);
+      console.error(`[PARSE] First 400 chars: ${rawText.substring(0, 400)}`);
+      console.error(`[PARSE] Last 200 chars: ${rawText.slice(-200)}`);
       throw { code: 'PARSE_ERROR', msg: 'The AI returned an unexpected response. Please try again.' };
     }
 
