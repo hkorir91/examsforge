@@ -1,7 +1,38 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-export function generateExamPDF(exam, meta) {
+// ── SVG → PNG data URL (browser-only) ────────────────────────────────────────
+// Converts a raw SVG string to a PNG data URL via an HTML canvas.
+// Used to embed AI-generated diagrams into the jsPDF document.
+function svgToDataUrl(svgString, widthPx = 280, heightPx = 200) {
+  return new Promise((resolve) => {
+    try {
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+      const url  = URL.createObjectURL(blob)
+      const img  = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        // 2× for retina-quality in PDF
+        canvas.width  = widthPx * 2
+        canvas.height = heightPx * 2
+        const ctx = canvas.getContext('2d')
+        // White background — SVG may have transparent background, PDF needs white
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.scale(2, 2)
+        ctx.drawImage(img, 0, 0, widthPx, heightPx)
+        URL.revokeObjectURL(url)
+        resolve(canvas.toDataURL('image/png'))
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null) }
+      img.src = url
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+export async function generateExamPDF(exam, meta) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const margin = 20
@@ -147,11 +178,34 @@ export function generateExamPDF(exam, meta) {
   })
   y += instrBoxH + 6
 
-  // ── Diagram placeholder helper ──────────────────────────
-  // Draws a dashed box with caption when a question has a diagram field.
-  // The web preview shows the actual SVG; PDF shows a clearly labelled placeholder.
-  const drawDiagramPlaceholder = (diagram) => {
+  // ── Diagram rendering helper ────────────────────────────
+  // If diagram.svg exists: convert to PNG and embed (real AI diagram).
+  // Otherwise: draw a clean labelled placeholder box.
+  const drawDiagram = async (diagram) => {
     if (!diagram?.type) return
+
+    if (diagram.svg) {
+      // Render AI-generated SVG as image
+      const dataUrl = await svgToDataUrl(diagram.svg, 280, 200)
+      if (dataUrl) {
+        const imgW = contentW - 20       // fit within content width with small margins
+        const imgH = imgW * (200 / 280)  // maintain 280:200 aspect ratio
+        checkPage(imgH + 10)
+        doc.addImage(dataUrl, 'PNG', margin + 10, y, imgW, imgH)
+        y += imgH + 4
+        if (diagram.caption) {
+          doc.setFont('helvetica', 'italic')
+          doc.setFontSize(8)
+          doc.setTextColor(...colors.gray)
+          doc.text(diagram.caption, pageW / 2, y, { align: 'center' })
+          y += 5
+        }
+        return
+      }
+      // SVG conversion failed — fall through to placeholder
+    }
+
+    // Placeholder box (no SVG available)
     const caption = diagram.caption || `Figure (${diagram.type.replace(/_/g, ' ')})`
     const boxH = 36
     checkPage(boxH + 6)
@@ -165,7 +219,7 @@ export function generateExamPDF(exam, meta) {
     doc.setTextColor(...colors.gray)
     doc.text(caption, pageW / 2, y + boxH / 2 - 2, { align: 'center' })
     doc.setFontSize(7.5)
-    doc.text('[ Diagram visible in digital preview — draw/attach here ]', pageW / 2, y + boxH / 2 + 5, { align: 'center' })
+    doc.text('[ Diagram — see digital preview ]', pageW / 2, y + boxH / 2 + 5, { align: 'center' })
     y += boxH + 5
   }
 
@@ -187,7 +241,7 @@ export function generateExamPDF(exam, meta) {
     doc.text(exam.sectionA.instruction || '', margin, y)
     y += 7
 
-    exam.sectionA.questions.forEach((q) => {
+    for (const q of exam.sectionA.questions) {
       checkPage(30)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
@@ -196,8 +250,7 @@ export function generateExamPDF(exam, meta) {
       doc.text(qLines, margin, y)
       y += qLines.length * 5 + 2
 
-      // Draw diagram placeholder if question has a diagram
-      if (q.diagram) drawDiagramPlaceholder(q.diagram)
+      if (q.diagram) await drawDiagram(q.diagram)
 
       if (q.options) {
         const half = Math.ceil(q.options.length / 2)
@@ -210,7 +263,7 @@ export function generateExamPDF(exam, meta) {
         })
         y += half * 5 + 4
       }
-    })
+    }
   }
 
   // ── SECTION B ──────────────────────────────────────
@@ -234,7 +287,7 @@ export function generateExamPDF(exam, meta) {
     doc.text(exam.sectionB.instruction || '', margin, y)
     y += 7
 
-    exam.sectionB.questions.forEach((q) => {
+    for (const q of exam.sectionB.questions) {
       checkPage(35)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
@@ -246,8 +299,7 @@ export function generateExamPDF(exam, meta) {
       doc.setTextColor(...colors.gray)
       doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       y += qLines.length * 5 + 3
-      if (q.diagram) drawDiagramPlaceholder(q.diagram)
-      // Answer lines
+      if (q.diagram) await drawDiagram(q.diagram)
       for (let i = 0; i < 3; i++) {
         doc.setDrawColor(...colors.lightGray)
         doc.setLineWidth(0.3)
@@ -255,7 +307,7 @@ export function generateExamPDF(exam, meta) {
         y += 6
       }
       y += 3
-    })
+    }
   }
 
   // ── SECTION C ──────────────────────────────────────
@@ -272,7 +324,7 @@ export function generateExamPDF(exam, meta) {
     doc.text(`SECTION C — STRUCTURED QUESTIONS  (${exam.sectionC.marks} marks)`, margin + 5, y + 5.5)
     y += 12
 
-    exam.sectionC.questions.forEach((q) => {
+    for (const q of exam.sectionC.questions) {
       checkPage(50)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
@@ -287,14 +339,14 @@ export function generateExamPDF(exam, meta) {
       doc.setFontSize(8)
       doc.setTextColor(...colors.gray)
       doc.text(`(${q.marks} marks)`, pageW - margin, y - 4, { align: 'right' })
-      if (q.diagram) drawDiagramPlaceholder(q.diagram)
+      if (q.diagram) await drawDiagram(q.diagram)
       for (let i = 0; i < 6; i++) {
         doc.setDrawColor(...colors.lightGray)
         doc.line(margin, y, pageW - margin, y)
         y += 7
       }
       y += 4
-    })
+    }
   }
 
   // ── MARKING SCHEME ─────────────────────────────────
