@@ -3,38 +3,103 @@ import autoTable from 'jspdf-autotable'
 
 // ── SVG → PNG data URL (browser-only) ────────────────────────────────────────
 // Converts a raw SVG string to a PNG data URL via an HTML canvas.
-// Used to embed AI-generated diagrams into the jsPDF document.
+// Key fixes:
+//   1. Inject explicit width/height into SVG — without them img.naturalWidth = 0
+//      and ctx.drawImage renders a blank canvas.
+//   2. Use FileReader.readAsDataURL for encoding — btoa() breaks on any
+//      Unicode character (°, →, etc.) outside Latin-1. FileReader handles all UTF-8.
+//   3. 5-second timeout so a malformed SVG never hangs the PDF download.
 function svgToDataUrl(svgString, widthPx = 280, heightPx = 200) {
   return new Promise((resolve) => {
     try {
-      // Use base64 data URL instead of Blob URL.
-      // Blob URLs are blocked by some browsers when drawing to canvas (tainted canvas),
-      // causing img.onerror to fire silently. Data URLs always work.
-      const encoded = btoa(unescape(encodeURIComponent(svgString)))
-      const dataUrl = `data:image/svg+xml;base64,${encoded}`
-
-      const img = new Image()
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas')
-          canvas.width  = widthPx * 2   // 2× for retina-quality in PDF
-          canvas.height = heightPx * 2
-          const ctx = canvas.getContext('2d')
-          ctx.fillStyle = '#ffffff'     // white background — SVG may be transparent
-          ctx.fillRect(0, 0, canvas.width, canvas.height)
-          ctx.scale(2, 2)
-          ctx.drawImage(img, 0, 0, widthPx, heightPx)
-          resolve(canvas.toDataURL('image/png'))
-        } catch {
-          resolve(null)
-        }
+      // Step 1: inject explicit dimensions if missing
+      let svg = svgString.trim()
+      if (!svg.startsWith('<svg')) {
+        resolve(null); return
       }
-      img.onerror = () => resolve(null)
-      img.src = dataUrl
+      // Replace the opening <svg tag to add width/height if not already present
+      svg = svg.replace(/^<svg([^>]*)>/, (match, attrs) => {
+        const w = /\bwidth=/.test(attrs) ? '' : ` width="${widthPx}"`
+        const h = /\bheight=/.test(attrs) ? '' : ` height="${heightPx}"`
+        return `<svg${attrs}${w}${h}>`
+      })
+
+      // Step 2: encode via FileReader (handles all UTF-8 correctly)
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+      const reader = new FileReader()
+
+      reader.onloadend = () => {
+        const img = new Image()
+        const timer = setTimeout(() => resolve(null), 5000) // safety timeout
+
+        img.onload = () => {
+          clearTimeout(timer)
+          try {
+            const canvas = document.createElement('canvas')
+            canvas.width  = widthPx * 2   // 2× for crisp PDF rendering
+            canvas.height = heightPx * 2
+            const ctx = canvas.getContext('2d')
+            ctx.fillStyle = '#ffffff'      // white bg — SVG backgrounds can be transparent
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+            ctx.scale(2, 2)
+            ctx.drawImage(img, 0, 0, widthPx, heightPx)
+            resolve(canvas.toDataURL('image/png'))
+          } catch {
+            resolve(null)
+          }
+        }
+        img.onerror = () => { clearTimeout(timer); resolve(null) }
+        img.src = reader.result   // FileReader gives a proper data: URL
+      }
+      reader.onerror = () => resolve(null)
+      reader.readAsDataURL(blob)
     } catch {
       resolve(null)
     }
   })
+}
+
+// ── Markdown table parser ─────────────────────────────────────────────────────
+// The AI sometimes embeds data tables as markdown (| col | col |) in q.text.
+// These functions detect and extract them so we can render with autoTable.
+function parseMarkdownTable(text) {
+  if (!text || !text.includes('|')) return null
+  const lines = text.split('\n').map(l => l.trim())
+  const tableLines = lines.filter(l => l.startsWith('|') && l.endsWith('|'))
+  if (tableLines.length < 2) return null
+
+  // Separator lines are like |---|---| — only pipes, dashes, colons, spaces
+  const isSeparator = l => /^[\|\-:\s]+$/.test(l)
+  const contentLines = tableLines.filter(l => !isSeparator(l))
+  if (contentLines.length < 2) return null
+
+  const parseCells = line =>
+    line.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1)
+
+  const headers = parseCells(contentLines[0])
+  const rows    = contentLines.slice(1).map(parseCells)
+  return { headers, rows }
+}
+
+// Splits question text into segments: text before table, the table itself, text after
+function splitTextAroundTable(text) {
+  if (!text || !text.includes('|')) return { before: text, table: null, after: '' }
+  const lines = text.split('\n')
+  const firstTableIdx = lines.findIndex(l => l.trim().startsWith('|') && l.trim().endsWith('|'))
+  if (firstTableIdx === -1) return { before: text, table: null, after: '' }
+
+  // Find where table ends
+  let lastTableIdx = firstTableIdx
+  for (let i = firstTableIdx; i < lines.length; i++) {
+    const t = lines[i].trim()
+    if (t.startsWith('|') && t.endsWith('|')) lastTableIdx = i
+    else if (t && !t.startsWith('|') && i > firstTableIdx) break
+  }
+
+  const before = lines.slice(0, firstTableIdx).join('\n').trim()
+  const tableText = lines.slice(firstTableIdx, lastTableIdx + 1).join('\n')
+  const after = lines.slice(lastTableIdx + 1).join('\n').trim()
+  return { before, table: parseMarkdownTable(tableText), after }
 }
 
 export async function generateExamPDF(exam, meta) {
@@ -228,7 +293,60 @@ export async function generateExamPDF(exam, meta) {
     y += boxH + 5
   }
 
-  // ── SECTION A ──────────────────────────────────────
+  // ── Question text renderer ──────────────────────────────
+  // Renders question text which may contain an embedded markdown table.
+  // Returns the y-advance so the caller knows where y ended up.
+  const renderQuestionText = (text, indentLeft = margin) => {
+    const maxW = pageW - margin - indentLeft
+    const { before, table, after } = splitTextAroundTable(text || '')
+
+    // Before-table text
+    if (before) {
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9.5)
+      doc.setTextColor(...colors.black)
+      const lines = doc.splitTextToSize(before, maxW)
+      doc.text(lines, indentLeft, y)
+      y += lines.length * 5 + 2
+    }
+
+    // Table (if any)
+    if (table) {
+      checkPage(table.rows.length * 8 + 16)
+      autoTable(doc, {
+        startY: y,
+        head: [table.headers],
+        body: table.rows,
+        margin: { left: indentLeft, right: margin },
+        styles: {
+          fontSize: 8.5,
+          cellPadding: 2.5,
+          textColor: colors.black,
+          lineColor: [180, 180, 180],
+          lineWidth: 0.3,
+        },
+        headStyles: {
+          fillColor: colors.blue,
+          textColor: colors.white,
+          fontStyle: 'bold',
+          fontSize: 8.5,
+        },
+        alternateRowStyles: { fillColor: [245, 247, 252] },
+        theme: 'grid',
+      })
+      y = doc.lastAutoTable.finalY + 4
+    }
+
+    // After-table text
+    if (after) {
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9.5)
+      doc.setTextColor(...colors.black)
+      const lines = doc.splitTextToSize(after, maxW)
+      doc.text(lines, indentLeft, y)
+      y += lines.length * 5 + 2
+    }
+  }
   if (exam.sectionA?.questions?.length) {
     checkPage(20)
     y += 4
@@ -250,17 +368,24 @@ export async function generateExamPDF(exam, meta) {
       checkPage(30)
       const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
 
+      // Question number prefix
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
-      const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
-      doc.text(qLines, margin, y)
+      doc.text(`${q.num}.`, margin, y)
+
       if (!hasSubParts) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(8)
         doc.setTextColor(...colors.gray)
         doc.text(`(${q.marks} mark${Number(q.marks) === 1 ? '' : 's'})`, pageW - margin, y, { align: 'right' })
       }
+
+      // Question body (handles embedded tables)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9.5)
+      doc.setTextColor(...colors.black)
+      renderQuestionText(q.text, margin + 6)
       y += qLines.length * 5 + 2
 
       if (q.diagram) await drawDiagram(q.diagram)
@@ -338,15 +463,19 @@ export async function generateExamPDF(exam, meta) {
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
-      const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
-      doc.text(qLines, margin, y)
+      doc.text(`${q.num}.`, margin, y)
+
       if (!hasSubParts) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(8)
         doc.setTextColor(...colors.gray)
         doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       }
-      y += qLines.length * 5 + 3
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9.5)
+      doc.setTextColor(...colors.black)
+      renderQuestionText(q.text, margin + 6)
 
       if (q.diagram) await drawDiagram(q.diagram)
 
@@ -401,21 +530,22 @@ export async function generateExamPDF(exam, meta) {
       checkPage(50)
       const hasSubParts = Array.isArray(q.subParts) && q.subParts.length > 0
 
-      // Question number + stem text (same pattern as Sections A and B)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
-      const qLines = doc.splitTextToSize(`${q.num}. ${q.text}`, contentW - 15)
-      doc.text(qLines, margin, y)
+      doc.text(`${q.num}.`, margin, y)
 
-      // Marks indicator (top-right, only if no sub-parts — otherwise sub-parts carry marks)
       if (!hasSubParts) {
         doc.setFont('helvetica', 'normal')
         doc.setFontSize(8)
         doc.setTextColor(...colors.gray)
         doc.text(`(${q.marks} marks)`, pageW - margin, y, { align: 'right' })
       }
-      y += qLines.length * 5 + 3
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9.5)
+      doc.setTextColor(...colors.black)
+      renderQuestionText(q.text, margin + 6)
 
       // Diagram (below stem, above sub-parts)
       if (q.diagram) await drawDiagram(q.diagram)
