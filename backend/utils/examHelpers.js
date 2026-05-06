@@ -44,8 +44,10 @@ const SUBJECT_TYPES = {
   language: ['Kiswahili', 'Arabic', 'French', 'German', 'Chinese',
     'Indigenous Languages', 'Literature in English', 'Fasihi ya Kiswahili',
     'Sign Language', 'Kenyan Sign Language'],
+  // CRE/IRE/HRE — religious education with specific 6-question exam format
+  cre: ['CRE', 'IRE', 'HRE'],
   // Humanities — require case studies, source analysis, essays
-  humanities: ['History and Citizenship', 'CRE', 'IRE', 'HRE',
+  humanities: ['History and Citizenship',
     'Business Studies', 'Life Skills Education', 'Community Service Learning'],
   // Geography — has its own specific rules
   geography: ['Geography'],
@@ -193,15 +195,76 @@ SECTION E — LISTENING AND SPEAKING ORAL (assessed separately — do NOT includ
 - Writing task must specify: audience, purpose, format, and marking rubric
 - Use KNEC-style marking language: "Award 1 mark for each correct point. Accept any reasonable answer."`,
 
-    humanities: `
-HUMANITIES-SPECIFIC REQUIREMENTS:
-- Include at least ONE source-based or data-based question (map extract, graph, table, photograph description, quote)
-- Geography: include map work / sketch map question in at least one section
-- History: include a source analysis question with a short extract followed by questions
-- Business Studies: use Kenyan business examples (M-Pesa, Equity Bank, Safaricom, Nakumatt, local markets)
-- CRE/IRE/HRE: questions must test understanding and application of values, not just recitation
-- Avoid pure recall questions — test application, analysis, and evaluation
-- Essays in Section C must have clear marking criteria with awarded marks per point`,
+    cre: `
+CRE EXAM REQUIREMENTS — CBC GRADE 10 (KNEC/KICD):
+
+━━━ EXAM STRUCTURE ━━━
+A Grade 10 CRE written exam has EXACTLY 6 questions. Answer ALL.
+Each question MUST have exactly THREE sub-parts: (a), (b), (c).
+Scale marks to total requested but maintain the 6-question 3-part structure.
+
+STANDARD MARK ALLOCATION PER QUESTION:
+For a 100-mark exam: 6 questions × varying marks = 100 total
+- Q1–Q2: (a) 8 marks + (b) 7 marks + (c) 5 marks = 20 marks each
+- Q3–Q6: (a) 6 marks + (b) 5 marks + (c) 4 marks = 15 marks each
+- Total: 20+20+15+15+15+15 = 100 marks
+
+For a 60-mark exam: adjust proportionally (e.g. 6 questions × 10 marks each)
+
+STRAND COVERAGE — questions must distribute across these strands:
+- Strand 1: The Old Testament (Q1-Q2 typically)
+  Sub-strands: The Holy Bible, The Exodus, The Sinai Covenant, Loyalty to God (Elijah), Prophet Amos
+- Strand 2: The New Testament (Q3-Q4 typically)
+  Sub-strands: New Testament Books, Infancy and Early Life of Jesus, Galilean Ministry, Paul's 1 Corinthians
+- Strand 3: Church in Action (Q5 typically)
+  Sub-strands: The Holy Spirit and Gifts, The Holy Trinity, Sacraments
+- Strand 4: Christian Living Today (Q6 typically)
+  Sub-strands: Christian Ethics, Human Rights and GBV, Human Sexuality, Marriage and Family, Medicine and Technology
+
+QUESTION FORMAT — each question must follow this EXACT pattern:
+
+(a) "Describe [Biblical event/concept] as recorded in [Book Chapter:Verses]." OR
+    "Explain how [Biblical figure] [action] and outline [result]." (6–8 marks)
+    → DETAILED descriptive answer: 1 mark per specific factual point
+    → Always cite the exact Bible reference in the question text
+
+(b) "Explain [NUMBER] [lessons/ways/reasons] that Christians can [action/learn] from [topic]." (5–7 marks)
+    → Application-level question connecting scripture to modern Christian life
+    → Each point = 1 mark, must be distinct and complete
+
+(c) "State [NUMBER] [characteristics/ways/qualities] of [topic]." (4–5 marks)
+    → Knowledge-level recall
+    → 1 mark per correct point, no elaboration needed
+
+━━━ CRITICAL CONTENT RULES ━━━
+1. EVERY question MUST cite at least ONE specific Bible reference (Book Chapter:Verse)
+2. Names must be Biblical (Moses, Elijah, Amos, Jesus, Paul, Peter, Abraham)
+3. Apply to Kenyan context: mention Kenya's churches, youth, families, society
+4. Use CBC action verbs matching marks:
+   - 1-4 marks: State, List, Name, Identify, Give
+   - 5-7 marks: Explain, Describe, Discuss, Outline  
+   - 8+ marks: Describe in detail, Examine, Analyse, Evaluate
+5. Each point in the marking scheme = exactly 1 mark
+6. Use KNEC marking language: "Award 1 mark for each correct point. Any [X] correct points."
+7. Never ask for essay-style prose — all answers are point-form (1 mark per point)
+
+━━━ TOPIC-SPECIFIC REQUIREMENTS ━━━
+The Holy Bible: inspiration (2 Tim 3:16), literary forms, OT categories, Bible study methods
+The Exodus: call of Moses (Ex 3), plagues, Passover, crossing Red Sea, provision in wilderness
+The Sinai Covenant: making of covenant (Ex 19-20), Ten Commandments, breaking and renewal
+Loyalty to God (Elijah): contest at Mt Carmel (1 Kings 18), still small voice (1 Kings 19)
+Prophet Amos: social injustice, Day of the Lord, restoration, relevance today
+Infancy/Early Life of Jesus: OT prophecies fulfilled, role of John the Baptist, baptism, temptation
+Galilean Ministry: rejection at Nazareth, calling disciples, Sermon on Plain, miracles, parables, transfiguration
+Paul's 1 Corinthians: divisions, immorality, unity, spiritual gifts (1 Cor 12), Lord's Supper
+Holy Spirit: Pentecost (Acts 2), gifts of the Spirit (1 Cor 12), role of Spirit in believers' lives
+Holy Trinity: Father, Son, Holy Spirit — unity and distinct roles
+Sacraments: Baptism and Lord's Supper — meaning, significance, practice
+Christian Ethics: integrity, honesty, moral decision-making
+Human Rights and GBV: dignity, equality, Kenyan law, Christian response
+Human Sexuality: God's design, abstinence, sexual integrity for youth
+Marriage and Family: Christian marriage, roles, challenges in Kenya
+Medicine and Technology: Christian ethics in healthcare, bioethics`,
 
     geography: `
 GEOGRAPHY-SPECIFIC REQUIREMENTS — CRITICAL:
@@ -259,7 +322,7 @@ ARTS AND PHYSICAL EDUCATION REQUIREMENTS:
 - Include questions that reference Kenyan cultural arts, sports personalities, or local events`,
   };
 
-  return base[type] || base[subject === 'English' ? 'english' : 'humanities'];
+  return base[type] || base[subject === 'English' ? 'english' : subject === 'CRE' || subject === 'IRE' || subject === 'HRE' ? 'cre' : 'humanities'];
 }
 
 // ── Subject-specific question format rules ───────────────
@@ -354,6 +417,54 @@ Section C (Essay / Extended Response — 10–15 marks):
   - "Discuss", "Analyse", "Evaluate", "Examine"
   - Clear marking guide: 1 mark per valid point, up to maximum
   - Introduction, body points, conclusion expected`,
+
+    cre: `
+CRE QUESTION FORMAT — Kenya CBC Grade 10 (KNEC Standard):
+
+EXAM STRUCTURE:
+A standard CRE End Term/Mock paper has 6 questions (no sections A/B/C).
+Each question has THREE parts: (a), (b), (c).
+Total marks: 100 (scale proportionally for other totals).
+Time: 2.5 hours.
+
+MARK ALLOCATION PER QUESTION (typical 20-mark question):
+  (a) "Describe EIGHT..." or "Explain EIGHT..." = 8 marks (1 mark per valid point)
+  (b) "Explain SEVEN..." or "Discuss SEVEN..." = 7 marks (1 mark per valid point)
+  (c) "State FIVE..." or "Outline FIVE..." = 5 marks (1 mark per valid point)
+
+MARK ALLOCATION PER QUESTION (typical 15-mark question):
+  (a) "Describe SIX..." = 6 marks
+  (b) "Explain FIVE..." = 5 marks
+  (c) "State FOUR..." = 4 marks
+
+CRITICAL CRE RULES:
+1. ALWAYS use these verbs matching marks: Describe/Explain (6-8 marks), Identify/Outline (4-5 marks), State/Give/Name (3-5 marks)
+2. NEVER say "discuss briefly" or give vague prompts — always specify exact number of points required
+3. Each question must cover ONE main topic/substrand — do not mix topics within a question
+4. ALWAYS include specific Bible references in questions e.g. "as recorded in Exodus 3:1-4:17"
+5. Marking scheme must list each point separately — "1 mark per valid point"
+6. Questions must test understanding and application, not just recitation
+7. Use Kenyan context where appropriate — "a Christian leader in Kenya today", "churches in Kenya"
+8. Questions should progress: (a) descriptive/historical, (b) explanation/lessons, (c) application/relevance today
+
+TOPIC COVERAGE — distribute 6 questions across these strands:
+- The Old Testament: The Bible, Bible Study Methods, Redemption, Stewardship, The Exodus, Sinai Covenant, Prophet Elijah, Prophet Amos
+- The New Testament: NT Books, Birth/Baptism/Temptation of Jesus, Galilean Ministry, Paul's 1 Corinthians
+- Church in Action: Holy Spirit, Gifts of the Holy Spirit, Holy Trinity, Sacraments
+- Christian Living Today: Christian Ethics, Human Rights, Human Sexuality, Marriage and Family, Medicine and Technology
+
+QUESTION EXAMPLES (exact format to follow):
+Q1. (a) Describe EIGHT steps through which the Bible was formed from oral tradition to the canon we have today. (8 marks)
+    (b) Explain SEVEN ways in which the Bible is important to Christians in their daily lives. (7 marks)
+    (c) State FIVE challenges that Bible translators face when translating the Bible into local languages. (5 marks)
+
+Q2. (a) Describe the call of Moses at the burning bush as recorded in Exodus 3:1-4:17 and explain how God prepared him for his mission. (6 marks)
+    (b) Explain FIVE lessons that Christians today can learn from the Ten Commandments as given in Exodus 20:1-17. (5 marks)
+    (c) State FOUR ways in which Moses' leadership qualities are relevant to Christian leaders in contemporary Kenya. (4 marks)
+
+Q3. (a) Describe how the Holy Spirit empowered the early church on the Day of Pentecost as recorded in Acts 2:1-47. (8 marks)
+    (b) Explain SEVEN gifts of the Holy Spirit as described in 1 Corinthians 12:1-31 and state their importance to the church. (7 marks)
+    (c) State FIVE ways in which Christians in Kenya today can demonstrate the fruits of the Holy Spirit. (5 marks)`,
 
     geography: `
 QUESTION FORMAT FOR GEOGRAPHY:
@@ -509,7 +620,7 @@ function buildHybridExamPrompt({
   const strandList = strands.join(', ');
   const substrandList = substrands.length > 0 ? substrands.join(', ') : 'All sub-strands within selected strands';
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = (subject === 'English' || subject === 'Kiswahili') ? '' : getQuestionFormatRules(subject);
+  const questionFormats = (subject === 'English' || subject === 'Kiswahili' || subject === 'CRE' || subject === 'IRE' || subject === 'HRE') ? '' : getQuestionFormatRules(subject);
 
   // When sectionCount=1, all seeds are in sectionASeeds — use totalMarks directly
   const saMarks = sectionCount === 1
@@ -783,7 +894,7 @@ function buildFallbackExamPrompt({
   const strandList = strands.join(', ');
   const substrandList = substrands.length > 0 ? substrands.join(', ') : `All sub-strands within ${strandList}`;
   const subjectInstructions = getSubjectInstructions(subject, examType, totalMarks);
-  const questionFormats = (subject === 'English' || subject === 'Kiswahili') ? '' : getQuestionFormatRules(subject);
+  const questionFormats = (subject === 'English' || subject === 'Kiswahili' || subject === 'CRE' || subject === 'IRE' || subject === 'HRE') ? '' : getQuestionFormatRules(subject);
 
   // ── Section-aware question + mark distribution ───────────
   // BUG FIX: when sectionCount=1, ALL questions/marks go to Section A.
