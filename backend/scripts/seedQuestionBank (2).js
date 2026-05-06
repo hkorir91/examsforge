@@ -1,0 +1,2842 @@
+/**
+ * ExamsForge by SmartSchool Digital
+ * scripts/seedQuestionBank.js
+ *
+ * Seeds the QuestionBank collection with starter questions for Grade 10–12 CBC.
+ * Run once after setup: node scripts/seedQuestionBank.js
+ *
+ * Usage:
+ *   cd backend
+ *   node scripts/seedQuestionBank.js
+ *
+ * FIX: QuestionBank schema is defined inline so this script is fully self-contained
+ *      and does not depend on models/QuestionBank.js existing beforehand.
+ */
+
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/examsforge';
+
+// ── Inline QuestionBank schema (no external model file required) ─────────────
+const questionBankSchema = new mongoose.Schema(
+  {
+    grade:             { type: String, required: true, enum: ['Grade 10', 'Grade 11', 'Grade 12'] },
+    subject:           { type: String, required: true },
+    strand:            { type: String, required: true },
+    subStrand:         { type: String, required: true },
+    questionType:      { type: String, required: true, enum: ['short_answer', 'structured', 'long_answer', 'calculation', 'essay'] },
+    difficulty:        { type: String, required: true, enum: ['easy', 'medium', 'hard'] },
+    marks:             { type: Number, required: true },
+    questionText:      { type: String, required: true },
+    answerGuide:       { type: String, required: true },
+    tags:              [{ type: String }],
+    learningObjective: { type: String },
+  },
+  { timestamps: true }
+);
+
+const QuestionBank = mongoose.models.QuestionBank || mongoose.model('QuestionBank', questionBankSchema);
+// ────────────────────────────────────────────────────────────────────────────
+
+const seedQuestions = [
+
+  // ── GRADE 10 — MATHEMATICS ──────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'Mathematics',
+    strand: 'Numbers and Algebra', subStrand: 'Quadratic Equations',
+    questionType: 'calculation', difficulty: 'medium', marks: 4,
+    questionText: 'Solve the quadratic equation 2x² + 5x − 3 = 0, giving your answers to 2 decimal places where necessary.',
+    answerGuide: 'Using quadratic formula or factorisation: x = ½ or x = −3. Award 2 marks for correct method, 1 mark per correct root.',
+    tags: ['quadratic', 'algebra', 'equations'], learningObjective: 'Solve quadratic equations by factorisation and formula',
+  },
+  {
+    grade: 'Grade 10', subject: 'Mathematics',
+    strand: 'Numbers and Algebra', subStrand: 'Indices and Logarithms',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: '(a) Simplify: 3²× 3⁴ ÷ 3³ (2 marks)\n(b) If log₁₀ 2 = 0.3010, find the value of log₁₀ 32 without using a calculator. Show your working. (4 marks)',
+    answerGuide: '(a) 3³ = 27 — 2 marks. (b) log₁₀ 32 = log₁₀ 2⁵ = 5 × 0.3010 = 1.505 — award 2 marks for recognising 32 = 2⁵, 2 marks for correct calculation.',
+    tags: ['indices', 'logarithms'], learningObjective: 'Apply laws of indices and logarithms',
+  },
+  {
+    grade: 'Grade 10', subject: 'Mathematics',
+    strand: 'Measurement and Geometry', subStrand: 'Trigonometry',
+    questionType: 'calculation', difficulty: 'medium', marks: 5,
+    questionText: 'A ladder of length 6 m leans against a vertical wall. The foot of the ladder is 2.5 m from the base of the wall on a horizontal ground.\n(a) Calculate the angle the ladder makes with the ground. (3 marks)\n(b) Find how high up the wall the ladder reaches. (2 marks)',
+    answerGuide: '(a) cos θ = 2.5/6, θ = cos⁻¹(0.4167) = 65.4° (3 marks). (b) height = √(6² − 2.5²) = √(36 − 6.25) = √29.75 ≈ 5.45 m (2 marks).',
+    tags: ['trigonometry', 'Pythagoras', 'angles'], learningObjective: 'Apply trigonometric ratios to solve real-life problems',
+  },
+  {
+    grade: 'Grade 10', subject: 'Mathematics',
+    strand: 'Statistics and Probability', subStrand: 'Measures of Central Tendency',
+    questionType: 'structured', difficulty: 'easy', marks: 4,
+    questionText: 'The marks scored by 10 students in a Mathematics test were: 45, 67, 54, 78, 62, 45, 89, 54, 73, 68.\n(a) Find the mode of the marks. (1 mark)\n(b) Calculate the median mark. (3 marks)',
+    answerGuide: '(a) Mode = 45 and 54 (bimodal) — 1 mark. (b) Arrange in order: 45,45,54,54,62,67,68,73,78,89; Median = (62+67)/2 = 64.5 — award 2 marks for arranging, 1 mark for correct median.',
+    tags: ['statistics', 'mean', 'median', 'mode'], learningObjective: 'Calculate measures of central tendency from raw data',
+  },
+
+  // ── GRADE 10 — BIOLOGY ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'Biology',
+    strand: 'Cell Biology', subStrand: 'Cell Structure and Function',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: '(a) State TWO differences between a plant cell and an animal cell. (2 marks)\n(b) Explain the function of the mitochondria in a cell. (3 marks)',
+    answerGuide: '(a) Any 2 from: plant cells have cell wall / chloroplasts / large central vacuole; animal cells do not — 1 mark each. (b) Mitochondria are the site of aerobic respiration; they produce ATP (energy) from glucose and oxygen — 1 mark for site, 2 marks for detailed explanation.',
+    tags: ['cell biology', 'organelles', 'plant cell', 'animal cell'], learningObjective: 'Describe the structure and functions of cell organelles',
+  },
+  {
+    grade: 'Grade 10', subject: 'Biology',
+    strand: 'Nutrition', subStrand: 'Nutrients and their Functions',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO functions of proteins in the human body.',
+    answerGuide: 'Any 2 from: growth and repair of body tissues; production of enzymes and hormones; production of antibodies for immunity; source of energy when carbohydrates are insufficient — 1 mark each.',
+    tags: ['nutrition', 'proteins', 'diet'], learningObjective: 'Identify the functions of food nutrients in the body',
+  },
+  {
+    grade: 'Grade 10', subject: 'Biology',
+    strand: 'Gaseous Exchange', subStrand: 'Breathing Mechanism',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe what happens during inhalation in a human being, starting from when the diaphragm contracts to when oxygen enters the blood. (8 marks)',
+    answerGuide: 'Diaphragm contracts and flattens (1); intercostal muscles contract (1); thoracic cavity volume increases (1); pressure in lungs decreases below atmospheric (1); air rushes into lungs through trachea/bronchi/bronchioles (1); oxygen diffuses across alveolar walls and capillary walls (1); oxygen dissolves in moisture on alveoli surface (1); oxygen combines with haemoglobin in red blood cells (1). Max 8 marks.',
+    tags: ['gaseous exchange', 'breathing', 'lungs', 'alveoli'], learningObjective: 'Explain the mechanism of breathing in humans',
+  },
+
+  // ── GRADE 10 — CHEMISTRY ────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'Chemistry',
+    strand: 'Acids, Bases and Salts', subStrand: 'pH and Indicators',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'A solution has a pH of 2.\n(a) Is the solution acidic, neutral, or alkaline? (1 mark)\n(b) Name ONE indicator that could be used to test this solution and state the colour it would turn. (2 marks)\n(c) If this solution were diluted with water, how would the pH change? Explain your answer. (2 marks)',
+    answerGuide: '(a) Acidic — 1 mark. (b) Any suitable indicator e.g. litmus → red; phenolphthalein → colourless; universal indicator → red/orange — 1 mark each. (c) pH would increase (move towards 7) — 1 mark; dilution reduces H⁺ ion concentration — 1 mark.',
+    tags: ['pH', 'acids', 'indicators', 'dilution'], learningObjective: 'Explain the pH scale and use of indicators',
+  },
+  {
+    grade: 'Grade 10', subject: 'Chemistry',
+    strand: 'Stoichiometry', subStrand: 'Mole Concept',
+    questionType: 'calculation', difficulty: 'medium', marks: 6,
+    questionText: 'Calculate the number of moles in 22.0 g of carbon dioxide (CO₂).\n(a) Calculate the molar mass of CO₂. (2 marks)\n(b) Calculate the number of moles of CO₂. (2 marks)\n(c) Calculate the number of molecules in this sample. (Avogadro\'s number = 6.02 × 10²³) (2 marks)',
+    answerGuide: '(a) Molar mass = 12 + (16×2) = 44 g/mol — 2 marks. (b) moles = 22/44 = 0.5 mol — 2 marks. (c) molecules = 0.5 × 6.02×10²³ = 3.01×10²³ — 2 marks.',
+    tags: ['mole concept', 'stoichiometry', 'Avogadro'], learningObjective: 'Apply the mole concept in chemical calculations',
+  },
+
+  // ── GRADE 10 — PHYSICS ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'Physics',
+    strand: 'Mechanics', subStrand: "Newton's Laws of Motion",
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'A car of mass 1200 kg accelerates from rest to a velocity of 20 m/s in 8 seconds.\n(a) Calculate the acceleration of the car. (2 marks)\n(b) Calculate the net force acting on the car. (2 marks)\n(c) If a frictional force of 300 N opposes the motion, calculate the driving force of the engine. (3 marks)',
+    answerGuide: '(a) a = (v-u)/t = (20-0)/8 = 2.5 m/s² — 2 marks. (b) F = ma = 1200 × 2.5 = 3000 N — 2 marks. (c) Net force = Driving force − Friction; 3000 = F − 300; F = 3300 N — 3 marks (1 for equation, 2 for answer).',
+    tags: ["Newton's laws", 'force', 'acceleration', 'mass'], learningObjective: "Apply Newton's second law to solve problems",
+  },
+  {
+    grade: 'Grade 10', subject: 'Physics',
+    strand: 'Waves', subStrand: 'Wave Properties',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'A wave has a frequency of 50 Hz and a wavelength of 4 m. Calculate the speed of the wave.',
+    answerGuide: 'Speed = frequency × wavelength; v = 50 × 4 = 200 m/s — 1 mark for formula, 2 marks for correct answer with units.',
+    tags: ['waves', 'frequency', 'wavelength', 'wave speed'], learningObjective: 'Apply the wave equation to calculate wave speed',
+  },
+
+  // ── GRADE 11 — MATHEMATICS ──────────────────────────────────────────────
+  {
+    grade: 'Grade 11', subject: 'Mathematics',
+    strand: 'Sequences and Series', subStrand: 'Arithmetic Progressions',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'An arithmetic progression has a first term of 5 and a common difference of 3.\n(a) Write down the first four terms of the sequence. (2 marks)\n(b) Find the 20th term of the sequence. (2 marks)\n(c) Calculate the sum of the first 20 terms. (2 marks)',
+    answerGuide: '(a) 5, 8, 11, 14 — 2 marks. (b) T₂₀ = 5 + (20−1)×3 = 5 + 57 = 62 — 2 marks. (c) S₂₀ = 20/2 × (5 + 62) = 10 × 67 = 670 — 2 marks.',
+    tags: ['sequences', 'arithmetic progression', 'series'], learningObjective: 'Find terms and sums of arithmetic progressions',
+  },
+  {
+    grade: 'Grade 11', subject: 'Mathematics',
+    strand: 'Calculus (Introductory)', subStrand: 'Differentiation',
+    questionType: 'calculation', difficulty: 'medium', marks: 5,
+    questionText: 'Given that f(x) = 3x³ − 2x² + 5x − 1,\n(a) Find f\'(x), the derivative of f(x). (3 marks)\n(b) Find the gradient of the curve at x = 2. (2 marks)',
+    answerGuide: '(a) f\'(x) = 9x² − 4x + 5 — 1 mark per correct term (3 marks). (b) f\'(2) = 9(4) − 4(2) + 5 = 36 − 8 + 5 = 33 — 2 marks.',
+    tags: ['calculus', 'differentiation', 'gradient'], learningObjective: 'Differentiate polynomials and find gradients at points',
+  },
+
+  // ── GRADE 11 — BIOLOGY ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 11', subject: 'Biology',
+    strand: 'Genetics and Heredity', subStrand: 'Mendelian Genetics',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'In pea plants, tall (T) is dominant over short (t). Two heterozygous tall plants are crossed.\n(a) Using a genetic cross diagram, show the expected offspring. (4 marks)\n(b) State the expected phenotypic ratio of the offspring. (2 marks)\n(c) If 80 offspring were produced, how many would be expected to be short? (2 marks)',
+    answerGuide: '(a) Parental genotypes: Tt × Tt; Gametes: T, t and T, t; Punnett square showing TT, Tt, Tt, tt — 4 marks (1 each for parents, gametes, grid, offspring). (b) 3 tall : 1 short — 2 marks. (c) 80 × ¼ = 20 short plants — 2 marks.',
+    tags: ['genetics', 'Mendel', 'dominant', 'recessive', 'Punnett square'], learningObjective: 'Predict outcomes of monohybrid crosses using Punnett squares',
+  },
+  {
+    grade: 'Grade 11', subject: 'Biology',
+    strand: 'Reproduction', subStrand: 'Human Reproduction',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Describe the events that occur during the menstrual cycle in a human female, explaining the role of hormones at each stage. (10 marks)',
+    answerGuide: 'Menstruation (days 1-5): low oestrogen and progesterone, uterine lining shed (2 marks); Follicular phase: FSH stimulates follicle development, oestrogen rises (2 marks); Ovulation (day 14): LH surge causes release of egg from ovary (2 marks); Luteal phase: corpus luteum produces progesterone, maintains uterine lining (2 marks); If no fertilisation: corpus luteum degenerates, progesterone drops, lining sheds (2 marks). Max 10 marks.',
+    tags: ['reproduction', 'menstrual cycle', 'hormones', 'FSH', 'LH'], learningObjective: 'Explain hormonal control of the menstrual cycle',
+  },
+
+  // ── GRADE 11 — CHEMISTRY ────────────────────────────────────────────────
+  {
+    grade: 'Grade 11', subject: 'Chemistry',
+    strand: 'Reaction Kinetics', subStrand: 'Factors Affecting Rate',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'An experiment was carried out to investigate the rate of reaction between marble chips and hydrochloric acid.\n(a) Write a balanced equation for this reaction. (2 marks)\n(b) State THREE factors that would increase the rate of this reaction, explaining each one. (6 marks)',
+    answerGuide: '(a) CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂ — 2 marks (1 for correct reactants/products, 1 for balancing). (b) Any 3 of: increase concentration of HCl — more frequent collisions (2 marks); increase temperature — more particles with activation energy (2 marks); use powdered marble — greater surface area, more collisions (2 marks); use a catalyst — provides alternative pathway with lower activation energy (2 marks).',
+    tags: ['kinetics', 'rate of reaction', 'collision theory'], learningObjective: 'Explain factors affecting rate of reaction using collision theory',
+  },
+
+  // ── GRADE 11 — PHYSICS ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 11', subject: 'Physics',
+    strand: 'Linear and Circular Motion', subStrand: 'Circular Motion',
+    questionType: 'calculation', difficulty: 'hard', marks: 8,
+    questionText: 'A stone of mass 0.2 kg is tied to a string of length 0.8 m and whirled in a horizontal circle at a speed of 4 m/s.\n(a) Calculate the centripetal acceleration of the stone. (3 marks)\n(b) Calculate the tension in the string (centripetal force). (3 marks)\n(c) What provides the centripetal force in this situation? (2 marks)',
+    answerGuide: '(a) a = v²/r = 4²/0.8 = 16/0.8 = 20 m/s² — 3 marks. (b) F = ma = 0.2 × 20 = 4 N — 3 marks. (c) The tension in the string provides the centripetal force — 2 marks.',
+    tags: ['circular motion', 'centripetal force', 'tension'], learningObjective: 'Apply equations for circular motion to solve problems',
+  },
+
+  // ── GRADE 12 — MATHEMATICS ──────────────────────────────────────────────
+  {
+    grade: 'Grade 12', subject: 'Mathematics',
+    strand: 'Calculus', subStrand: 'Integration',
+    questionType: 'calculation', difficulty: 'hard', marks: 8,
+    questionText: 'Given f(x) = 3x² + 4x − 1,\n(a) Find ∫f(x) dx. (3 marks)\n(b) Evaluate ∫₁³ f(x) dx. (5 marks)',
+    answerGuide: '(a) ∫(3x² + 4x − 1)dx = x³ + 2x² − x + C — 3 marks (1 per term; accept without +C in definite integral context). (b) [x³ + 2x² − x]₁³ = (27 + 18 − 3) − (1 + 2 − 1) = 42 − 2 = 40 — 3 marks for substitution, 2 marks for correct evaluation.',
+    tags: ['integration', 'calculus', 'definite integral'], learningObjective: 'Evaluate definite and indefinite integrals of polynomials',
+  },
+  {
+    grade: 'Grade 12', subject: 'Mathematics',
+    strand: 'Vectors and Matrices', subStrand: 'Matrix Operations',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Given matrices A = [[2, 3], [1, 4]] and B = [[1, 0], [2, 1]],\n(a) Calculate A × B. (4 marks)\n(b) Find the determinant of matrix A. (2 marks)',
+    answerGuide: '(a) AB = [[2×1+3×2, 2×0+3×1], [1×1+4×2, 1×0+4×1]] = [[8, 3], [9, 4]] — 1 mark per correct element (4 marks). (b) det(A) = 2×4 − 3×1 = 8 − 3 = 5 — 2 marks.',
+    tags: ['matrices', 'matrix multiplication', 'determinant'], learningObjective: 'Perform matrix operations including multiplication and determinants',
+  },
+
+  // ── GRADE 12 — BIOLOGY ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 12', subject: 'Biology',
+    strand: 'Molecular Biology and Biotechnology', subStrand: 'DNA Structure and Replication',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Describe the structure of the DNA molecule and explain the process of DNA replication. (10 marks)',
+    answerGuide: 'Structure (5 marks): Double helix structure (1); two polynucleotide strands held by hydrogen bonds (1); each nucleotide has deoxyribose sugar, phosphate group, and nitrogenous base (1); complementary base pairing — A-T, G-C (1); antiparallel strands (1). Replication (5 marks): enzyme helicase unwinds and unzips the double helix by breaking hydrogen bonds (1); each strand serves as a template (1); DNA polymerase adds complementary nucleotides in 5\'→3\' direction (1); two identical DNA molecules formed — semi-conservative replication (1); leading and lagging strand synthesis explained (1).',
+    tags: ['DNA', 'replication', 'molecular biology', 'base pairing'], learningObjective: 'Describe DNA structure and explain semi-conservative replication',
+  },
+  {
+    grade: 'Grade 12', subject: 'Biology',
+    strand: 'Ecology and Conservation', subStrand: 'Ecosystems and Biomes',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'Study the food chain: Grass → Grasshopper → Frog → Snake → Hawk.\n(a) Identify the producer in this food chain. (1 mark)\n(b) Construct a pyramid of numbers for this food chain and explain its shape. (4 marks)\n(c) Using the 10% energy transfer rule, if 10,000 kJ of energy is available at the producer level, calculate the energy available to the hawk. (3 marks)',
+    answerGuide: '(a) Grass — 1 mark. (b) Correct pyramid drawn with grass at base and hawk at apex (2 marks); each level has fewer organisms than the level below, hence a typical upright pyramid shape (2 marks). (c) Grasshopper: 1000 kJ; Frog: 100 kJ; Snake: 10 kJ; Hawk: 1 kJ — 1 mark per correct calculation up to 3 marks.',
+    tags: ['ecology', 'food chain', 'energy flow', 'pyramid of numbers'], learningObjective: 'Explain energy flow through ecosystems and construct ecological pyramids',
+  },
+
+  // ── GRADE 12 — CHEMISTRY ────────────────────────────────────────────────
+  {
+    grade: 'Grade 12', subject: 'Chemistry',
+    strand: 'Advanced Organic Chemistry', subStrand: 'Reactions of Organic Compounds',
+    questionType: 'structured', difficulty: 'hard', marks: 9,
+    questionText: 'Ethanol (C₂H₅OH) undergoes several types of chemical reactions.\n(a) Write a balanced equation for the complete combustion of ethanol. (3 marks)\n(b) Write the equation for the oxidation of ethanol to ethanoic acid. Name the oxidising agent used. (3 marks)\n(c) Describe the esterification reaction between ethanol and ethanoic acid, including the conditions required and the name of the product. (3 marks)',
+    answerGuide: '(a) C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O — 3 marks (1 for correct products, 2 for balancing). (b) C₂H₅OH → CH₃COOH (or via CH₃CHO); oxidising agent: acidified potassium dichromate (K₂Cr₂O₇/H₂SO₄) — 2 marks for equation, 1 for oxidising agent. (c) C₂H₅OH + CH₃COOH ⇌ CH₃COOC₂H₅ + H₂O; conditions: concentrated H₂SO₄ catalyst, heat; product: ethyl ethanoate — 1 mark each.',
+    tags: ['organic chemistry', 'ethanol', 'combustion', 'esterification', 'oxidation'], learningObjective: 'Write equations for reactions of alcohols and carboxylic acids',
+  },
+
+  // ── GRADE 12 — PHYSICS ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 12', subject: 'Physics',
+    strand: 'Nuclear Physics', subStrand: 'Radioactivity',
+    questionType: 'structured', difficulty: 'hard', marks: 9,
+    questionText: 'A radioactive sample has a half-life of 20 years. The initial activity of the sample is 800 counts per second.\n(a) Define the term "half-life". (2 marks)\n(b) Calculate the activity after 60 years. (4 marks)\n(c) State TWO safety precautions that should be taken when handling radioactive materials. (3 marks)',
+    answerGuide: '(a) Half-life is the time taken for half of the radioactive nuclei in a sample to decay / for the activity to halve — 2 marks. (b) After 20 years: 400 cps; after 40 years: 200 cps; after 60 years: 100 cps — 4 marks (1 per correct step + 1 for final answer). (c) Any 2: wear protective clothing/lead apron; use tongs/remote handling; store in lead containers; minimise exposure time; stand behind lead screen — 1.5 marks each.',
+    tags: ['radioactivity', 'half-life', 'nuclear physics', 'safety'], learningObjective: 'Apply the concept of half-life to calculate activity at different times',
+  },
+
+  // ── GRADE 10 — HISTORY ──────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Pre-Colonial African History', subStrand: 'African Political Systems',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'With reference to pre-colonial East African societies:\n(a) Distinguish between a centralised and a non-centralised political system. (2 marks)\n(b) Give ONE example each of a centralised and a non-centralised society in pre-colonial Kenya. (2 marks)\n(c) Identify TWO strengths of the centralised political system. (2 marks)',
+    answerGuide: '(a) Centralised: one supreme ruler/king with defined hierarchical authority; non-centralised: authority distributed among elders/age groups, no single ruler — 1 mark each. (b) Centralised: e.g. Buganda Kingdom (accept Wanga Kingdom); non-centralised: e.g. Kikuyu, Maasai, Luo — 1 mark each. (c) Any 2: strong military for defence; efficient tax collection; clear laws and order; large-scale projects possible; diplomatic relations — 1 mark each.',
+    tags: ['pre-colonial', 'political systems', 'East Africa'], learningObjective: 'Compare centralised and non-centralised political systems in pre-colonial Africa',
+  },
+
+  // ── GRADE 10 — GEOGRAPHY ────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Physical Geography', subStrand: 'Plate Tectonics',
+    questionType: 'long_answer', difficulty: 'medium', marks: 8,
+    questionText: 'Explain how the theory of plate tectonics accounts for the formation of the following:\n(a) Fold mountains (3 marks)\n(b) Ocean trenches (3 marks)\n(c) State TWO pieces of evidence that support the theory of plate tectonics. (2 marks)',
+    answerGuide: '(a) Two plates converge (collide); continental plates buckle and fold upwards under compression; layers of rock folded to form mountain ranges e.g. Himalayas — 3 marks. (b) Oceanic plate subducts (slides under) continental plate; denser oceanic crust sinks into mantle; forms deep trench at subduction zone e.g. Mariana Trench — 3 marks. (c) Any 2: continental fit of Africa and South America; similar fossils on separated continents; similar rock types; mid-ocean ridges; palaeomagnetism — 1 mark each.',
+    tags: ['plate tectonics', 'fold mountains', 'ocean trenches'], learningObjective: 'Explain landform formation using the theory of plate tectonics',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'structured', difficulty: 'easy', marks: 4,
+    questionText: 'A group of Grade 10 learners from Mwangaza School visited Lake Nakuru National Park to study the surrounding environment.\n(a) Define Geography as a learning area. (2 marks)\n(b) Mention two branches of Geography they are likely to study during the trip. (2 marks)',
+    answerGuide: '(a) Geography is the study of the interrelationships between natural and human phenomena on the Earth\'s surface — 2 marks. (b) Any 2 from: Physical Geography; Human and Economic Geography; Practical Geography — 1 mark each.',
+    tags: ['introduction to geography', 'branches of geography', 'definition'], learningObjective: 'Define Geography and identify its main branches',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'structured', difficulty: 'easy', marks: 4,
+    questionText: 'During a lesson on the school field, the Geography teacher asked students to identify features created by nature.\n(a) Name two physical features they might identify. (2 marks)\n(b) State two aspects studied under Human Geography. (2 marks)',
+    answerGuide: '(a) Any 2: mountains/hills; rivers/lakes; valleys; plains; forests — 1 mark each. (b) Any 2: population; settlement; agriculture; trade; industry; transport — 1 mark each.',
+    tags: ['physical features', 'human geography', 'introduction'], learningObjective: 'Distinguish between physical and human geography aspects',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'long_answer', difficulty: 'medium', marks: 10,
+    questionText: 'During an inter-school Geography contest, students were challenged to explore the relationship between Geography and other subjects.\n(a) Explain the relationship between:\n   i. Geography and Biology. (2 marks)\n   ii. Geography and Computer Studies. (2 marks)\n   iii. Geography and Agriculture. (2 marks)\n(b) Give two reasons Geography is considered significant in understanding environmental issues. (4 marks)',
+    answerGuide: '(a)(i) Geography and Biology — both study living organisms and their environments; Biogeography examines distribution of plants and animals — 2 marks. (ii) Geography and Computer Studies — GIS and remote sensing use computer technology to store and analyse spatial data; computers aid in mapping and data presentation — 2 marks. (iii) Geography and Agriculture — Geography studies soils, climate, relief which influence crop and livestock farming; land use planning uses geographical knowledge — 2 marks. (b) Any 4: Geography identifies causes of environmental degradation; promotes conservation of natural resources; monitors climate change impacts; assists in disaster risk management; supports sustainable land use planning — 1 mark each.',
+    tags: ['relationship with other subjects', 'GIS', 'environment', 'agriculture'], learningObjective: 'Explain the relationship between Geography and other learning areas',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Give two importance of studying Geography.',
+    answerGuide: 'Any 2 from: helps understand the Earth and environment; aids in resource planning and management; enhances disaster preparedness; provides knowledge for economic and social development; promotes environmental conservation; aids navigation and mapping; fosters cultural understanding — 1 mark each.',
+    tags: ['importance of geography', 'introduction'], learningObjective: 'State the importance of studying Geography',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Map Work',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'A map of Kisumu County was given to students to identify social amenities.\n(a) Define a map. (1 mark)\n(b) State two methods of representing relief on topographical maps. (2 marks)\n(c) Explain one use of map scales. (1 mark)\n(d) A person who designs and reads maps is known as a? (1 mark)',
+    answerGuide: '(a) A map is a representation of the Earth\'s surface or part of it on a flat surface, drawn to scale — 1 mark. (b) Any 2: contour lines; spot heights/triangulation points; hachures/shading/layer colouring; relief models — 1 mark each. (c) Map scales are used to measure actual distances on the ground from distances on the map — 1 mark. (d) Cartographer — 1 mark.',
+    tags: ['map definition', 'relief representation', 'map scale', 'cartographer'], learningObjective: 'Define a map and describe methods of representing relief',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Map Work',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Students from Baraka High School used an atlas to study East African countries.\n(a) Describe two characteristics of a topographical map. (4 marks)\n(b) Explain three uses of maps in daily life. (6 marks)',
+    answerGuide: '(a) Any 2: drawn to a specific scale; shows both natural and man-made features; uses conventional symbols/signs; includes marginal information (title, scale, key, north arrow); covers a specific area in detail — 2 marks each. (b) Any 3: navigation and route planning; land use planning and management; locating resources and social amenities; military and disaster planning; tourism and recreation; urban and regional development planning — 2 marks each.',
+    tags: ['topographical map', 'map uses', 'characteristics'], learningObjective: 'Describe characteristics and uses of topographical maps',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Map Work',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'Students compared various maps during a group discussion.\n(a) Explain two differences between sketch maps and topographical maps. (4 marks)\n(b) Name four items of marginal information found in topographical maps. (4 marks)',
+    answerGuide: '(a) Any 2 differences: sketch maps are not drawn to precise scale while topographical maps are drawn to exact scale; sketch maps show only selected features while topographical maps show detailed features; sketch maps are hand-drawn approximations while topographical maps are professionally surveyed — 2 marks each difference (1 per map). (b) Any 4: title; scale; key/legend; north arrow; grid references; contour interval; date of publication; publisher/authority — 1 mark each.',
+    tags: ['sketch maps', 'topographical maps', 'marginal information'], learningObjective: 'Differentiate between sketch maps and topographical maps',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Map Work',
+    questionType: 'structured', difficulty: 'hard', marks: 13,
+    questionText: 'Study the map of Tambach (1:50,000 Sheet 90/3) and answer the following questions.\n(a) i) Identify two types of scale used in the map. (2 marks)\n    ii) Give the longitudinal extent of the area covered by the map. (2 marks)\n(b) i) Identify three relief features found at grid square 0581. (3 marks)\n    ii) Measure the length of dry weather road D329 from the junction at Chebokokwa to the northern edge of the map. (2 marks)\n(c) Explain how the following factors have influenced settlement in the area covered by the map:\n    i. Relief (1 mark)\n    ii. Drainage (1 mark)\n    iii. Transport (1 mark)\n(d) Citing evidence from the map, give two economic activities carried out in the area. (2 marks)',
+    answerGuide: '(a)(i) Any 2: representative fraction (RF); linear/graphical scale; statement scale — 1 mark each. (ii) Read from the map longitude values on east and west edges — 2 marks. (b)(i) Any 3 features from grid square 0581 e.g. hills, valleys, rivers, escarpments — 1 mark each. (ii) Measure map distance and convert using scale (1:50,000 means 1 cm = 0.5 km) — 2 marks. (c)(i) Settlements avoid steep slopes; found on gentle/flat land — 1 mark. (ii) Settlements found near rivers for water supply but avoid flood-prone areas — 1 mark. (iii) Settlements cluster along roads for accessibility — 1 mark. (d) Any 2 with evidence: farming (cultivated land); pastoralism (grazing land); trade (market centres); lumbering (forests) — 1 mark each.',
+    tags: ['topographical map', 'Tambach', 'map reading', 'grid references', 'settlement', 'economic activities'], learningObjective: 'Read and interpret a topographical map',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'The table below shows the number of mangoes harvested by a farmer over nine consecutive days:\nDay 1: 25, Day 2: 30, Day 3: 20, Day 4: 25, Day 5: 30, Day 6: 40, Day 7: 25, Day 8: 35, Day 9: 20.\n(a) Calculate the mean number of mangoes harvested. (2 marks)\n(b) Determine the median of the data. (2 marks)\n(c) Identify the mode of the number of mangoes harvested. (1 mark)',
+    answerGuide: '(a) Mean = (25+30+20+25+30+40+25+35+20) ÷ 9 = 250 ÷ 9 ≈ 27.8 — 1 mark for summing, 1 mark for dividing correctly. (b) Arranged in order: 20, 20, 25, 25, 25, 30, 30, 35, 40; Median = 5th value = 25 — 1 mark for arranging, 1 mark for correct answer. (c) Mode = 25 (appears 3 times) — 1 mark.',
+    tags: ['mean', 'median', 'mode', 'statistics', 'data analysis'], learningObjective: 'Calculate measures of central tendency from raw data',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'The table below shows the population of four towns in Nakuru County in 2023:\nMolo: 45,000; Njoro: 60,000; Naivasha: 85,000; Gilgil: 35,000.\n(a) Construct a simple bar graph to represent the population distribution of the four towns. (4 marks)\n(b) State two merits of using a bar graph to present the above data. (2 marks)',
+    answerGuide: '(a) Award 1 mark for correct labelled axes; 1 mark for appropriate scale; 1 mark for correctly plotted bars; 1 mark for title. (b) Any 2: easy to read and interpret; allows direct comparison between categories; visually appealing; can show exact values; suitable for discrete data — 1 mark each.',
+    tags: ['bar graph', 'data presentation', 'population', 'statistics', 'Nakuru'], learningObjective: 'Construct and interpret bar graphs from geographical data',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Learners in a Geography project analysed rainfall and temperature data for Kisii County.\n(a) Using statistical tools, explain three ways in which data can be presented. (6 marks)\n(b) Describe four methods of analysing and interpreting collected data. (4 marks)',
+    answerGuide: '(a) Any 3: bar graphs — use vertical/horizontal bars to show quantities for comparison; line graphs — show trends/changes over time using plotted points joined by lines; pie charts — show proportions/percentages of a whole using a circle divided into sectors; tables — organise data in rows and columns for easy reference — 2 marks each. (b) Any 4: calculation of mean/median/mode; use of frequency distribution tables; drawing and interpreting graphs; comparison of trends over time; use of GIS and mapping software; regression and correlation analysis — 1 mark each.',
+    tags: ['data presentation', 'statistical methods', 'graphs', 'analysis'], learningObjective: 'Present and analyse geographical data using statistical methods',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Learners at Kimathi School prepared bar graphs showing population changes.\n(a) Differentiate between:\n   i. Simple bar graph and multiple bar graph. (2 marks)\n   ii. Line graph and compound line graph. (2 marks)\n(b) Explain three advantages of using line graphs. (6 marks)',
+    answerGuide: '(a)(i) A simple bar graph shows one set of data using single bars while a multiple bar graph shows two or more sets of data side by side for comparison — 2 marks. (ii) A line graph shows a single trend over time while a compound line graph shows two or more trends on the same axes for comparison — 2 marks. (b) Any 3: show trends and changes over time clearly; easy to construct and interpret; useful for continuous data; allow comparison of multiple variables when combined; accurately represent fluctuations in data — 2 marks each.',
+    tags: ['bar graph', 'line graph', 'compound graph', 'multiple bar graph', 'statistical methods'], learningObjective: 'Distinguish between types of graphs and explain their advantages',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'While compiling their fieldwork report, students presented results using graphs.\n(a) Describe the steps in drawing a combined bar graph. (4 marks)\n(b) Explain three advantages of presenting geographical data using graphs. (3 marks)\n(c) Outline three branches of Geography. (3 marks)',
+    answerGuide: '(a) Any 4: draw and label the x-axis and y-axis; choose and mark an appropriate scale on both axes; plot bars for each category side by side; shade/colour each set of bars differently; include a title and key/legend — 1 mark each. (b) Any 3: data is easy to read and interpret visually; allows quick comparison between sets of data; shows trends and patterns clearly; saves space compared to tables — 1 mark each. (c) Physical Geography; Human and Economic Geography; Practical Geography — 1 mark each.',
+    tags: ['combined bar graph', 'data presentation', 'branches of geography'], learningObjective: 'Draw combined bar graphs and outline branches of Geography',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Statistical Methods',
+    questionType: 'structured', difficulty: 'medium', marks: 14,
+    questionText: 'A topographical map of Mt. Kenya region was issued for interpretation during a class test.\n(a) Describe three steps followed when drawing a cross-section from a topographical map. (6 marks)\n(b) Explain four limitations of using statistics to explain geographical facts. (4 marks)\n(c) State two methods of data collection OTHER THAN questionnaires. (2 marks)\n(d) List two disadvantages of administering questionnaires as a method of data collection. (2 marks)',
+    answerGuide: '(a) Any 3 steps: place a piece of paper along the line of cross-section; mark where each contour crosses the paper edge and note its elevation; transfer each point to graph paper using vertical scale and draw the profile by joining the points — 2 marks each. (b) Any 4: statistics can be misleading if data is incomplete or biased; cannot explain reasons behind patterns or trends; may not show variations over time or space; over-simplify complex geographical phenomena; averages can hide extremes — 1 mark each. (c) Any 2: observation; interviews; photography/video recording; sampling using instruments — 1 mark each. (d) Any 2: respondents may give false or biased answers; misinterpretation of questions; time-consuming; low response rate — 1 mark each.',
+    tags: ['cross-section', 'topographical map', 'limitations of statistics', 'data collection'], learningObjective: 'Draw cross-sections and evaluate statistical methods in Geography',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'GIS/GPS/Remote Sensing',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Grade 10 students learned about geospatial technologies in Geography.\n(a) Name the two main types of geospatial technologies. (2 marks)\n(b) State four components of GIS. (4 marks)\n(c) Explain two importance of GIS in Geography. (4 marks)',
+    answerGuide: '(a) GIS (Geographic Information Systems) and Remote Sensing (RS); GPS is also accepted — 1 mark each (any 2). (b) Any 4: hardware (computers, GPS units, scanners, printers); software (ArcGIS, QGIS); data (spatial and attribute data); people (trained operators); procedures/methods — 1 mark each. (c) Any 2: planning and decision making in urban, transport, and resource management; environmental monitoring of deforestation and pollution; disaster management and early warning systems; mapping and visualisation of spatial data — 2 marks each.',
+    tags: ['GIS', 'GPS', 'remote sensing', 'geospatial technology'], learningObjective: 'Describe geospatial technologies and their importance in Geography',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'The school career counsellor advised students to choose careers based on their strengths and interests. List two factors learners should consider when choosing a geography-related career.',
+    answerGuide: 'Any 2: personal interest and aptitude in Geography; educational qualifications and skills required; job availability and earning potential; working conditions (fieldwork, office, travel); location preference; physical fitness for fieldwork — 1 mark each.',
+    tags: ['careers in geography', 'career choice', 'geography careers'], learningObjective: 'Identify factors to consider when choosing a Geography-related career',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Practical Geography', subStrand: 'Introduction to Geography',
+    questionType: 'long_answer', difficulty: 'medium', marks: 10,
+    questionText: 'During career week, a guest speaker introduced career paths for Geography students.\n(a) Explain four careers related to the study of Geography. (8 marks)\n(b) State two reasons Geography is important in career development. (2 marks)',
+    answerGuide: '(a) Any 4: Cartographer — designs and produces maps; Meteorologist — studies weather and climate patterns; Town Planner — plans land use and urban development using geographical knowledge; Environmental Scientist — monitors and manages environmental issues; GIS Analyst — uses GIS software to analyse spatial data; Geologist — studies rocks and earth materials; Surveyor — measures land for mapping and construction — 2 marks each. (b) Any 2: Geography provides practical and analytical skills used across many industries; understanding of environment, resources, and human activities is essential in many careers; fosters problem-solving and fieldwork skills valued by employers — 1 mark each.',
+    tags: ['careers in geography', 'cartographer', 'meteorologist', 'town planner', 'GIS analyst'], learningObjective: 'Explain careers related to the study of Geography',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Natural Systems and Processes', subStrand: 'Rocks',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Study the Rock Cycle diagram and answer the questions below.\n(a) Name and explain the process by which igneous rocks are formed. (2 marks)\n(b) Describe the process of metamorphism and give ONE example each of:\n   i. A rock formed from an igneous rock by metamorphism. (1 mark)\n   ii. A rock formed from a sedimentary rock by metamorphism. (1 mark)\n(c) Explain the difference between intrusive and extrusive igneous rocks, giving ONE example of each. (3 marks)\n(d) State TWO economic importances of rocks and minerals to Kenya. (2 marks)',
+    answerGuide: '(a) Igneous rocks are formed by solidification/crystallisation of magma (molten rock); when magma cools below the surface (intrusive) or lava cools on the surface (extrusive) it solidifies into igneous rock — 2 marks. (b) Metamorphism is the transformation of existing rocks by heat and/or pressure without melting: (i) e.g. granite → gneiss; (ii) e.g. limestone → marble or shale → slate — 1 mark each. (c) Intrusive igneous rocks form underground from slowly cooling magma, e.g. granite; extrusive igneous rocks form on the surface from fast-cooling lava, e.g. basalt — 3 marks. (d) Any 2: source of building materials (limestone, granite); source of minerals for mining (gold, soda ash, fluorspar); raw materials for industry; tourism attraction (rock formations) — 1 mark each.',
+    tags: ['rocks', 'igneous rocks', 'metamorphism', 'rock cycle', 'minerals'], learningObjective: 'Describe the rock cycle and classify rock types',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Natural Systems and Processes', subStrand: 'Earth Movements',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Study the structure of the Earth diagram and answer the questions.\n(a) Name the layer of the Earth directly responsible for plate movement and explain the mechanism involved. (2 marks)\n(b) Explain why East Africa experiences frequent earthquake activity, with reference to plate tectonics theory. (3 marks)\n(c) Describe THREE effects of earthquakes on human settlements and the economy. (3 marks)\n(d) Define the term "drought" and explain TWO causes of drought in Kenya. (2 marks)',
+    answerGuide: '(a) The asthenosphere (upper mantle) — convection currents within the mantle cause plates to move — 2 marks. (b) East Africa lies along the East African Rift System where the African plate is splitting apart (diverging); this movement causes frequent earthquakes along fault lines — 3 marks. (c) Any 3: destruction of buildings and infrastructure; loss of human life and displacement; disruption of economic activities (trade, agriculture); collapse of bridges and roads; tsunamis if earthquake occurs under ocean — 1 mark each. (d) Drought is a prolonged period of abnormally low rainfall leading to water shortage — 1 mark; causes: irregular ITCZ movement reducing rainfall; deforestation reducing moisture in atmosphere — 1 mark each.',
+    tags: ['earthquakes', 'plate tectonics', 'East African Rift', 'drought', 'earth movements'], learningObjective: 'Explain causes and effects of earth movements and natural hazards',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Natural Systems and Processes', subStrand: 'Weathering and Soil',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Grade 10 learners studied weathering and soil during a field activity.\n(a) Define the term "soil profile" and name at least THREE horizons found in a typical soil profile. (3 marks)\n(b) Describe THREE types of physical (mechanical) weathering, giving an example of where each commonly occurs in Kenya. (3 marks)\n(c) Explain how climate influences the rate of chemical weathering. (2 marks)\n(d) State TWO ways in which human activities lead to soil degradation. (2 marks)',
+    answerGuide: '(a) A soil profile is a vertical section through the soil showing distinct layers (horizons): Horizon O (organic litter); Horizon A (topsoil); Horizon B (subsoil); Horizon C (weathered parent material); Horizon R (bedrock) — 1 mark for definition, 1 mark per any 2 horizons. (b) Any 3: freeze-thaw action (e.g. Mt Kenya highlands — water in cracks freezes and expands, splitting rock); exfoliation/onion weathering (e.g. Rift Valley — heating and cooling causes rock layers to peel); abrasion (e.g. coastal areas or rivers — rocks fragments grind against each other) — 1 mark each. (c) High temperatures increase the rate of chemical reactions; high rainfall provides water for hydrolysis and solution — 2 marks. (d) Any 2: overgrazing removes vegetation cover; poor farming practices such as monocropping deplete soil nutrients; deforestation exposes soil to erosion; urbanisation seals soil with concrete — 1 mark each.',
+    tags: ['soil profile', 'weathering', 'physical weathering', 'chemical weathering', 'soil degradation'], learningObjective: 'Describe soil profiles and types of weathering',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Human and Economic Activities', subStrand: 'Population',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Study the population pyramid and answer the questions.\n(a) Define the term "population pyramid" and state what information it conveys. (2 marks)\n(b) Identify THREE characteristics of a broad-based population pyramid and explain what each suggests about the country. (3 marks)\n(c) Calculate the dependency ratio given the following data: Young dependants (0–14 yrs): 18.6 million; Working population (15–64 yrs): 31.2 million; Old dependants (65+ yrs): 2.4 million. (3 marks)\n(d) State TWO problems caused by a high dependency ratio in a developing country. (2 marks)',
+    answerGuide: '(a) A population pyramid is a back-to-back bar graph showing the age and sex structure of a population; it conveys birth rates, death rates, life expectancy, and dependency levels — 2 marks. (b) Any 3 characteristics: wide base — high birth rate; rapidly narrowing bars — high death rate; small top — low life expectancy; more young people than old — young population — 1 mark each. (c) Dependency ratio = (dependants ÷ working population) × 100 = (18.6 + 2.4) ÷ 31.2 × 100 = 21 ÷ 31.2 × 100 ≈ 67.3% — 1 mark for formula, 1 mark for correct addition, 1 mark for correct answer. (d) Any 2: strain on social services (education, health); reduced savings and investment; slower economic growth; high government expenditure on social welfare — 1 mark each.',
+    tags: ['population pyramid', 'dependency ratio', 'population structure', 'birth rate', 'death rate'], learningObjective: 'Interpret population pyramids and calculate dependency ratios',
+  },
+  {
+    grade: 'Grade 10', subject: 'Geography',
+    strand: 'Human and Economic Activities', subStrand: 'Population',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Study the Demographic Transition Model (DTM) and answer the questions.\n(a) State the stage of the DTM most developing African countries are currently in and give TWO reasons for your answer. (3 marks)\n(b) Explain the meaning of the term "natural population increase" and how it is represented in the DTM. (2 marks)\n(c) Define "urbanisation" and identify THREE factors that have led to rapid urbanisation in Kenya. (3 marks)\n(d) Distinguish between "push factors" and "pull factors" in rural–urban migration, giving ONE example of each. (2 marks)',
+    answerGuide: '(a) Stage 2 or early Stage 3 — 1 mark; reasons: death rate falling due to improved healthcare; birth rate remains high due to cultural/traditional practices; rapid population growth — 1 mark each (any 2). (b) Natural population increase is the difference between birth rate and death rate when birth rate exceeds death rate; on the DTM it is shown by the gap between the birth rate and death rate lines — 2 marks. (c) Urbanisation is the process by which an increasing proportion of a population lives in towns and cities — 1 mark; factors: rural–urban migration for employment; industrialisation creating jobs in cities; better social services in urban areas — 1 mark each. (d) Push factors are conditions in rural areas that drive people away e.g. drought/land shortage; pull factors are attractions in urban areas that draw people in e.g. employment opportunities — 2 marks.',
+    tags: ['demographic transition model', 'urbanisation', 'natural population increase', 'rural-urban migration', 'push factors', 'pull factors'], learningObjective: 'Apply the Demographic Transition Model to African population trends',
+  },
+
+  // ── GRADE 11 — BUSINESS STUDIES ─────────────────────────────────────────
+  {
+    grade: 'Grade 11', subject: 'Business Studies',
+    strand: 'Financial Accounting', subStrand: 'Final Accounts',
+    questionType: 'calculation', difficulty: 'medium', marks: 8,
+    questionText: 'The following information is provided for Njeri\'s business for the year ended 31 December:\nSales: Ksh 450,000; Cost of goods sold: Ksh 280,000; Rent: Ksh 36,000; Salaries: Ksh 60,000; Electricity: Ksh 12,000.\n(a) Prepare a Trading Account showing the Gross Profit. (3 marks)\n(b) Prepare a Profit and Loss Account showing the Net Profit. (5 marks)',
+    answerGuide: '(a) Sales 450,000 − COGS 280,000 = Gross Profit Ksh 170,000 — 3 marks (1 per line). (b) Gross profit 170,000; less: Rent 36,000 + Salaries 60,000 + Electricity 12,000 = 108,000; Net Profit = 170,000 − 108,000 = Ksh 62,000 — 5 marks (1 for GP b/f, 1 per expense, 1 for total expenses, 1 for net profit).',
+    tags: ['accounting', 'final accounts', 'profit and loss', 'trading account'], learningObjective: 'Prepare trading and profit and loss accounts from given data',
+  },
+
+  // ── GRADE 12 — GEOGRAPHY ────────────────────────────────────────────────
+  {
+    grade: 'Grade 12', subject: 'Geography',
+    strand: 'Environmental Management', subStrand: 'Environmental Management',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Climate change is one of the greatest environmental challenges facing Kenya today.\n(a) Define climate change. (2 marks)\n(b) Identify THREE causes of climate change. (3 marks)\n(c) Describe FIVE effects of climate change on Kenya\'s environment and economy. (5 marks)',
+    answerGuide: '(a) Long-term alteration in global temperatures and weather patterns, mainly caused by human activities since the mid-20th century — 2 marks. (b) Any 3: burning fossil fuels releasing CO₂; deforestation reducing carbon sinks; industrial emissions; agricultural practices (methane from livestock); urbanisation — 1 mark each. (c) Any 5: reduced rainfall affecting crop production; prolonged droughts affecting water supply; flooding in low-lying areas; melting of Mt Kenya glaciers; loss of biodiversity; sea level rise affecting coastal areas; disruption to tourism; increased disease vectors — 1 mark each.',
+    tags: ['climate change', 'environment', 'Kenya', 'sustainability'], learningObjective: 'Analyse the causes and effects of climate change on Kenya',
+  },
+
+
+  // ── GRADE 10 — CRE ─────────────────────────────────────────────────────
+
+// SUB-STRAND: The Holy Bible
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 2,
+  questionText: 'What does the word "inspired" mean in the biblical context?',
+  answerGuide: 'Inspired means "God-breathed" (2 Timothy 3:16). God guided human authors so that what they wrote was exactly what God wanted, without error. (2 marks)',
+  tags: ['bible', 'inspiration', 'word of God'], learningObjective: 'Explain the meaning of biblical inspiration',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR reasons why the Bible is referred to as the inspired Word of God. (4 marks)\n(b) Explain how God used the Holy Spirit in the writing of the Bible. (2 marks)',
+  answerGuide: '(a) Any 4: It claims to be inspired (2 Tim 3:16); contains fulfilled prophecies; unity and consistency despite 40+ authors over 1,500 years; changes lives; has power to convict people of sin — 1 mark each. (b) The Holy Spirit moved upon human authors, guiding their minds and memories so they recorded God\'s message without error while still using their own personalities and writing styles — 2 marks.',
+  tags: ['bible', 'inspiration', 'Holy Spirit'], learningObjective: 'Explain why the Bible is the inspired Word of God',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) How many books are in the Old Testament and into how many categories are they divided? (2 marks)\n(b) Name the FIVE books of the Law (Pentateuch). (5 marks)\n(c) Name the FIVE Major Prophets of the Old Testament. (5 marks)',
+  answerGuide: '(a) 39 books divided into 4 categories: Law, History, Poetry/Wisdom, Prophecy — 1 mark each. (b) Genesis, Exodus, Leviticus, Numbers, Deuteronomy — 1 mark each. (c) Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel — 1 mark each. (Total: award max 8 marks)',
+  tags: ['Old Testament', 'books of the Bible', 'categories'], learningObjective: 'Identify the books and categories of the Old Testament',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 5,
+  questionText: 'State and explain FIVE methods used to study the Holy Bible.',
+  answerGuide: 'Any 5 from: Inductive method (observation, interpretation, application); Devotional method (personal spiritual growth); Biographical method (studying a person\'s life); Topical method (gathering verses on a theme); Word study method (tracing a key word). 1 mark for naming, 1 mark for explanation each — max 5 marks.',
+  tags: ['bible study', 'methods', 'inductive'], learningObjective: 'Describe methods of studying the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'long_answer', difficulty: 'medium', marks: 8,
+  questionText: 'State and explain EIGHT benefits of studying the Holy Bible.',
+  answerGuide: 'Any 8 from: Spiritual growth (1 Peter 2:2); Wisdom for salvation (2 Tim 3:15); Guidance (Psalm 119:105); Freedom from sin; Faith (Romans 10:17); Hope and comfort (Romans 15:4); Equipping for good works (2 Tim 3:16-17); Victory over temptation; Deepens relationship with God; Renews the mind (Romans 12:2). 1 mark each — max 8.',
+  tags: ['bible', 'benefits', 'spiritual growth'], learningObjective: 'Explain the benefits of studying the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define integrity as used in CRE and give ONE Bible reference. (2 marks)\n(b) State and explain FOUR ways of applying integrity in daily life. (4 marks)',
+  answerGuide: '(a) Integrity: being honest, consistent in values, and morally upright. Bible reference: Proverbs 11:3 — 2 marks. (b) Any 4 from: being honest in exams; returning extra change; keeping promises; admitting mistakes; not cheating or lying — 1 mark each.',
+  tags: ['integrity', 'values', 'ethics'], learningObjective: 'Apply the virtue of integrity in daily life',
+},
+
+// SUB-STRAND: The Exodus
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the call of Moses at the burning bush (Exodus 3:1-22). (5 marks)\n(b) State THREE signs God gave to Moses to reassure him (Exodus 4:1-17). (3 marks)',
+  answerGuide: '(a) Moses was tending flocks at Horeb; God appeared in burning bush not consumed; God told Moses to remove sandals on holy ground; identified Himself as the God of Abraham, Isaac, and Jacob; Moses hid his face; God said He heard Israel\'s cry in Egypt; commanded Moses to lead Israel out — 1 mark each for any 5 points. (b) Staff turned into snake; hand became leprous then healed; water from Nile turned to blood — 1 mark each.',
+  tags: ['Moses', 'burning bush', 'call-of-Moses', 'Exodus'], learningObjective: 'Describe the call of Moses and events of the Exodus',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Name and describe ALL TEN plagues of Egypt in order, giving the Bible reference for each. (10 marks)',
+  answerGuide: '1 mark each: 1-Water to blood (Ex 7:20); 2-Frogs (Ex 8:2); 3-Gnats/lice (Ex 8:16); 4-Flies (Ex 8:21); 5-Livestock disease (Ex 9:3); 6-Boils (Ex 9:9); 7-Hail (Ex 9:18); 8-Locusts (Ex 10:4); 9-Darkness (Ex 10:21); 10-Death of firstborn (Ex 11:5). Award 1 mark per correctly named plague.',
+  tags: ['plagues', 'Egypt', 'Moses', 'Exodus'], learningObjective: 'Identify and describe the ten plagues of Egypt',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe what the Passover was and how it was observed (Exodus 12:1-31). (4 marks)\n(b) State TWO ways the Passover foreshadows Jesus Christ\'s atonement. (2 marks)',
+  answerGuide: '(a) God commanded Israel to take an unblemished lamb, slaughter it at twilight, put blood on doorframes; eat it with unleavened bread and bitter herbs; roast over fire; eat in haste; angel of death would pass over homes with blood — 1 mark for each 4 points. (b) Any 2: Jesus is the Passover Lamb (1 Cor 5:7); His blood protects from judgment; the lamb without defect represents Jesus Christ sinlessness; the meal represents Holy Communion — 1 mark each.',
+  tags: ['Passover', 'atonement', 'Jesus Christ', 'Exodus'], learningObjective: 'Explain the significance of the Passover',
+},
+
+// SUB-STRAND: The Sinai Covenant
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State the TEN Commandments as given to Moses at Mount Sinai. (5 marks)\n(b) Explain how Christians apply the Ten Commandments in their daily lives today. (3 marks)',
+  answerGuide: '(a) 1-No other gods; 2-No idols; 3-Do not misuse God\'s name; 4-Keep Sabbath; 5-Honour parents; 6-Do not murder; 7-Do not commit adultery; 8-Do not steal; 9-Do not give false testimony; 10-Do not covet — ½ mark each = 5 marks. (b) Any 3: worship only God; respect parents; avoid murder/abortion; be faithful in marriage; honest in work; avoid materialism/covetousness — 1 mark each.',
+  tags: ['Ten Commandments', 'Sinai', 'Moses', 'covenant'], learningObjective: 'State and apply the Ten Commandments',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how Israel broke the Sinai Covenant while Moses was on the mountain. (3 marks)\n(b) How was the covenant renewed? (3 marks)',
+  answerGuide: '(a) The people asked Aaron to make gods; Aaron collected gold earrings; made a golden calf; people worshipped it saying "These are your gods who brought you from Egypt" — 1 mark each for 3 points. (b) Moses interceded for Israel; God relented; Moses returned to the mountain; God wrote the commandments on new tablets; Moses\' face shone — 1 mark each for 3 points.',
+  tags: ['golden calf', 'covenant renewal', 'Sinai'], learningObjective: 'Describe the breaking and renewal of the Sinai Covenant',
+},
+
+// SUB-STRAND: Loyalty to God (Elijah)
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the contest on Mount Carmel between Elijah and the prophets of Baal (1 Kings 18). (5 marks)\n(b) State THREE lessons Christians learn from Elijah\'s contest on Mount Carmel. (3 marks)',
+  answerGuide: '(a) Elijah challenged 450 prophets of Baal; two bulls prepared on altars; each side to call their god; Baal prophets called all day — no answer; they cut themselves; Elijah repaired the altar using 12 stones; dug a trench; poured water on sacrifice three times; Elijah prayed; fire from God consumed the sacrifice, wood, stones, and water; people fell down saying "The Lord, He is God!" — 1 mark each for 5 points. (b) Any 3: God alone is powerful; prayer is powerful; idols are powerless; God answers those who trust Him; one faithful person can make a difference — 1 mark each.',
+  tags: ['Elijah', 'Mount Carmel', 'Baal', 'idolatry'], learningObjective: 'Describe Elijah\'s fight against Baalism and lessons learned',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the injustice of Naboth\'s vineyard (1 Kings 21) and how Elijah responded. (4 marks)\n(b) State TWO ways Christians should respond to injustice in society today. (2 marks)',
+  answerGuide: '(a) Ahab wanted Naboth\'s vineyard; Naboth refused as it was his inheritance; Jezebel arranged for false accusers; Naboth was stoned; Ahab took the vineyard; Elijah confronted Ahab with God\'s judgment — 1 mark each for 4 points. (b) Any 2: speak out against injustice; support the poor and vulnerable; report corruption; pray for justice; use legal means — 1 mark each.',
+  tags: ['Elijah', 'Naboth', 'injustice', 'Jezebel'], learningObjective: 'Describe Elijah\'s fight against injustice',
+},
+
+// SUB-STRAND: Old Testament Prophets and Prophet Amos
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the call of Prophet Amos and the background to his ministry. (4 marks)\n(b) State FOUR visions of Prophet Amos and their significance. (4 marks)',
+  answerGuide: '(a) Amos was a shepherd and fig farmer from Tekoa in Judah; not a trained prophet; called by God; ministered during reign of Jeroboam II of Israel; a time of prosperity but great social injustice — 1 mark each for 4 points. (b) Any 4 from: locusts (judgment stayed by intercession); fire (judgment stayed); plumb line (Israel measured and found crooked); summer fruit (end is near); God at the altar (no escape from judgment) — 1 mark each.',
+  tags: ['Amos', 'prophet', 'visions', 'social justice'], learningObjective: 'Describe the call and visions of Prophet Amos',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'State and explain EIGHT social evils and injustices condemned by Prophet Amos and explain their relevance to Christians in Kenya today.',
+  answerGuide: 'Any 8 from: selling the righteous for silver (human trafficking); trampling on the poor (exploitation); sexual immorality (cult prostitution); dishonest trade/false scales (business fraud); bribery in courts; luxury while poor suffer; oppression of women (cows of Bashan); insincere worship; religious hypocrisy; corruption by leaders — 1 mark for naming the evil + 1 mark for Kenyan relevance each. Max 10 marks.',
+  tags: ['Amos', 'social justice', 'injustice', 'Kenya'], learningObjective: 'Apply Amos\'s teachings on justice to contemporary Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define the "Day of the Lord" as taught by Amos and explain why Amos warned it would be darkness, not light. (3 marks)\n(b) State and explain FOUR values acquired from the teachings of Prophet Amos. (4 marks)',
+  answerGuide: '(a) Day of the Lord: a time of God\'s judgment and reckoning — 1 mark; Amos warned it would be darkness because Israel assumed it would bless them automatically but their sin made them liable to judgment rather than reward — 2 marks. (b) Any 4 from: Obedience (do what God commands); Integrity (honest in all dealings); Faithfulness (loyal to God); Hope (trust God\'s restoration); Fairness (treat all equally); Love (care for poor); Righteousness (do what is right); Courage (speak against injustice) — 1 mark each.',
+  tags: ['Day of the Lord', 'Amos', 'values', 'judgment'], learningObjective: 'Explain the Day of the Lord and values from Prophet Amos,'
+},
+
+// ── GRADE 10 — CRE — STRAND 2: THE NEW TESTAMENT ─────────────
+
+// SUB-STRAND: New Testament Books
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'New Testament Books',
+  questionType: 'structured', difficulty: 'easy', marks: 6,
+  questionText: '(a) How many books are in the New Testament and into how many categories are they divided? (2 marks)\n(b) Name the FOUR Gospels. (4 marks)',
+  answerGuide: '(a) 27 books divided into 4 categories: Gospels, History (Acts), Epistles (Letters), Prophecy (Revelation) — 1 mark each. (b) Matthew, Mark, Luke, John — 1 mark each.',
+  tags: ['New Testament', 'Gospels', 'books'], learningObjective: 'Identify the books and categories of the New Testament',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'New Testament Books',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State EIGHT reasons why the Bible is referred to as a "library". (4 marks)\n(b) State FOUR ways in which Christians use the Bible to spread the gospel in Kenya today. (4 marks)',
+  answerGuide: '(a) Any 8 halved for marks: Many books (66); many authors (~40); many genres; written over ~1,500 years; many languages (Hebrew, Aramaic, Greek); many topics; arranged in sections; used for reading, study, reference — ½ mark each, max 4. (b) Any 4: preaching; evangelism; Bible study groups; Scripture memorization; distribution of Bibles; radio and TV; social media; Bible translation — 1 mark each.',
+  tags: ['Bible as library', 'gospel', 'Kenya'], learningObjective: 'Explain why the Bible is a library and how it is used',
+},
+
+// SUB-STRAND: Infancy and Early Life of Jesus Christ
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain FOUR Messianic prophecies from the Old Testament that were fulfilled by Jesus Christ. (8 marks)',
+  answerGuide: 'Any 4 from: Isaiah 7:14 — born of a virgin, fulfilled Matthew 1:23 (2 marks); Micah 5:2 — born in Bethlehem, fulfilled Matthew 2:1 (2 marks); Isaiah 53 — suffering servant, fulfilled in crucifixion (2 marks); 2 Samuel 7:12-13 — descendant of David with everlasting kingdom (2 marks); Isaiah 61:1-3 — anointing to preach good news, fulfilled Luke 4:18-19 (2 marks). Award 2 marks per prophecy: 1 for the prophecy and its reference, 1 for the fulfillment.',
+  tags: ['Messianic prophecies', 'Jesus Christ', 'Old Testament', 'fulfillment'], learningObjective: 'Identify Messianic prophecies and their fulfillment in Jesus Christ',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the baptism of Jesus (Luke 3:21-22). (3 marks)\n(b) State THREE temptations of Jesus in the wilderness and how He overcame each. (3 marks)',
+  answerGuide: '(a) Jesus was baptized by John in the Jordan; Heaven opened; Holy Spirit descended like a dove; voice from heaven said "You are my Son, whom I love; with you I am well pleased" — 1 mark each for 3 points. (b) Turn stones to bread — Jesus quoted Scripture (Man shall not live by bread alone); throw yourself down — Jesus quoted Scripture (Do not test the Lord); worship Satan for all kingdoms — Jesus quoted Scripture (Worship the Lord your God only) — 1 mark each.',
+  tags: ['baptism', 'temptation', 'Jesus Christ', 'wilderness'], learningObjective: 'Describe the baptism and temptations of Jesus Christ',
+},
+
+// SUB-STRAND: Galilean Ministry
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe what happened when Jesus was rejected in Nazareth (Luke 4:14-30). (4 marks)\n(b) State FOUR lessons Christians learn from Jesus Christ rejection in Nazareth. (4 marks)',
+  answerGuide: '(a) Jesus returned to Galilee in the power of the Spirit; went to synagogue in Nazareth; read Isaiah 61:1-2 and said it was fulfilled; people were amazed at His gracious words; then questioned "Is this not Joseph\'s son?"; Jesus referenced Elijah and Elisha serving Gentiles; they were furious and drove Him to the cliff edge; He walked through the crowd — 1 mark each for 4 points. (b) Any 4: prophets are not accepted in their hometown; God\'s blessings are not limited to one group; rejection is part of ministry; Jesus continued despite rejection; familiarity can breed contempt; God\'s plan cannot be stopped — 1 mark each.',
+  tags: ['Nazareth', 'rejection', 'Jesus Christ', 'Galilean ministry'], learningObjective: 'Describe Jesus Christ rejection at Nazareth and lessons learned',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FIVE teachings of Jesus from the Sermon on the Plain (Luke 6:17-49). (5 marks)\n(b) Identify THREE miracles of Jesus during the Galilean ministry and state what each reveals about Jesus. (3 marks)',
+  answerGuide: '(a) Any 5: Blessed are the poor; love your enemies; do to others as you would have them do to you; do not judge; by their fruit you will know them; build on the rock not sand; be merciful as God is merciful; give and it will be given to you — 1 mark each. (b) Any 3: Miraculous catch of fish (Jesus is Lord over creation); healing of leper (Jesus has compassion and power to heal); healing paralyzed man (Jesus has authority to forgive sins); raising widow\'s son at Nain (Jesus has power over death); calming the storm (Jesus is Lord over nature) — 1 mark each.',
+  tags: ['Sermon on the Plain', 'miracles', 'Galilean ministry', 'Jesus'], learningObjective: 'Describe Jesus\'s teachings and miracles in the Galilean ministry',
+},
+
+// SUB-STRAND: Paul's First Letter to the Corinthians
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FOUR causes of division in the church at Corinth as addressed by Paul. (4 marks)\n(b) State FOUR moral challenges facing youth today that Paul would address, and state Paul\'s teaching on each. (4 marks)',
+  answerGuide: '(a) Any 4: Following different leaders (Paul, Apollos, Peter, Christ); disagreements over food sacrificed to idols; spiritual gifts causing pride; sexual immorality tolerated; taking fellow believers to court; divisions at the Lord\'s Supper — 1 mark each. (b) Any 4 with teaching: sexual immorality — body is temple of Holy Spirit (1 Cor 6:19); peer pressure — bad company corrupts (1 Cor 15:33); drug use — flee and honor God; social media addiction — all things permissible but not beneficial — 1 mark each.',
+  tags: ['Corinthians', 'Paul', 'division', 'moral challenges'], learningObjective: 'Describe the challenges Paul addressed in Corinth and their relevance',
+},
+
+// ── GRADE 10 — CRE — STRAND 3: CHURCH IN ACTION ─────────────
+
+// SUB-STRAND: The Holy Spirit and Gifts of the Holy Spirit
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Describe the events of the Day of Pentecost (Acts 2:1-13). (5 marks)\n(b) State THREE lessons learnt from the Day of Pentecost. (3 marks)',
+  answerGuide: '(a) Believers were all together in one place; a sound like violent wind filled the house; tongues of fire rested on each of them; all were filled with the Holy Spirit; they spoke in other languages; devout Jews from many nations heard in their own language; some were amazed, others mocked saying they were drunk — 1 mark each for 5 points. (b) Any 3: God keeps His promises; Holy Spirit gives courage to witness; Spirit enables cross-cultural communication; repentance is needed to receive the Spirit; Pentecost marks the birth of the church; obedience leads to blessing — 1 mark each.',
+  tags: ['Pentecost', 'Holy Spirit', 'tongues', 'church'], learningObjective: 'Describe the Day of Pentecost and its significance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Name and classify the NINE gifts of the Holy Spirit as listed in 1 Corinthians 12:8-11 into THREE categories. (6 marks)\n(b) State TWO ways of discerning true gifts of the Holy Spirit. (2 marks)',
+  answerGuide: '(a) Gifts of knowledge: message of wisdom, message of knowledge, distinguishing spirits — 2 marks. Gifts of power: faith, gifts of healing, miraculous powers — 2 marks. Gifts of utterance: prophecy, speaking in tongues, interpretation of tongues — 2 marks. (b) Any 2: confesses Jesus as Lord (1 Cor 12:3); bears good fruit (Gal 5:22-23); edifies the church not self; operates in order; aligns with Scripture; gift of discernment — 1 mark each.',
+  tags: ['gifts of the Spirit', 'Holy Spirit', 'Corinthians'], learningObjective: 'Identify and classify the gifts of the Holy Spirit',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: 'State and explain SIX roles of the Holy Spirit as taught by Jesus (John 14-16, Acts 1:6-8).',
+  answerGuide: 'Any 6: Reveals truth about God (John 14:26) — 1 mark; Comforts and counsels as Paraclete — 1 mark; Empowers proclamation of gospel (Acts 1:8) — 1 mark; Teaches and reminds of Jesus Christ words (John 14:26) — 1 mark; Convicts of sin, righteousness and judgment (John 16:8-11) — 1 mark; Unites believers into one body — 1 mark; Glorifies Jesus (John 16:14) — 1 mark. Max 6.',
+  tags: ['Holy Spirit', 'roles', 'John', 'Acts'], learningObjective: 'Explain the roles of the Holy Spirit as taught by Jesus Christ',
+},
+
+// SUB-STRAND: The Holy Trinity
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define the Holy Trinity. (2 marks)\n(b) Describe the role of each person of the Trinity in the life of a Christian. (6 marks)',
+  answerGuide: '(a) One God in three distinct persons: Father, Son, and Holy Spirit — co-equal, co-eternal, and co-essential — 2 marks. (b) God the Father: Creator, Provider, plans salvation, gives daily bread and protection — 2 marks. God the Son (Jesus): Redeemer and Saviour, accomplished salvation through death and resurrection, intercedes for believers — 2 marks. God the Holy Spirit: Helper and Comforter, applies salvation, lives in believers, teaches, convicts, and empowers for holy living — 2 marks.',
+  tags: ['Trinity', 'Father', 'Son', 'Holy Spirit'], learningObjective: 'Describe the Holy Trinity and the role of each person',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Give THREE Bible references that reveal the Father, Son and Holy Spirit together. (3 marks)\n(b) Explain how the Christian belief in monotheism (one God) is consistent with the doctrine of the Trinity. (3 marks)',
+  answerGuide: '(a) Matthew 3:16-17 (baptism of Jesus — all three present); Matthew 28:19 (baptize in the name of Father, Son, Holy Spirit); 2 Corinthians 13:14 (grace, love, fellowship) — 1 mark each. (b) Christianity holds that there is only one God (Deuteronomy 6:4); the Trinity does not mean three gods but one God revealed in three persons; each person is distinct but shares the same divine essence — 1 mark each for 3 points.',
+  tags: ['Trinity', 'monotheism', 'Bible references'], learningObjective: 'Support the doctrine of the Trinity with Bible references',
+},
+
+// SUB-STRAND: Sacraments
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define a sacrament and name the TWO most common sacraments in Christianity. (3 marks)\n(b) Explain FIVE ways in which baptism is important to Christians. (5 marks)',
+  answerGuide: '(a) A sacred rite instituted by Christ, using physical elements to convey spiritual grace — 1 mark; Baptism and Holy Communion/Lord\'s Table — 2 marks. (b) Any 5: obedience to Christ\'s command; public declaration of faith; union with Christ\'s death and resurrection; death of the old self; beginning of new life; entry into the Christian community; invitation for the Holy Spirit\'s work; symbol of forgiveness of sins — 1 mark each.',
+  tags: ['sacraments', 'baptism', 'Holy Communion'], learningObjective: 'Define sacraments and explain the importance of baptism',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how the Lord\'s Table (Holy Communion) is celebrated in church today. (4 marks)\n(b) State TWO things the bread and wine symbolize in the Lord\'s Table. (2 marks)',
+  answerGuide: '(a) The congregation prays and reads Scripture; pastor gives thanks and breaks bread; bread is shared representing Jesus Christ body; cup (wine/juice) is shared representing His blood and the new covenant; believers partake in remembrance of Jesus; conducted with self-examination — 1 mark each for 4 points. (b) Bread = Jesus Christ body broken for us — 1 mark; Wine = Jesus Christ blood of the new covenant shed for forgiveness — 1 mark.',
+  tags: ['Holy Communion', 'Lord\'s Table', 'sacrament'], learningObjective: 'Describe the celebration and significance of Holy Communion',
+},
+
+// ── GRADE 10 — CRE — STRAND 4: CHRISTIAN LIVING TODAY ────────
+
+// SUB-STRAND: Christian Ethics
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define Christian ethics and state FOUR sources of Christian ethics. (5 marks)\n(b) State and explain THREE ethical values needed by youth today. (3 marks)',
+  answerGuide: '(a) Definition: the study of moral principles based on Christian teaching — 1 mark. Sources: the Bible; Holy Spirit\'s guidance; Church tradition; Christian community; conscience; reason; natural law — 1 mark each for any 4. (b) Any 3 with explanation: Courage (doing right despite fear); Honesty (no cheating/lying); Respect (honouring others); Chastity (sexual purity); Diligence (hard work); Obedience (following rules); Forgiveness; Humility — 1 mark each.',
+  tags: ['ethics', 'values', 'youth', 'Christian living'], learningObjective: 'Define Christian ethics and explain ethical values for youth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: 'State and explain SIX moral challenges facing youth in Kenya today and suggest a solution to EACH challenge.',
+  answerGuide: 'Any 6 from: Peer pressure — choose good friends; Drug and substance use — seek counselling/church support; Sexual immorality — abstain, set boundaries; Dishonesty — develop integrity; Social media addiction — limit screen time; Gambling — avoid betting; Mental health — seek help, pray. 1 mark for challenge + solution each = max 6.',
+  tags: ['moral challenges', 'youth', 'Kenya', 'solutions'], learningObjective: 'Identify moral challenges facing Kenyan youth and propose solutions',
+},
+
+// SUB-STRAND: Human Rights and GBV
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define gender-based violence (GBV) and state SIX types of GBV in Kenya. (4 marks)\n(b) State FOUR causes of gender-based violence in Kenya. (4 marks)',
+  answerGuide: '(a) Harmful acts directed at a person based on gender — 1 mark. Types (any 5 for 3 marks): physical; sexual; emotional/psychological; economic; harmful traditional practices (FGM, early marriage); online GBV — ½ mark each, max 3. (b) Any 4: traditional beliefs promoting male dominance; poverty and economic dependence; lack of education; alcohol and drug abuse; weak legal enforcement; harmful cultural practices; political instability; exposure to violence as a child; gender inequality — 1 mark each.',
+  tags: ['GBV', 'gender-based violence', 'types', 'causes'], learningObjective: 'Define GBV, identify types and causes in Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State FOUR effects of gender-based violence on individuals and families. (4 marks)\n(b) State FOUR support services available for GBV victims in Kenya and explain each. (4 marks)',
+  answerGuide: '(a) Any 4: physical injuries; STIs including HIV; mental health (depression, PTSD); stigma and shame; family breakdown; children traumatized; economic hardship; cycles of violence continue — 1 mark each. (b) Any 4: Trauma counselling (professional therapy); Psychosocial support (group support); Safe houses/shelters; Legal aid (free lawyers); Medical care at hospitals; GBV Hotline 1195; Faith-based counselling — 1 mark each.',
+  tags: ['GBV', 'effects', 'support services', 'Kenya'], learningObjective: 'Describe effects of GBV and support services in Kenya',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Genesis 1:26-28 teach about gender equality and GBV? (2 marks)\n(b) What does Galatians 3:28 teach about equality in Christ? (2 marks)\n(c) State TWO values needed to avoid gender-based violence. (2 marks)',
+  answerGuide: '(a) Both male and female are made in the image of God; both have equal dignity and worth; violence against another is an attack on God\'s image — 2 marks. (b) "There is neither Jew nor Gentile, neither slave nor free, nor is there male and female, for you are all one in Christ Jesus" — all are equal before God — 2 marks. (c) Any 2: Love; Respect; Equality; Integrity; Courage; Accountability; Compassion; Justice; Self-discipline — 1 mark each.',
+  tags: ['equality', 'GBV', 'Genesis', 'Galatians'], learningObjective: 'Apply biblical teachings on equality to the issue of GBV',
+},
+
+// SUB-STRAND: Human Sexuality
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define human sexuality and state what Genesis 1:27 teaches about it. (3 marks)\n(b) Distinguish between dating and courtship using FOUR differences. (4 marks)\n(c) State ONE Christian value that helps young people maintain sexual purity. (1 mark)',
+  answerGuide: '(a) Human sexuality is the God-given dimension of being male or female, including physical, emotional, and relational aspects — 1 mark; Genesis 1:27 teaches that God created humankind male and female in His image — 2 marks. (b) Dating is casual while courtship is serious; dating has no commitment while courtship intends marriage; dating is often physical while courtship sets guarded boundaries; dating is private while courtship involves family/church — 1 mark each. (c) Any 1: abstinence; self-discipline; chastity; respect; courage to say no — 1 mark.',
+  tags: ['human sexuality', 'dating', 'courtship', 'purity'], learningObjective: 'Explain human sexuality and distinguish between dating and courtship',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define irresponsible sexual behaviour and state FOUR types. (3 marks)\n(b) State and explain FOUR effects of irresponsible sexual behaviour. (4 marks)\n(c) State ONE way of avoiding irresponsible sexual behaviour. (1 mark)',
+  answerGuide: '(a) Sexual activity outside God\'s design — 1 mark. Types (any 4): incest; rape; prostitution; adultery; fornication; bestiality; pornography; sex with a minor — ½ mark each for any 4 = 2 marks. (b) Any 4: unplanned pregnancies; STIs including HIV/AIDS; emotional trauma (guilt, shame); abortion; school dropout; damaged reputation; broken trust; infertility — 1 mark each. (c) Any 1: abstain until marriage; avoid tempting situations; set physical boundaries; pray; avoid pornography; be accountable — 1 mark.',
+  tags: ['sexual behaviour', 'effects', 'values', 'purity'], learningObjective: 'Identify irresponsible sexual behaviour and its effects',
+},
+
+// SUB-STRAND: Marriage and Family
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain FOUR Christian teachings on marriage using Bible references. (8 marks)',
+  answerGuide: 'Any 4 from: One man, one woman (Genesis 2:24) — 2 marks; Marriage is for companionship (Genesis 2:18) — 2 marks; Marriage is for procreation (Genesis 1:28) — 2 marks; Marriage is permanent (Matthew 19:6) — 2 marks; Husbands love wives as Christ loved the church (Ephesians 5:25) — 2 marks; Wives respect husbands (Ephesians 5:33) — 2 marks. Award 1 mark for teaching + 1 mark for Bible reference each. Max 8 marks.',
+  tags: ['marriage', 'family', 'Bible', 'Christian teachings'], learningObjective: 'State Christian teachings on marriage and family',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR challenges facing marriage and family life in Kenya today. (4 marks)\n(b) State TWO roles of the church in preparing young people for marriage. (2 marks)',
+  answerGuide: '(a) Any 4: financial pressure; infidelity; communication breakdown; interference from in-laws; childlessness; substance abuse; domestic violence; work-life imbalance; social media distraction; parenting disagreements; divorce culture — 1 mark each. (b) Any 2: teaching biblical sexuality; offering premarital counselling; mentoring engaged couples; providing youth groups; supporting married couples through family ministries — 1 mark each.',
+  tags: ['marriage challenges', 'family', 'church', 'Kenya'], learningObjective: 'Identify challenges facing families and the church\'s role in supporting them',
+},
+
+// SUB-STRAND: Christian Response to Medicine and Technology
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) Define euthanasia and state THREE forms in which it can be carried out. (4 marks)\n(b) State FOUR Christian views on euthanasia. (4 marks)',
+  answerGuide: '(a) Euthanasia is the deliberate ending of a person\'s life to relieve suffering (mercy killing) — 1 mark. Forms: Active euthanasia (giving a lethal injection); Passive euthanasia (withdrawing life support); Assisted suicide (providing means to kill self) — 1 mark each. (b) Any 4: it is a form of murder (Exodus 20:13); life is sacred, only God can take it; deprives relatives of showing love; Jesus has power over sickness and death; suffering does not justify killing; God\'s timing should be respected; palliative care is the Christian alternative — 1 mark each.',
+  tags: ['euthanasia', 'right to life', 'Christian ethics'], learningObjective: 'Explain Christian views on euthanasia and the right to life',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR ways in which technology has contributed to the spread of the Gospel. (4 marks)\n(b) State TWO Christian teachings on cosmetic plastic surgery. (2 marks)',
+  answerGuide: '(a) Any 4: social media (Facebook, YouTube, TikTok); live broadcasting of church services; digital books and online Bible courses; Christian films and animations; printing press (Bibles, tracts); radio and TV ministries; church websites and apps — 1 mark each. (b) Any 2: God looks at the heart not appearance (1 Samuel 16:7); true beauty comes from inner character (1 Peter 3:3-4); body is temple of the Holy Spirit (1 Corinthians 6:19-20); we are fearfully and wonderfully made (Psalm 139:14); excessive focus on appearance is vanity — 1 mark each.',
+  tags: ['technology', 'gospel', 'cosmetic surgery', 'Christian views'], learningObjective: 'Evaluate technology\'s role in spreading the gospel and Christian views on cosmetic surgery',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain SIX lessons Christians learn from Daniel and King Solomon\'s aptitude and wisdom. (6 marks)',
+  answerGuide: 'Any 6: True wisdom comes from God — not human skill; Daniel gave credit to God not himself — humility; Solomon prayed for wisdom not wealth — seek God first; those faithful to God receive knowledge and discernment — faithfulness; godly wisdom enables just leadership; wisdom brings favour before rulers; wisdom leads to positions of influence; studying honours God; wisdom protects from deception; wise people plan for the future — 1 mark each.',
+  tags: ['Daniel', 'Solomon', 'wisdom', 'aptitude'], learningObjective: 'Apply lessons from Daniel and Solomon\'s wisdom to Christian life',
+},
+
+  // ── GRADE 10 — CRE (Additional Questions) ──────────────────────────────
+
+// ── STRAND 1: THE OLD TESTAMENT — Additional Questions ───────
+
+// The Holy Bible — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe NINE literary forms used in writing the Bible, giving the Bible book associated with each. (6 marks)',
+  answerGuide: 'Any 6 for max marks: Legislative texts (Leviticus); Wise sayings (Proverbs); Prophetic speeches (Isaiah); Prayers (Psalms); Love songs (Song of Solomon); Philosophical essays (Job); Religious epics (Exodus); Epistles (Romans); Gospels (Matthew) — 1 mark each for naming the form with the correct Bible book.',
+  tags: ['literary forms', 'Bible', 'genres'], learningObjective: 'Identify literary forms used in writing the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) Describe the inductive method of Bible study and state its THREE main steps. (4 marks)',
+  answerGuide: 'Inductive method: careful, systematic reading of Scripture — 1 mark. Three steps: Observation (what does it say? — noting who, what, when, where, why, how) — 1 mark; Interpretation (what does it mean? — original meaning to first audience) — 1 mark; Application (how do I respond? — acting on the truth) — 1 mark.',
+  tags: ['inductive method', 'Bible study', 'observation'], learningObjective: 'Describe the inductive method of Bible study',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 3,
+  questionText: 'State THREE difficulties Christians in Kenya face when reading the Bible.',
+  answerGuide: 'Any 3: Lack of time; Difficulty understanding; Boredom; Lack of discipline; Distractions (phones, TV); Discouragement from sin; No personal application seen; Negative church experiences; Spiritual attack — 1 mark each.',
+  tags: ['Bible reading', 'challenges', 'Kenya'], learningObjective: 'Identify challenges Christians face in reading the Bible',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) Define chastity as a virtue and give the relevant Bible reference. (2 marks)\n(b) State FOUR ways of applying chastity in daily life. (2 marks)',
+  answerGuide: '(a) Chastity: sexual purity; refraining from sex outside marriage — 1 mark; 1 Corinthians 6:18-20 — 1 mark. (b) Any 4: avoiding pornography; dressing modestly; fleeing sexual temptation; setting boundaries in dating; honouring marriage; memorizing scripture — ½ mark each, max 2 marks.',
+  tags: ['chastity', 'integrity', 'values'], learningObjective: 'Apply the virtue of chastity in daily life',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the biographical method of Bible study using the book of Jonah. (3 marks)\n(b) State THREE lessons a Christian can learn from the life of Jonah. (3 marks)',
+  answerGuide: '(a) The biographical method involves studying a person\'s life in Scripture — 1 mark; Jonah ran from God (disobedience) — 1 mark; prayed from the fish (repentance) and finally went to Nineveh (obedience) — 1 mark. (b) Any 3: God is patient and persistent; disobedience has consequences; repentance restores relationship with God; God\'s mercy extends to all nations; one person\'s obedience can save thousands; God can use suffering to correct us — 1 mark each.',
+  tags: ['Jonah', 'biographical method', 'obedience', 'repentance'], learningObjective: 'Apply the biographical method using the book of Jonah',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Holy Bible',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR ways in which the Bible is used in Kenya today.',
+  answerGuide: 'Any 4: In churches for worship and preaching; in schools for CRE lessons; in courts for swearing oaths; in homes for devotions; in hospitals for chaplaincy; in prisons for rehabilitation; on radio and TV broadcasts; on online platforms — 1 mark each.',
+  tags: ['Bible', 'Kenya', 'uses'], learningObjective: 'Identify ways the Bible is used in Kenya',
+},
+
+// The Exodus — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State FOUR attributes of God revealed through the ten plagues of Egypt. (4 marks)\n(b) State TWO purposes of the ten plagues. (2 marks)',
+  answerGuide: '(a) Any 4: God is all-powerful (omnipotent); God is just — punishes sin; God is merciful — warned before each plague; God is faithful — kept His promise to Moses; God is sovereign — controls nature; God protects His people; God is holy — cannot tolerate injustice — 1 mark each. (b) Any 2: to demonstrate God\'s power to Egypt and Israel; to judge Egypt for enslaving Israel; to compel Pharaoh to release Israel; to show the powerlessness of Egyptian gods; to build Israel\'s faith — 1 mark each.',
+  tags: ['plagues', 'attributes of God', 'Exodus'], learningObjective: 'Identify attributes of God revealed through the plagues',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Exodus',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the challenges the Israelites faced in the desert after leaving Egypt and how God cared for them. (6 marks)',
+  answerGuide: 'Any 6: Lack of water at Marah — God sweetened bitter water — 1 mark; hunger — God provided manna and quail — 1 mark; thirst at Rephidim — Moses struck rock and water came out — 1 mark; attack by Amalekites — God gave victory when Moses raised his hands — 1 mark; fear and discouragement — God\'s presence in pillar of cloud and fire — 1 mark; complaints and rebellion — God responded with patience and provision — 1 mark.',
+  tags: ['Exodus', 'desert', 'God\'s provision', 'challenges'], learningObjective: 'Describe challenges in the desert and how God cared for Israel',
+},
+
+// The Sinai Covenant — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how the Sinai Covenant was made (Exodus 19-24). (4 marks)\n(b) State TWO ways Christians today express their covenant with God. (2 marks)',
+  answerGuide: '(a) God called Moses to Mount Sinai; told Israel to consecrate themselves; God descended in fire, thunder and smoke; Moses presented the Ten Commandments and laws to the people; people agreed "We will do everything the Lord says"; Moses sprinkled blood on the people saying "This is the blood of the covenant" — 1 mark each for 4 points. (b) Any 2: baptism; Holy Communion; church membership commitment; daily prayer and Bible study; tithing; Christian marriage vows — 1 mark each.',
+  tags: ['Sinai Covenant', 'making the covenant', 'Moses'], learningObjective: 'Describe the making of the Sinai Covenant and its relevance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe worship in the wilderness as outlined in the Old Testament. (3 marks)\n(b) State THREE ways in which Christians worship God today. (3 marks)',
+  answerGuide: '(a) God commanded Israel to build the Tabernacle as His dwelling place; priests offered daily sacrifices; the Ark of the Covenant was placed in the Most Holy Place; the Sabbath was observed as a day of rest and worship; festivals like Passover and Pentecost were celebrated — 1 mark each for 3 points. (b) Any 3: singing hymns and praise; reading the Bible; prayer; Holy Communion; giving offerings; baptism; fellowship with other believers; preaching and listening to sermons — 1 mark each.',
+  tags: ['worship', 'wilderness', 'Tabernacle', 'Christian worship'], learningObjective: 'Describe worship in the wilderness and how Christians worship today',
+},
+
+// Loyalty to God (Elijah) — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Elijah\'s flight to Mount Horeb and what happened there (1 Kings 19). (4 marks)\n(b) State TWO lessons Christians learn from Elijah\'s experience at Horeb. (2 marks)',
+  answerGuide: '(a) After defeating Baal prophets, Elijah feared Jezebel and fled to the desert; an angel fed him twice for the journey; he travelled 40 days to Horeb; hid in a cave; God asked "What are you doing here Elijah?"; Elijah complained he was the only one left; God appeared not in wind, earthquake or fire but in a still small voice; God gave Elijah new instructions and told him 7,000 had not bowed to Baal — 1 mark each for 4 points. (b) Any 2: God meets us in our exhaustion; God speaks in a still small voice; we are never alone in serving God; God provides rest and food before giving new assignments; self-pity is overcome by God\'s perspective — 1 mark each.',
+  tags: ['Elijah', 'Horeb', 'still small voice', 'burnout'], learningObjective: 'Describe Elijah\'s experience at Horeb and lessons for Christians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Loyalty to God (Elijah)',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR forms of idol worship and religious extremism that exist in Kenya today.',
+  answerGuide: 'Any 4: Worshipping traditional spirits/ancestors; seeking help from witchdoctors; putting money/career/family above God; joining cults; believing in charms and amulets; worshipping celebrities or political leaders; superstition; occult practices — 1 mark each.',
+  tags: ['idol worship', 'Kenya', 'religious extremism', 'Elijah'], learningObjective: 'Identify forms of idol worship in contemporary Kenya',
+},
+
+// Old Testament Prophets and Prophet Amos — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Distinguish between TRUE and FALSE prophets using FOUR characteristics each. (4 marks)\n(b) State TWO ways of identifying a false prophet in Kenya today. (2 marks)',
+  answerGuide: '(a) True prophets: speaks in God\'s name; prophecy is fulfilled; leads people to God; willing to suffer for the truth — 1 mark each. False prophets: speaks what people want to hear; prophecy fails; leads people away from God; motivated by money — 1 mark each. (b) Any 2: their predictions fail; they demand money before praying; they lead people away from the Bible; they perform miracles but promote sin; they use fear and manipulation — 1 mark each.',
+  tags: ['true-prophets', 'false-prophets', 'Amos', 'Kenya'], learningObjective: 'Distinguish between true and false prophets',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Amos 5:21-24 teach about God\'s rejection of insincere worship? (3 marks)\n(b) What does this passage teach Christians in Kenya about worship and social responsibility? (3 marks)',
+  answerGuide: '(a) God says "I hate, I despise your religious festivals; I cannot stand your assemblies" — 1 mark; God rejects their burnt offerings, grain offerings, and fellowship offerings — 1 mark; God wants justice to roll like a river and righteousness like a never-failing stream — 1 mark. (b) Any 3: worship that is not accompanied by justice is worthless; Christians cannot separate Sunday worship from Monday ethics; churches should champion justice for the poor; corruption cannot coexist with true worship; caring for the needy is part of worship — 1 mark each.',
+  tags: ['Amos', 'worship', 'justice', 'hypocrisy'], learningObjective: 'Apply Amos\'s teaching on genuine worship to Kenyan Christians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain FOUR characteristics of cults and ungodly groups in Kenya today. (4 marks)\n(b) State TWO ways of avoiding joining a cult. (2 marks)',
+  answerGuide: '(a) Any 4: distort Scripture; use fear and guilt to control members; discourage association with family; demand absolute loyalty to a leader; claim exclusive revelation; demand money or property; deny core Christian doctrines (Trinity, deity of Christ) — 1 mark each. (b) Any 2: know Scripture well; pray for discernment; check group\'s beliefs against the Bible; avoid groups that isolate members; stay accountable to a local church; be wary of pressure tactics; ask questions before committing — 1 mark each.',
+  tags: ['cults', 'false religion', 'Kenya', 'Amos'], learningObjective: 'Identify characteristics of cults and how to avoid them',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'short_answer', difficulty: 'medium', marks: 4,
+  questionText: 'State and explain FOUR of God\'s promises of restoration to Israel as found in Amos 9:8-15.',
+  answerGuide: 'Any 4: Rebuild the fallen tabernacle of David — restore true worship; Restore fortunes — return from exile; Bless the land with abundant harvest — reaper overtakes ploughman; Plant them securely in their land — never to be uprooted again — 1 mark each.',
+  tags: ['Amos', 'restoration', 'remnant', 'promises'], learningObjective: 'Describe God\'s promises of restoration from Amos',
+},
+
+// ── STRAND 2: THE NEW TESTAMENT — Additional Questions ────────
+
+// Messianic Prophecies — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Isaiah\'s prophecy about the Suffering Servant (Isaiah 53). State SIX characteristics. (6 marks)',
+  answerGuide: 'Any 6: Despised and rejected by men — 1 mark; Man of sorrows, acquainted with grief — 1 mark; He bore our infirmities — 1 mark; Pierced for our transgressions, crushed for our iniquities — 1 mark; By His wounds we are healed — 1 mark; Led like a lamb to the slaughter — 1 mark; Cut off from the land of the living — 1 mark; Buried with the rich in His death — 1 mark; He bore the sin of many — 1 mark. Max 6.',
+  tags: ['Isaiah 53', 'Suffering Servant', 'Messianic prophecy'], learningObjective: 'Describe Isaiah\'s prophecy of the Suffering Servant',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the annunciation of Jesus Christ birth to Mary (Luke 1:26-38). (4 marks)\n(b) State TWO ways the birth of Jesus fulfilled Old Testament prophecy. (2 marks)',
+  answerGuide: '(a) Angel Gabriel was sent to Nazareth to a virgin named Mary, pledged to be married to Joseph; greeted her "Highly favoured"; told her she would conceive and give birth to a Son named Jesus; He would be called Son of the Most High; His kingdom would never end; Mary asked "How can this be since I am a virgin?"; Gabriel said Holy Spirit would come upon her; nothing is impossible with God; Mary said "I am the Lord\'s servant" — 1 mark each for 4 points. (b) Any 2: born of a virgin as Isaiah 7:14 predicted; born in Bethlehem as Micah 5:2 predicted; called Son of God as 2 Samuel 7:14 foretold; born of the line of David — 1 mark each.',
+  tags: ['annunciation', 'Mary', 'Gabriel', 'Jesus'], learningObjective: 'Describe the annunciation of Jesus Christ birth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: '(a) State the role of John the Baptist in preparing the way for Jesus. (4 marks)',
+  answerGuide: 'Any 4: Called people to repentance; baptized in the Jordan for forgiveness of sins; proclaimed the coming of the Messiah; fulfilled Isaiah\'s prophecy (a voice crying in the wilderness); told people Jesus was greater than himself; pointed to Jesus as the Lamb of God; lived a simple life as a model of dedication — 1 mark each.',
+  tags: ['John the Baptist', 'repentance', 'baptism', 'prophecy'], learningObjective: 'Describe the role of John the Baptist',
+},
+
+// Galilean Ministry — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the miraculous catch of fish (Luke 5:1-11). (3 marks)\n(b) State THREE lessons Christians learn from this miracle. (3 marks)',
+  answerGuide: '(a) Jesus was teaching by Lake Gennesaret; got into Simon\'s boat; asked him to push out; after teaching, told Simon to let down nets in deep water; Simon said they had worked all night and caught nothing but obeyed; they caught so many fish the nets began to break; both boats filled and began to sink; Simon fell at Jesus Christ feet saying "Go away, I am a sinful man"; Jesus said "Don\'t be afraid, from now on you will catch men" — 1 mark each for 3 points. (b) Any 3: obedience to Jesus leads to blessing; Jesus is Lord even over nature; humility and acknowledgment of sin leads to a call; Jesus calls ordinary people; discipleship means leaving everything; success in ministry comes from Jesus Christ power not our ability — 1 mark each.',
+  tags: ['miraculous catch', 'Simon Peter', 'discipleship', 'Luke 5'], learningObjective: 'Describe the miraculous catch and lessons for discipleship',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State THREE parables Jesus told during His Galilean ministry and the main lesson of each. (6 marks)',
+  answerGuide: 'Any 3 parables at 2 marks each: Parable of the Sower (Luke 8) — responses to God\'s word depend on the condition of the heart; Parable of the Good Samaritan (Luke 10) — love your neighbour regardless of background; Parable of the Prodigal Son (Luke 15) — God welcomes repentant sinners; Parable of the Lost Sheep — God seeks one lost person; Parable of the Lost Coin — God rejoices over one repentant sinner; Parable of the Wise and Foolish Builders — obey Jesus Christ words for a stable life. 1 mark for naming, 1 mark for lesson.',
+  tags: ['parables', 'Galilean ministry', 'Jesus teachings'], learningObjective: 'Describe parables told during the Galilean ministry',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: 'Galilean Ministry',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the Transfiguration of Jesus (Luke 9:28-36). (4 marks)\n(b) State TWO lessons Christians learn from the Transfiguration. (2 marks)',
+  answerGuide: '(a) Jesus took Peter, James, and John up a mountain to pray; His appearance changed — face shone, clothes became dazzling white; Moses and Elijah appeared and talked with Jesus about His departure (death) in Jerusalem; Peter offered to make three shelters; a cloud enveloped them; voice from the cloud said "This is my Son whom I have chosen; listen to Him"; when voice had spoken, they saw only Jesus — 1 mark each for 4 points. (b) Any 2: Jesus is the fulfilment of the Law (Moses) and Prophets (Elijah); Jesus is the Son of God confirmed by the Father; believers must listen to Jesus above all; Jesus Christ glory was revealed before His suffering; prayer leads to spiritual revelation — 1 mark each.',
+  tags: ['Transfiguration', 'Jesus Christ', 'Peter', 'Moses', 'Elijah'], learningObjective: 'Describe the Transfiguration and its significance',
+},
+
+// Paul's First Letter to the Corinthians — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What did Paul teach about the body as a temple of the Holy Spirit (1 Corinthians 6:19-20)? (3 marks)\n(b) How should Kenyan youth apply this teaching in their daily lives? (3 marks)',
+  answerGuide: '(a) "Do you not know that your bodies are temples of the Holy Spirit who is in you?" — 1 mark; "You are not your own; you were bought at a price" (Jesus Christ blood) — 1 mark; "Therefore honour God with your bodies" — 1 mark. (b) Any 3: avoid drug and substance abuse; dress modestly; abstain from premarital sex; avoid tattoos that dishonour God; exercise and eat well; avoid pornography; reject peer pressure to sin — 1 mark each.',
+  tags: ['body as temple', 'Holy Spirit', 'Paul', 'Corinthians'], learningObjective: 'Apply Paul\'s teaching on the body as a temple',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe how Paul addressed sexual immorality in the church at Corinth (1 Corinthians 5-6). (4 marks)\n(b) State TWO ways the church in Kenya should address immorality today. (2 marks)',
+  answerGuide: '(a) Paul condemned a man sleeping with his father\'s wife — 1 mark; told the church to expel the immoral person — 1 mark; warned that a little yeast (sin) leavens the whole batch — 1 mark; declared that the sexually immoral will not inherit the kingdom of God (1 Cor 6:9) — 1 mark. (b) Any 2: preach consistently on sexual purity; provide counselling for those struggling; discipline members in love; teach that the body is a temple; mentor youth on godly relationships — 1 mark each.',
+  tags: ['immorality', 'Corinth', 'Paul', 'church discipline'], learningObjective: 'Describe how Paul addressed immorality and apply it to Kenyan church',
+},
+
+// ── STRAND 3: CHURCH IN ACTION — Additional Questions ─────────
+
+// Holy Spirit — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe Peter\'s message on the Day of Pentecost (Acts 2:14-41). (4 marks)\n(b) State TWO results of Peter\'s message that day. (2 marks)',
+  answerGuide: '(a) Peter stood and addressed the crowd; denied they were drunk (only 9am); quoted Joel\'s prophecy about the Spirit being poured on all people — 1 mark; declared Jesus of Nazareth was accredited by God through miracles — 1 mark; stated Jesus was crucified but God raised Him from the dead — 1 mark; declared God has made Jesus both Lord and Messiah — 1 mark. (b) Any 2: the crowd was cut to the heart; they asked "What shall we do?"; about 3,000 were baptized; the church began to grow rapidly; the disciples were accepted as genuine witnesses — 1 mark each.',
+  tags: ['Peter', 'Pentecost', 'sermon', 'Acts 2'], learningObjective: 'Describe Peter\'s Pentecost sermon and its results',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR ways in which the gifts of the Holy Spirit promote unity in the church today.',
+  answerGuide: 'Any 4: Each gift serves others so no member is unnecessary; different gifts complement each other; gifts are given for the common good not personal benefit; those with gifts of wisdom resolve conflicts; gifts of healing and mercy show love; prophecy and teaching build shared understanding; no single gift is superior so pride is avoided — 1 mark each.',
+  tags: ['gifts of the Spirit', 'unity', 'church'], learningObjective: 'Explain how spiritual gifts promote unity in the church',
+},
+
+// Holy Trinity — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Trinity',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Explain how Matthew 3:16-17 (the baptism of Jesus) reveals the Holy Trinity. (3 marks)\n(b) Explain how Matthew 28:19 (the Great Commission) supports the doctrine of the Trinity. (3 marks)',
+  answerGuide: '(a) Jesus was baptized — the Son present in bodily form — 1 mark; the Holy Spirit descended like a dove — the Spirit present visibly — 1 mark; a voice from heaven said "You are my Son" — the Father speaking from heaven — 1 mark. (b) Jesus commanded baptism "in the name (singular) of the Father, Son and Holy Spirit" — 1 mark; the use of one "name" for three shows they share one divine essence — 1 mark; all three persons are equally honoured in the Christian initiation rite — 1 mark.',
+  tags: ['Trinity', 'baptism', 'Matthew', 'Great Commission'], learningObjective: 'Identify biblical evidence for the Holy Trinity',
+},
+
+// Sacraments — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Romans 6:3-4 teach about baptism and its connection to Jesus Christ death and resurrection? (3 marks)\n(b) State THREE ways in which baptism differs across different Christian denominations in Kenya. (3 marks)',
+  answerGuide: '(a) "We were baptized into Christ\'s death" — believers are united with Christ\'s death through baptism — 1 mark; "buried with Him through baptism into death" — the act of going under water symbolizes burial — 1 mark; "just as Christ was raised, we too may live a new life" — coming out of water symbolizes resurrection to new life — 1 mark. (b) Any 3: mode (immersion vs. sprinkling vs. pouring); age (infant vs. believer\'s baptism); formula (Trinitarian name vs. Jesus Christ name only); setting (river, pool, or font); necessity for salvation (some see it as essential, others as symbolic) — 1 mark each.',
+  tags: ['baptism', 'Romans 6', 'denominations', 'Kenya'], learningObjective: 'Explain the meaning of baptism from Romans 6',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'Sacraments',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State SIX ways in which the Lord\'s Table (Holy Communion) is significant to a Christian. (6 marks)',
+  answerGuide: 'Any 6: Reminds of Jesus Christ death and resurrection; unites believers as they wait for the second coming; opportunity to seek forgiveness; renews faith; strengthens fellowship; proclaims the Lord\'s death until He comes; deepens gratitude for salvation; fulfils Jesus Christ command "Do this in remembrance of me"; provides spiritual nourishment; celebrates the new covenant — 1 mark each.',
+  tags: ['Holy Communion', 'Lord\'s Table', 'significance'], learningObjective: 'Explain the significance of the Lord\'s Table to Christians',
+},
+
+// ── STRAND 4: CHRISTIAN LIVING TODAY — Additional Questions ───
+
+// Christian Ethics — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe THREE ethical issues facing Kenyan youth in the area of cyber security. (3 marks)\n(b) State THREE Christian guidelines for responsible use of the internet and social media. (3 marks)',
+  answerGuide: '(a) Any 3: cyberbullying — using social media to harass or intimidate others; sexting — sending nude images; online fraud/scamming; pornography access and addiction; identity theft; spreading fake news (misinformation); online gambling — 1 mark each. (b) Any 3: use social media to glorify God not shame others; avoid accessing pornographic sites (body is a temple); be truthful online (no fake news or gossip); do not bully or harass others; practice the golden rule online; respect privacy; limit screen time — 1 mark each.',
+  tags: ['cyber security', 'social media', 'ethics', 'youth'], learningObjective: 'Apply Christian ethics to cyber security and social media use',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'short_answer', difficulty: 'easy', marks: 4,
+  questionText: 'State and explain FOUR road safety ethics that Kenyan Christians should practice.',
+  answerGuide: 'Any 4: Obey traffic rules (Romans 13:1-2 — submit to governing authorities); do not drink and drive (do not be drunk with wine — Ephesians 5:18); use seatbelts (value life — body is temple); do not use mobile phone while driving; be patient and avoid road rage; respect pedestrians; do not overload vehicles — 1 mark each.',
+  tags: ['road ethics', 'safety', 'Kenya', 'Christian living'], learningObjective: 'Apply Christian ethics to road safety in Kenya',
+},
+
+// Human Rights and GBV — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does the Bible teach about human rights using Genesis 1:26-27 and Galatians 3:28? (4 marks)\n(b) State TWO ways Christians can help victims of gender-based violence in their communities. (2 marks)',
+  answerGuide: '(a) Genesis 1:26-27: all humans are made in God\'s image (Imago Dei) — 1 mark; therefore every person has inherent dignity and worth — 1 mark; violence against a person is an attack on God\'s image — 1 mark; Galatians 3:28: all are equal in Christ — no discrimination based on gender, ethnicity, or social status — 1 mark. (b) Any 2: provide shelter and safety; report abuse to authorities; offer prayer and counselling; accompany victims to seek legal aid; support financially; offer emotional support — 1 mark each.',
+  tags: ['human rights', 'Imago Dei', 'GBV', 'Christian response'], learningObjective: 'Apply biblical teachings on human rights to address GBV',
+},
+
+// Human Sexuality — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State and explain FOUR Christian teachings on male-female relationships using Bible references. (4 marks)\n(b) State TWO values that help young people maintain healthy relationships. (2 marks)',
+  answerGuide: '(a) Any 4: Both created in God\'s image (Genesis 1:27) — treat each other with dignity — 1 mark; marriage is between one man and one woman (Genesis 2:24) — 1 mark; homosexual acts are forbidden (Leviticus 18:22; Romans 1:26-27) — 1 mark; the sexually immoral will not inherit the kingdom of God (1 Corinthians 6:9) — 1 mark; Sodom and Gomorrah punished for sexual immorality (Jude 1:7) — 1 mark. (b) Any 2: respect — honour one another\'s boundaries; love — seek each other\'s good; honesty — be truthful about intentions; self-discipline — control desires; accountability — involve trusted adults — 1 mark each.',
+  tags: ['sexuality', 'relationships', 'Bible', 'values'], learningObjective: 'State Christian teachings on male-female relationships',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Define celibacy and explain TWO Bible references that present it as an alternative to marriage. (4 marks)\n(b) State TWO reasons some Christians choose celibacy. (2 marks)',
+  answerGuide: '(a) Celibacy: remaining unmarried and sexually abstinent — 1 mark; Matthew 19:10-12: some are eunuchs for the kingdom of heaven; not everyone can accept this but those who can should — 1 mark plus explanation — 1 mark; 1 Corinthians 7:7-9: Paul presents celibacy as a gift, wishes all were celibate but says if they cannot control themselves they should marry — 1 mark. (b) Any 2: to devote themselves fully to God\'s service; as a calling from God; to avoid distractions of marriage; as a missionary calling; to live as a sign of the kingdom of heaven — 1 mark each.',
+  tags: ['celibacy', 'marriage', 'Paul', 'Matthew'], learningObjective: 'Explain celibacy as a Christian alternative to marriage',
+},
+
+// Marriage and Family — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 8,
+  questionText: '(a) State and explain SIX values that contribute to a stable Christian family. (6 marks)\n(b) State TWO Christian solutions to families facing financial pressure. (2 marks)',
+  answerGuide: '(a) Any 6: Love (selfless care for each member); Respect (valuing each person\'s dignity); Trust (relying on each other\'s word); Responsibility (each person doing their part); Communication (honest and open sharing); Commitment (staying together through hardship); Patience (not rushing or losing temper); Forgiveness (releasing offenses); Teamwork (working together for shared goals) — 1 mark each. (b) Any 2: budget together and plan finances; tithe and trust God\'s provision; seek financial counselling; avoid debt; both partners work together; pray about finances; cut unnecessary expenses — 1 mark each.',
+  tags: ['family values', 'stability', 'marriage', 'finances'], learningObjective: 'Identify values that contribute to stable Christian families',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Ephesians 5:25 teach about the husband\'s role in marriage? (2 marks)\n(b) What does Colossians 3:18-21 teach about harmonious family relationships? (4 marks)',
+  answerGuide: '(a) "Husbands, love your wives, just as Christ loved the church and gave himself up for her" — 1 mark; husbands must love sacrificially, putting wives\' interests first as Christ did for the church — 1 mark. (b) Wives submit to husbands as is fitting in the Lord — 1 mark; husbands love wives and do not be harsh with them — 1 mark; children obey parents in everything for this pleases the Lord — 1 mark; fathers do not embitter/provoke children or they will become discouraged — 1 mark.',
+  tags: ['Ephesians 5', 'Colossians 3', 'marriage', 'family roles'], learningObjective: 'Apply Paul\'s teachings on family roles from Ephesians and Colossians',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+  questionType: 'structured', difficulty: 'easy', marks: 4,
+  questionText: 'State FOUR roles of the church in supporting married couples in Kenya today.',
+  answerGuide: 'Any 4: Offering premarital counselling; providing marriage enrichment seminars; counselling during marital crises; organizing couples\' fellowships; teaching biblical principles of marriage; supporting families in financial difficulty; hosting family retreats; mentoring young married couples — 1 mark each.',
+  tags: ['church', 'marriage support', 'Kenya'], learningObjective: 'Describe the church\'s role in supporting married couples',
+},
+
+// Christian Response to Medicine and Technology — Additional
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) State SIX reasons why Christians say the right to life must be defended according to God\'s Word. (6 marks)',
+  answerGuide: 'Any 6: God commands "Do not murder" (Exodus 20:13); life is made in God\'s image (Genesis 1:26-27); God is the giver of life (Acts 17:25); only God has authority over death (Deuteronomy 32:39); Jesus values every person (Matthew 10:31); we are stewards not owners of our bodies; human life has inherent dignity; abortion violates the right to life of the unborn — 1 mark each.',
+  tags: ['right to life', 'euthanasia', 'Bible', 'ethics'], learningObjective: 'Defend the right to life using biblical arguments',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) Describe the creative skills mentioned in Exodus 31:1-6 and Exodus 35:30-35. (4 marks)\n(b) State TWO lessons Christians learn about creative skills from these passages. (2 marks)',
+  answerGuide: '(a) Exodus 31:1-6: Bezalel was filled with the Spirit of God with wisdom, understanding, knowledge, and all kinds of skills — 1 mark; skilled to make artistic designs in gold, silver, and bronze; cut and set stones; carve wood — 1 mark; Exodus 35:30-35: skills of engraving, designing and embroidering with blue, purple, and scarlet yarn — 1 mark; also skilled to teach others — 1 mark. (b) Any 2: creative skills are gifts from God; the Holy Spirit can fill people with artistic skill; skill must be used for God\'s glory; God values excellence and craftsmanship; skills should be shared and taught to others — 1 mark each.',
+  tags: ['creative skills', 'Bezalel', 'Exodus', 'gifts'], learningObjective: 'Identify creative skills in the Bible and their significance',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+  questionType: 'structured', difficulty: 'medium', marks: 6,
+  questionText: '(a) What does Psalm 139:14 teach Christians about God\'s creation of the human body? (2 marks)\n(b) Using 1 Samuel 16:7 and 1 Peter 3:3-4, explain what TRUE beauty means for a Christian. (4 marks)',
+  answerGuide: '(a) "I praise you because I am fearfully and wonderfully made" — 1 mark; God made every human body perfectly; cosmetic surgery driven by dissatisfaction denies this truth — 1 mark. (b) 1 Samuel 16:7: "The Lord looks at the heart" not outward appearance — 1 mark; God\'s standard of beauty is internal character and integrity — 1 mark; 1 Peter 3:3-4: true beauty should not come from outward adornment (braided hair, gold jewellery, fine clothes) — 1 mark; but from the unfading beauty of a gentle and quiet spirit which is of great worth to God — 1 mark.',
+  tags: ['beauty', 'cosmetic surgery', 'Psalm 139', 'inner character'], learningObjective: 'Apply biblical teaching on true beauty to the issue of cosmetic surgery',
+},
+
+// Mixed/Comprehensive Questions covering multiple strands
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Describe the second coming of Christ as taught in the New Testament. State FIVE signs of the second coming, FOUR ways Christians should prepare, and explain why the second coming gives hope to suffering Christians. (10 marks)',
+  answerGuide: 'Signs (any 5, ½ mark each = 2.5 marks): signs in sun/moon/stars; nations in anguish; roaring seas; people fainting with fear; wars and rumours of wars; gospel preached to all nations; great tribulation; false prophets; love of many growing cold. Preparation (any 4, 1 mark each = 4 marks): repent of sin; live holy lives; share the gospel; stay watchful in prayer; study Scripture; love one another; be faithful stewards; do not love the world. Hope (3.5 marks): Jesus promised to return for His people; suffering is temporary; final judgment will vindicate the righteous; reunion with loved ones who died in Christ; eternity with God in the new creation. Award marks for quality of reasoning.',
+  tags: ['second coming', 'Christ', 'signs', 'hope', 'preparation'], learningObjective: 'Explain the second coming and how Christians should prepare',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+  questionType: 'long_answer', difficulty: 'hard', marks: 10,
+  questionText: 'Imagine you are a CRE teacher giving a talk to Form 1 students on living a Christian life in the modern world. Using what you have learned in Grade 10 CRE, write a speech addressing: (a) ONE challenge facing youth today, (b) TWO relevant Bible teachings, (c) FOUR practical ways of overcoming the challenge, and (d) TWO values the youth need.',
+  answerGuide: '(a) Any valid challenge (peer pressure, sexual immorality, drugs, cyberbullying, etc.) — 1 mark. (b) Two relevant Bible verses correctly applied — 2 marks. (c) Four practical, realistic solutions — 4 marks. (d) Two clearly explained values — 2 marks. Award 1 mark for quality of speech structure/introduction/conclusion. Max 10 marks.',
+  tags: ['applied CRE', 'youth', 'Christian living', 'speech'], learningObjective: 'Apply CRE knowledge to address challenges facing Kenyan youth',
+},
+{
+  grade: 'Grade 10', subject: 'CRE',
+  strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+  questionType: 'structured', difficulty: 'hard', marks: 9,
+  questionText: '(a) State and explain how the following THREE gifts of the Holy Spirit are manifested in the church today: prophecy, healing, and wisdom. (6 marks)\n(b) Explain how 1 Corinthians 12:4-7 teaches that all gifts are given for the common good. (3 marks)',
+  answerGuide: '(a) Prophecy (2 marks): manifests through preaching God\'s word; speaking encouragement, warning, or direction to the church. Healing (2 marks): prayer for the sick with recovery; healing services; medical missions by Christians. Wisdom (2 marks): godly counsel for church leadership decisions; conflict resolution with divine insight; strategic vision for ministry. (b) "There are different kinds of gifts but the same Spirit" — diversity of gifts — 1 mark; "To each one the manifestation of the Spirit is given for the common good" — no gift is for self-benefit — 1 mark; unity in diversity because all gifts come from the same Spirit who distributes as He wills — 1 mark.',
+  tags: ['spiritual gifts', 'prophecy', 'healing', 'wisdom', '1 Corinthians 12'], learningObjective: 'Describe manifestations of spiritual gifts and their purpose',
+},
+
+
+  // ── GRADE 10 — ENGLISH ─────────────────────────────────────────────────
+  // Source: KLB Topical Revision Booklet, QS Exam, Opener Term 2 2026 (100 questions)
+
+  // ══════════════════════════════════════════════════════════════════
+  // GRAMMAR IN USE — NOUNS, PRONOUNS, DETERMINERS
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Nouns — Count and Non-count',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Classify the underlined nouns in the sentences below, stating the type of noun and giving a reason:\n(a) The committee met on Friday to discuss the new policy.\n(b) Nairobi is the capital of Kenya.\n(c) I need some advice about the situation.\n(d) The flock of birds flew over the valley.\n(e) Her happiness was evident to everyone in the room.',
+    answerGuide: '(a) committee — collective noun (group of people acting as one unit). (b) Nairobi — proper noun (specific name of a place). (c) advice — non-count/mass noun (cannot be pluralised). (d) flock — collective noun (group of birds). (e) happiness — abstract noun (names a feeling/quality). Award 1 mark each for correct type + reason.',
+    tags: ['nouns', 'classification', 'collective', 'abstract', 'proper'],
+    learningObjective: 'Classify different types of nouns and explain their use in sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Nouns — Common and Proper',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Fill in the blanks with the most appropriate word from the options provided:\n(i) ______________ students who study consistently tend to perform well in examinations. (Each / The / A)\n(ii) The award was given to ______________ — the team that had worked hardest all year. (them / they / their)\n(iii) Is there ______________ milk left in the container on the kitchen shelf? (some / any / many)',
+    answerGuide: '(i) The — 1 mark. (ii) them — 1 mark. (iii) any — 1 mark. Accept "some" for (iii) if learner justifies it as an affirmative context.',
+    tags: ['determiners', 'articles', 'quantifiers', 'fill-gap'],
+    learningObjective: 'Use articles, determiners and quantifiers correctly in sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Pronouns — Personal, Reflexive, Emphatic, Reciprocal',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Identify and name the pronoun type in each of the following sentences:\n(a) The students helped each other during the revision.\n(b) I myself witnessed the accident at the roundabout.\n(c) Who left the door open?\n(d) The book that I borrowed is extremely interesting.\n(e) Those are the items we ordered online.',
+    answerGuide: '(a) each other — reciprocal pronoun. (b) myself — emphatic pronoun (emphasises "I"). (c) Who — interrogative pronoun. (d) that — relative pronoun. (e) Those — demonstrative pronoun. Award 1 mark each for correct identification.',
+    tags: ['pronouns', 'reciprocal', 'emphatic', 'interrogative', 'relative', 'demonstrative'],
+    learningObjective: 'Identify and classify different types of pronouns in context',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Pronouns — Personal, Reflexive, Emphatic, Reciprocal',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Explain the difference between a reflexive pronoun and an emphatic pronoun. Write ONE original example sentence for each to illustrate the difference.',
+    answerGuide: 'Reflexive pronoun: used when the subject and object are the same person — the pronoun refers back to the subject e.g. "She hurt herself when she fell." Emphatic pronoun: used to emphasise the subject — it can be removed without changing the meaning e.g. "I myself cooked the entire meal." Award 2 marks for each correct explanation + example.',
+    tags: ['pronouns', 'reflexive', 'emphatic', 'distinction'],
+    learningObjective: 'Distinguish between reflexive and emphatic pronouns with correct usage',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Determiners',
+    questionType: 'structured', difficulty: 'medium', marks: 3,
+    questionText: 'Distinguish between a determiner and a pronoun. Using the word "this" as an example, write TWO sentences — one showing "this" as a determiner and one showing "this" as a pronoun. Explain the difference.',
+    answerGuide: 'A determiner precedes a noun to modify it e.g. "This book is interesting" — "this" modifies "book". A pronoun replaces a noun e.g. "This is interesting" — "this" replaces a previously mentioned noun/idea. Award 1 mark for definition of determiner, 1 mark for definition of pronoun, 1 mark for correct example sentences.',
+    tags: ['determiners', 'pronouns', 'distinction', 'word-class'],
+    learningObjective: 'Distinguish between determiners and pronouns and use each correctly',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Pronouns — Personal, Reflexive, Emphatic, Reciprocal',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'Fill in the blanks with the correct pronoun from the options in brackets:\n(i) It was _________ (him/he) and not _________ (she/her) who broke into the teacher\'s locker.\n(ii) Madam Janet gave my sister and _________ (I/me) a lift to school.\n(iii) Charles and __________ (I/me) have not been here.\n(iv) Evans handed the book to __________ (her/she).\n(v) Wachiuri likes studying more than _________ (he/him).',
+    answerGuide: '(i) him / her. (ii) me. (iii) I. (iv) her. (v) him. Award 1 mark each. Note: (v) "him" because it means "more than he/him does" — object pronoun after implied verb.',
+    tags: ['pronouns', 'personal', 'case', 'subject', 'object', 'fill-gap'],
+    learningObjective: 'Use subject and object personal pronouns correctly in sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Pronouns — Personal, Reflexive, Emphatic, Reciprocal',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Underline the words "which" and "whose" ONLY where they are used as INTERROGATIVE pronouns:\n(i) Which have they chosen?\n(ii) That is the school which I attended years ago.\n(iii) The girl whose painting won a prize is my sister.\n(iv) Whose do you admire most?',
+    answerGuide: '(i) "Which" — interrogative (correct, underline). (ii) "which" — relative pronoun (do NOT underline). (iii) "whose" — relative pronoun (do NOT underline). (iv) "Whose" — interrogative (correct, underline). Award 1 mark for correctly identifying (i) and (iv), 1 mark for NOT underlining (ii) and (iii).',
+    tags: ['pronouns', 'interrogative', 'relative', 'which', 'whose'],
+    learningObjective: 'Distinguish interrogative pronouns from relative pronouns',
+  },
+
+  // ── TENSE & VERB FORMS ──────────────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Verbs, Tense and Aspect',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Rewrite each sentence using the tense indicated in brackets. Do not alter the meaning.\n(i) The students are writing their examinations. (Simple Past)\n(ii) She has lived in Mombasa for ten years. (Simple Present)\n(iii) The farmers will harvest the maize next month. (Past Perfect)\n(iv) The teacher is explaining the concept very clearly. (Future Continuous)\n(v) By the time we arrived, the match had already begun. (Simple Future)',
+    answerGuide: '(i) The students wrote their examinations. (ii) She lives in Mombasa. (iii) The farmers had harvested the maize. (iv) The teacher will be explaining the concept very clearly. (v) By the time we arrive, the match will have already begun. Award 1 mark each for correct tense with no other changes to meaning.',
+    tags: ['tense', 'verbs', 'rewrite', 'aspect', 'past', 'present', 'future'],
+    learningObjective: 'Transform sentences between different tenses correctly',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Verbs, Tense and Aspect',
+    questionType: 'structured', difficulty: 'hard', marks: 6,
+    questionText: 'Change the following sentences from direct to reported speech OR from reported to direct speech as instructed:\n(i) "We will finish the project before the deadline," said the manager. (Change to reported speech.)\n(ii) "Have you submitted your assignment?" the teacher asked Kamau. (Change to reported speech.)\n(iii) The doctor told the patient that he should rest for at least two weeks. (Change to direct speech.)\n(iv) Grace asked whether anyone had seen her notebook. (Change to direct speech.)\n(v) The Principal announced that the school would close on Friday owing to maintenance work. (Change to direct speech.)\n(vi) "Do not enter the laboratory without protective gear," the technician warned us. (Change to reported speech.)',
+    answerGuide: '(i) The manager said that they would finish the project before the deadline. (ii) The teacher asked Kamau if/whether he had submitted his assignment. (iii) "You should rest for at least two weeks," the doctor told the patient. (iv) "Has anyone seen my notebook?" Grace asked. (v) "The school will close on Friday owing to maintenance work," the Principal announced. (vi) The technician warned us not to/that we should not enter the laboratory without protective gear. Award 1 mark each.',
+    tags: ['reported-speech', 'direct-speech', 'verbs', 'backshift', 'tense'],
+    learningObjective: 'Convert between direct and reported speech with correct tense backshift and pronoun changes',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Verbs, Tense and Aspect',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Choose the correct form of the verb in brackets to complete each sentence:\n(i) Each of the contestants ________ (was/were) given a number.\n(ii) Neither the principal nor the teachers ________ (has/have) arrived yet.\n(iii) The committee ________ (meets/meet) every first Monday of the month.\n(iv) News ________ (travel/travels) fast in the age of social media.',
+    answerGuide: '(i) was — "each" is singular. (ii) have — with "neither...nor", verb agrees with the noun closest to it ("teachers"). (iii) meets — collective noun used as a single unit. (iv) travels — "news" is uncountable, takes singular verb. Award 1 mark each.',
+    tags: ['subject-verb-agreement', 'verbs', 'collective-nouns', 'indefinite-pronouns'],
+    learningObjective: 'Apply subject-verb agreement rules with collective nouns, indefinite pronouns and correlative conjunctions',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Verbs, Tense and Aspect',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Rewrite the following sentences by changing from active to passive voice or passive to active voice as indicated:\n(i) The engineer designed the new bridge. (Change to passive.)\n(ii) The report has been submitted by the secretary. (Change to active.)\n(iii) The government is building more schools in rural areas. (Change to passive.)\n(iv) The award was presented to the best student by the governor. (Change to active.)',
+    answerGuide: '(i) The new bridge was designed by the engineer. (ii) The secretary has submitted the report. (iii) More schools are being built in rural areas by the government. (iv) The governor presented the award to the best student. Award 1 mark each.',
+    tags: ['active-voice', 'passive-voice', 'verbs', 'transformation'],
+    learningObjective: 'Transform sentences between active and passive voice correctly',
+  },
+
+  // ── ADJECTIVES & PREPOSITIONS ──────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Choose the correct word from the brackets and write it in the space provided:\n(i) Climate change will greatly ______________ the agricultural sector. (affect / effect)\n(ii) The scientist refused to ______________ the results that did not support her hypothesis. (accept / except)\n(iii) She gave me useful ______________ about preparing for the university interview. (advice / advise)',
+    answerGuide: '(i) affect — verb meaning to have an impact on. (ii) accept — verb meaning to receive or agree to. (iii) advice — noun (the verb form is "advise"). Award 1 mark each.',
+    tags: ['homophones', 'confused-words', 'affect-effect', 'accept-except', 'advice-advise'],
+    learningObjective: 'Use commonly confused homophones and paronyms correctly in context',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Complete each sentence by filling in the blank with the correct word from the brackets:\n(i) Take a deep ________________ (breath/breathe)\n(ii) Try not to __________________ (loose/lose) your temper.\n(iii) People ought to keep ____________ (quiet/quite) when they have nothing useful to say.',
+    answerGuide: '(i) breath — noun (the verb is "breathe"). (ii) lose — verb meaning to be deprived of. (iii) quiet — adjective meaning silent. Award 1 mark each.',
+    tags: ['homophones', 'confused-words', 'breath-breathe', 'loose-lose', 'quiet-quite'],
+    learningObjective: 'Distinguish between commonly confused words and use them correctly',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives and Prepositions',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'Fill in the blank with the correct particle (up, out, off, down, into, on, away) to complete the phrasal verb. Use each particle only once:\n(i) The fire brigade managed to put ________ the fire before it spread further.\n(ii) She could not put ________ the meeting any longer; a decision had to be made.\n(iii) The police are looking ________ the cause of the accident on Thika Road.\n(iv) He broke ________ tears when he heard the sad news.\n(v) The company was set ________ in 1998 by two university graduates.',
+    answerGuide: '(i) out — put out = extinguish. (ii) off — put off = postpone. (iii) into — looking into = investigating. (iv) down — broke down = became emotional. (v) up — set up = established. Award 1 mark each.',
+    tags: ['phrasal-verbs', 'particles', 'prepositions', 'vocabulary'],
+    learningObjective: 'Complete phrasal verbs with the correct particle in context',
+  },
+
+  // ── SPELLING, AFFIXES, ABBREVIATIONS ──────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Spelling and Commonly Confused Words',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Identify the correctly spelled word from each group and use it to construct a sentence:\n(i) Necessary / necessary\n(ii) Occurrence / occurrence\n(iii) Proffesor / professor',
+    answerGuide: '(i) "Necessary" (capital or lowercase — both the same word; looking for correct spelling) — one "c" and two "s"s: n-e-c-e-s-s-a-r-y. (ii) "Occurrence" — double "c" and double "r": o-c-c-u-r-r-e-n-c-e. (iii) "professor" — one "f" and two "s"s. Award 1 mark each for identifying correct spelling and constructing an appropriate sentence.',
+    tags: ['spelling', 'commonly-misspelt', 'sentence-construction'],
+    learningObjective: 'Identify correctly spelled words and use them in sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Abbreviations and Acronyms',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Explain the difference between an abbreviation, an acronym, and an initialism. Give ONE example of each type.',
+    answerGuide: 'Abbreviation: a shortened form of a word/phrase e.g. "Dr." for Doctor, "etc." for etcetera. Acronym: letters from initials that form a pronounceable word e.g. NASA, UNEP, AIDS. Initialism: letters from initials that are pronounced individually e.g. BBC, WHO, KRA. Award 1 mark for each correct definition and 1 mark for a valid example (total: 1 mark definition + 1 example × 3 = but award up to 4 total). Accept any valid examples.',
+    tags: ['abbreviations', 'acronyms', 'initialisms', 'writing-mechanics'],
+    learningObjective: 'Distinguish between abbreviations, acronyms and initialisms and use them correctly',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Abbreviations and Acronyms',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Write the full meaning of each acronym below and use it in a sentence:\n(i) UNEP\n(ii) WHO\n(iii) NASA',
+    answerGuide: '(i) UNEP — United Nations Environment Programme. (ii) WHO — World Health Organisation. (iii) NASA — National Aeronautics and Space Administration. Award 1 mark each for correct expansion. Sentence construction need not be marked separately unless the question specifies it.',
+    tags: ['acronyms', 'full-forms', 'environmental', 'international-organisations'],
+    learningObjective: 'Identify and expand common acronyms used in academic and professional contexts',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Spelling and Commonly Confused Words',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Provide a word that has a different vowel sound but rhymes with the word given. An example has been provided.\nExample: Stock → stork\n(i) cot →\n(ii) Order →\n(iii) Pot →',
+    answerGuide: '(i) cot → caught / court / core (the /ɒ/ sound vs /ɔ:/ sound). (ii) order → alder / older / shoulder (variations accepted). (iii) pot → port / pore / paw / pause. Award 1 mark each for any phonologically valid minimal pair with correct vowel sound change. Accept any reasonable answer.',
+    tags: ['pronunciation', 'vowel-sounds', 'minimal-pairs', 'rhyme'],
+    learningObjective: 'Identify and produce minimal pairs with contrasting vowel sounds',
+  },
+
+  // ── SENTENCE FLUENCY & PUNCTUATION ────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Sentence Fluency: Comma Splices and Run-on Sentences',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Each sentence below contains a comma splice or run-on error. Rewrite each one correctly using the method indicated in brackets:\n(i) The sun was shining brightly, the birds were singing in the trees. [Use a coordinating conjunction]\n(ii) The cat sat on the mat it looked very comfortable and sleepy. [Use a period]\n(iii) She studied all night, she failed the test because she did not manage her time well. [Use a semicolon]\n(iv) We arrived late, the show had already started without us. [Use a conjunctive adverb]\n(v) The meeting was long and tedious the speaker droned on about irrelevant topics. [Use a subordinating conjunction]',
+    answerGuide: '(i) The sun was shining brightly, and the birds were singing in the trees. (ii) The cat sat on the mat. It looked very comfortable and sleepy. (iii) She studied all night; she failed the test because she did not manage her time well. (iv) We arrived late; however, the show had already started without us. (v) Although the speaker droned on about irrelevant topics, the meeting was long and tedious. (Accept equivalent valid corrections.) Award 1 mark each.',
+    tags: ['comma-splice', 'run-on', 'sentence-correction', 'conjunctions', 'punctuation'],
+    learningObjective: 'Identify and correct comma splices and run-on sentences using appropriate methods',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Sentence Fluency: Comma Splices and Run-on Sentences',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Rewrite the following paragraph, correcting ALL sentence errors (comma splices and run-ons) and improving the overall fluency:\n"Climate change is a major global issue, it affects millions of people every year the temperatures are rising sea levels are going up extreme weather events are becoming more frequent scientists warn that we must act urgently, governments are slow to respond, ordinary citizens can make a difference."',
+    answerGuide: 'Climate change is a major global issue that affects millions of people every year. Temperatures are rising, sea levels are going up, and extreme weather events are becoming more frequent. Scientists warn that we must act urgently; however, governments are slow to respond. Nevertheless, ordinary citizens can make a difference. Award marks as follows: 2 marks for identifying all comma splices, 2 marks for identifying run-on sentences, 2 marks for correct use of punctuation/conjunctions, 2 marks for overall fluency and coherence.',
+    tags: ['comma-splice', 'run-on', 'paragraph-correction', 'fluency', 'climate-change'],
+    learningObjective: 'Rewrite a paragraph to eliminate all sentence boundary errors and improve fluency',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Sentence Fluency: Comma Splices and Run-on Sentences',
+    questionType: 'structured', difficulty: 'medium', marks: 2,
+    questionText: 'Write correct sentences using each of the following conjunctive adverbs:\n(i) However\n(ii) Moreover',
+    answerGuide: '(i) Any grammatically correct sentence using "however" as a conjunctive adverb with correct punctuation e.g. "The weather was terrible; however, the match continued." (ii) Any grammatically correct sentence using "moreover" e.g. "The school has excellent teachers; moreover, the facilities are modern." Award 1 mark each for correct usage and punctuation (semicolon or full stop before the conjunctive adverb).',
+    tags: ['conjunctive-adverbs', 'however', 'moreover', 'sentence-construction'],
+    learningObjective: 'Use conjunctive adverbs correctly with appropriate punctuation',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Punctuation and Capitalisation',
+    questionType: 'structured', difficulty: 'medium', marks: 3,
+    questionText: 'Punctuate the following sentences correctly and rewrite them in full:\n(i) the headteacher announced that mr odhiambo had won the national teacher of the year award\n(ii) however the committee decided to postpone the event until january 2027\n(iii) the package contained the following items pens pencils rulers erasers and a geometry set',
+    answerGuide: '(i) The headteacher announced that Mr Odhiambo had won the National Teacher of the Year Award. (ii) However, the committee decided to postpone the event until January 2027. (iii) The package contained the following items: pens, pencils, rulers, erasers and a geometry set. Award 1 mark each for complete correct punctuation including capitals, commas, and colon.',
+    tags: ['punctuation', 'capitalisation', 'commas', 'colon', 'rewrite'],
+    learningObjective: 'Apply correct punctuation and capitalisation rules in sentence rewriting',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Punctuation and Capitalisation',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Join the following sentences correctly using appropriate coordinating conjunctions:\n(i) He was willing to help. The application form came in too late.\n(ii) Mbula rushed home. She found the party still going on.',
+    answerGuide: '(i) He was willing to help, but the application form came in too late. (ii) Mbula rushed home, yet/but she found the party still going on. Award 1 mark each for correct conjunction and punctuation (comma before the conjunction).',
+    tags: ['conjunctions', 'coordinating', 'FANBOYS', 'joining-sentences'],
+    learningObjective: 'Join sentences using appropriate coordinating conjunctions with correct punctuation',
+  },
+
+  // ── PHRASES ────────────────────────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Determiners and Phrases',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'In the sentences below, identify and underline the complete noun phrase and briefly describe its constituents:\n(i) An exciting journey through the dense forest\n(ii) The tall mountains with snow-capped peaks\n(iii) Several carefully selected learners from our school\n(iv) A very challenging exam set by the board\n(v) My old leather satchel with brass buckles',
+    answerGuide: '(i) "An exciting journey through the dense forest" — determiner (An) + adjective (exciting) + head noun (journey) + prepositional phrase (through the dense forest). (ii) "The tall mountains with snow-capped peaks" — determiner + adjective + head noun + post-modifier. (iii) Determiner (Several) + adverb + adjective + head noun + post-modifier. (iv) Determiner + adverb + adjective + head noun + post-modifier (past participial). (v) Possessive det + adjectives + head noun + post-modifier. Award 1 mark each for correctly identifying the full NP and its key constituents.',
+    tags: ['noun-phrases', 'constituents', 'determiners', 'pre-modifiers', 'post-modifiers'],
+    learningObjective: 'Identify noun phrases and analyse their constituents in sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Phrases',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Identify and underline the verb phrase in each sentence below, then state the main verb and any auxiliaries:\n(i) She has been studying since early morning.\n(ii) They might have left before we arrived.\n(iii) The committee should make a final decision today.\n(iv) He was not listening carefully during the presentation.\n(v) We could have finished the project if we had planned better.',
+    answerGuide: '(i) has been studying — aux: has been, main verb: studying (present perfect continuous). (ii) might have left — modal: might, aux: have, main verb: left. (iii) should make — modal: should, main verb: make. (iv) was not listening — aux: was, main verb: listening (past continuous). (v) could have finished — modal: could, aux: have, main verb: finished. Award 1 mark each for correctly identifying all elements of the VP.',
+    tags: ['verb-phrases', 'auxiliaries', 'modal-verbs', 'tense', 'aspect'],
+    learningObjective: 'Identify verb phrases and analyse the function of main verbs and auxiliaries',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Phrases: Prepositional Phrases',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Fill in the gaps with expressions that make the highlighted nouns countable:\n(i) There are ___________ books on the shelf that we can borrow for the project.\n(ii) We need _________________ information before we write the report.',
+    answerGuide: '(i) any number/quantifier: "several / a few / many / three / some" — award 1 mark for any appropriate quantifier that makes the noun countable. (ii) any appropriate expression: "a piece of / some / a lot of / sufficient / further" — award 1 mark for any appropriate expression. Note: the question tests understanding that "books" is count and "information" is non-count.',
+    tags: ['countable-nouns', 'uncountable-nouns', 'quantifiers', 'determiners'],
+    learningObjective: 'Use appropriate quantifiers with countable and uncountable nouns',
+  },
+
+  // ── CLAUSES ────────────────────────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Relative Pronouns',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Identify whether each relative clause below is DEFINING (D) or NON-DEFINING (ND). Write D or ND and explain your choice:\n(i) The elder who shared the traditional stories is highly respected.\n(ii) My grandmother, who is a respected storyteller, taught me many traditions.\n(iii) The artifacts that represent our history are kept in the museum.\n(iv) The festival, which takes place annually, celebrates our heritage.\n(v) The book that she borrowed from the library was about climate change.',
+    answerGuide: '(i) D — no commas; the clause identifies which elder. (ii) ND — set off by commas; adds extra information about grandmother (already identified). (iii) D — no commas; identifies which artifacts. (iv) ND — set off by commas; adds extra info about the festival. (v) D — no commas; identifies which book. Award 1 mark each for correct label + brief reason.',
+    tags: ['relative-clauses', 'defining', 'non-defining', 'commas', 'relative-pronouns'],
+    learningObjective: 'Distinguish between defining and non-defining relative clauses and use commas correctly',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Clauses: Relative and Adverbial',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Underline and identify the adverbial clause in each sentence below, stating the type of clause and the subordinating conjunction:\n(a) When the ceremony began, everyone fell silent.\n(b) She felt proud because her cultural dance was well received.\n(c) They will attend the festival if the weather permits.\n(d) Although it was raining heavily, the match continued.\n(e) She studied hard so that she could pass her examinations.',
+    answerGuide: '(a) "When the ceremony began" — clause of time, conjunction: when. (b) "because her cultural dance was well received" — clause of reason, conjunction: because. (c) "if the weather permits" — clause of condition, conjunction: if. (d) "Although it was raining heavily" — clause of contrast, conjunction: although. (e) "so that she could pass her examinations" — clause of purpose, conjunction: so that. Award 1 mark each for correctly underlined clause + type + conjunction.',
+    tags: ['adverbial-clauses', 'subordinating-conjunctions', 'clauses-of-time', 'reason', 'condition', 'contrast', 'purpose'],
+    learningObjective: 'Identify and classify adverbial clauses by type and subordinating conjunction',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Clauses: Relative and Adverbial',
+    questionType: 'structured', difficulty: 'hard', marks: 5,
+    questionText: 'Combine each pair of sentences into ONE sentence using either a relative clause or an adverbial clause as instructed:\n(a) The man is very wise. He leads our community. [Use a relative clause]\n(b) The rain was heavy. The game was cancelled. [Use an adverbial clause of reason]\n(c) She practises every day. She wants to become a professional athlete. [Use an adverbial clause of purpose]\n(d) My history teacher is very dedicated. She marks our work every evening. [Use a non-defining relative clause]\n(e) They arrived at the stadium. The match had already started. [Use an adverbial clause of time]',
+    answerGuide: '(a) The man who leads our community is very wise. (b) The game was cancelled because the rain was heavy. (c) She practises every day so that she can become a professional athlete. (d) My history teacher, who marks our work every evening, is very dedicated. (e) When they arrived at the stadium, the match had already started. / By the time they arrived at the stadium, the match had already started. Award 1 mark each. Accept reasonable alternatives.',
+    tags: ['sentence-combination', 'relative-clauses', 'adverbial-clauses', 'complex-sentences'],
+    learningObjective: 'Combine sentences using relative and adverbial clauses to create complex sentences',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Sentences — Types and Structures',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'A student wrote the following paragraph. Identify and correct ALL grammatical errors (word class errors, comma splices, run-on sentences). Rewrite the corrected version:\n"The committee has decided to review there policies regarding environmental issues, this was long overdue every member agrees that the new regulations must be implement quickly however some of the member\'s are not happy with the new proposals they feel that it is to strict and may affect they\'s businesses."',
+    answerGuide: 'Errors: "there" → "their" (possessive determiner); comma splice after "issues," → full stop or semicolon; run-on "overdue every member" → "overdue. Every member"; "must be implement" → "must be implemented"; "however" needs semicolon before it; "member\'s" → "members" (plural not possessive); run-on "proposals they" → "proposals. They"; "to strict" → "too strict"; "they\'s" → "their". Corrected: "The committee has decided to review their policies regarding environmental issues. This was long overdue. Every member agrees that the new regulations must be implemented quickly; however, some of the members are not happy with the new proposals. They feel that it is too strict and may affect their businesses." Award 1 mark per error correctly identified and fixed.',
+    tags: ['error-correction', 'grammar', 'comma-splice', 'run-on', 'word-class', 'homophone'],
+    learningObjective: 'Identify and correct a range of grammatical errors in a paragraph',
+  },
+
+  // ── SYNONYMS & ANTONYMS ────────────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Write a SYNONYM for each of the following words as used in English:\n(i) eloquent\n(ii) frugal\n(iii) turbulent',
+    answerGuide: '(i) eloquent: articulate / fluent / expressive / persuasive. (ii) frugal: thrifty / economical / careful / sparing. (iii) turbulent: chaotic / stormy / unstable / disorderly. Award 1 mark each for any appropriate synonym.',
+    tags: ['synonyms', 'vocabulary', 'word-meaning'],
+    learningObjective: 'Identify synonyms for academic vocabulary used in context',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Write an ANTONYM for each of the following words:\n(i) transparent\n(ii) diligent\n(iii) lenient',
+    answerGuide: '(i) transparent: opaque / dark / cloudy. (ii) diligent: lazy / negligent / careless / idle. (iii) lenient: strict / harsh / severe / rigid. Award 1 mark each for any appropriate antonym.',
+    tags: ['antonyms', 'vocabulary', 'opposites'],
+    learningObjective: 'Identify antonyms for academic vocabulary',
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // READING — COMPREHENSION
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 20,
+    questionText: 'Read the following passage carefully and then answer the questions that follow.\n\nThe courtroom was packed. Every wooden bench was occupied, and a ring of standing spectators pressed against the walls as if held there by the weight of the moment. At the centre of it all sat Dr. Miriam Ochieng, her hands folded neatly on the table before her, her face bearing the composed expression of a woman who had long since made her peace with whatever was to come.\n\nDr. Ochieng had been a medical officer at Kericho District Hospital for eleven years. In that time, she had seen the full spectrum of human suffering: children born too soon, farmers mangled by machinery, women who had walked twenty kilometres for a consultation. She had always believed that medicine was not merely a profession but a calling — a covenant between the healer and the vulnerable.\n\nThree years ago, however, something changed. A consignment of anti-malarial drugs arrived bearing the correct labels, the correct serial numbers, but carrying a quiet, invisible defect: the dosage of the active compound was thirty percent below the registered level. In the weeks that followed, forty-seven patients who had been treated with those drugs deteriorated. Eleven of them died.\n\nDr. Ochieng had made the connection early. She had cross-referenced patient files, consulted colleagues, and sent a detailed report to the Ministry of Health and to the pharmaceutical company that supplied the drugs. The response from both offices was identical in substance: her findings were "under review." She waited six months. Nothing happened.\n\nColleagues warned her. The hospital administrator called her into his office on three separate occasions. A senior official from the Ministry visited and, over tea, spoke gently of careers that had flourished through patience and discretion. Dr. Ochieng listened carefully, and then she went to the press.\n\nThe story broke with the force of a thunderclap. Investigations were launched. The pharmaceutical company\'s local director resigned. A parliamentary committee convened. But none of that stopped the charges filed against Dr. Ochieng herself — charges of "causing public panic" and "sharing confidential medical information without authorisation."\n\nSeated in the courtroom, she was asked by the prosecutor whether she regretted her decision. "I regret," she said quietly, "that eleven people died before I spoke. I do not regret the speaking."\n\nThe gallery erupted. Outside, a young nurse leaned against the wall and wept — not from grief, but from recognition of something she had not known she was missing.\n\nQuestions:\n1. What was the atmosphere in the courtroom at the beginning of the passage? Use evidence from the text to support your answer. (3 marks)\n2. How does the writer convey the range of Dr. Ochieng\'s experience as a medical officer? Refer to the passage. (3 marks)\n3. Describe in your own words the problem that Dr. Ochieng discovered with the anti-malarial drugs. (3 marks)\n4. What pressures were placed on Dr. Ochieng to keep silent? Give THREE examples from the passage. (3 marks)\n5. What does the phrase "with the force of a thunderclap" tell you about the impact of the published story? (2 marks)\n6. Explain the irony in the charges brought against Dr. Ochieng after she went to the press. (2 marks)\n7. Comment on the significance of the young nurse\'s reaction at the end of the passage. (2 marks)\n8. Explain the meaning of: (a) a covenant (paragraph 2) (b) discretion (paragraph 5) (2 marks)',
+    answerGuide: '1. The atmosphere was tense/charged — evidence: "packed", "every bench was occupied", "ring of standing spectators pressed against the walls as if held there by the weight of the moment" (3 marks: 1 for identifying atmosphere + 2 for evidence). 2. Through listing specific types of suffering: "children born too soon, farmers mangled by machinery, women who had walked twenty kilometres" — each example shows breadth across age/profession/gender (3 marks). 3. The drugs appeared normal but had insufficient active ingredient (30% below required level); patients treated with them did not recover as expected; eleven died (3 marks in own words). 4. Any 3: colleagues warned her; hospital administrator called her to office three times; senior Ministry official told her careers flourish through "patience and discretion" (3 marks). 5. The story had a sudden, dramatic and powerful impact — it caused immediate widespread reaction (investigations, resignation, parliamentary committee) (2 marks). 6. Irony: she exposed a cover-up that was causing deaths yet was charged with "causing public panic" — the very act of protecting public health led to her prosecution (2 marks). 7. The nurse wept from "recognition" — she had been suppressing similar feelings of conflict about staying silent; the reaction shows Dr. Ochieng gave voice to others\' unexpressed moral distress (2 marks). 8. (a) covenant: a solemn binding promise/agreement (1 mark). (b) discretion: the quality of keeping quiet/not sharing sensitive information (1 mark).',
+    tags: ['comprehension', 'atmosphere', 'inference', 'irony', 'characterisation', 'vocabulary', 'healthcare', 'Kericho'],
+    learningObjective: 'Answer comprehension questions testing literal retrieval, inference, figurative language and vocabulary in context',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Read the passage below about career choices (a passage about choosing a career is provided).\n\nChoosing a career is one of the most important decisions in a person\'s life. It is not something to be done sooner or later without careful thought. Students should take time to think about their interests, skills, and goals. A good career choice can bring peace of mind and a strong sense of purpose.\n\nWhen selecting a career, it is important to look at the pros and cons of different options. Some careers require hard work and dedication, while others demand creativity, communication, and teamwork. Making lists, asking questions, and doing research can help students understand different careers inside and out.\n\nCareer selection also involves planning for the future and being ready for ups and downs. Students must study day and night to reach their goals. Success does not come by chance, but through effort, patience, and determination.\n\nQuestions:\n(a) Why is choosing a career an important decision? (1 mark)\n(b) What should students think about when selecting a career? (1 mark)\n(c) What does the text mean by "pros and cons" of different careers? (1 mark)\n(d) The phrase "pros and cons" is a binomial expression. Write THREE other binomial expressions from the passage. (3 marks)\n(e) What does the text say about success and hard work? (1 mark)\n(f) Explain the meaning of: (i) dedication (ii) ups and downs (iii) confident (3 marks)',
+    answerGuide: '(a) It is important because it affects peace of mind, sense of purpose, and future happiness/stability. (b) Their interests, skills, goals, strengths and weaknesses. (c) The advantages and disadvantages of different career options. (d) Any three: sooner or later / day and night / trial and error / inside and out / here and there (accept any correct binomial pairs). (e) Success does not come by chance but through effort, patience and determination — studying consistently is necessary. (f) (i) dedication — commitment and hard work; (ii) ups and downs — difficulties and successes/good and bad times; (iii) confident — sure/certain about oneself and the future. Award marks as specified.',
+    tags: ['comprehension', 'careers', 'binomial-expressions', 'vocabulary', 'retrieval'],
+    learningObjective: 'Answer comprehension questions testing retrieval, inference, vocabulary and language features',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Read the passage below and answer the questions that follow.\n\nThe late afternoon sun cast long shadows across the rolling hills outside Kilgoris. A group of young boys were herding cattle back towards their manyattas. Among them was Lemayan, known for his keen observation. As they rounded a bend, he stopped abruptly, pointing towards a cluster of trees. Tangled in a wait-a-bit bush was a bird unlike anything they had ever seen — its feathers a brilliant electric blue, contrasting sharply with patches of yellow and black. Lemayan carefully freed the bird. "We should take it to Mama Nasha," he suggested. The village elder examined the bird gently. "This is not one of our birds. This one has travelled far." Days later, the bird soared free. Mama Nasha smiled. "Sometimes life brings us beautiful surprises, reminding us that the world is much bigger than we imagine. It is our duty to care for all living things."\n\n(i) Who is the intended audience of this passage? Give evidence from the text. (2 marks)\n(ii) What is the author\'s purpose in writing this passage? (2 marks)',
+    answerGuide: '(i) Young readers/learners — evidence: the story features young boys as characters, uses simple accessible language, and teaches a moral lesson suitable for young people. (ii) To entertain and to teach/instil a moral lesson — that we should care for living things, appreciate the world\'s diversity, and respond with kindness to the unexpected. Award 1 mark for identification + 1 mark for evidence each.',
+    tags: ['critical-reading', 'audience', 'purpose', 'Kilgoris', 'Maasai', 'moral'],
+    learningObjective: 'Identify intended audience and authorial purpose in a narrative text',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Refer to the Kilgoris passage (Lemayan and the bird). Answer the following:\n(iii) Describe the author\'s attitude towards the theme of caring for living things. What words or phrases reveal this attitude? (2 marks)\n(iv) Explain the message conveyed by Mama Nasha\'s final words. What life lesson do they communicate? (2 marks)',
+    answerGuide: '(iii) The author\'s attitude is positive/respectful/affirming — revealed by words like "carefully freed the bird", "examined gently", the resolution of the bird soaring free, and Mama Nasha\'s warm smile. (iv) Mama Nasha teaches that the world is larger and more diverse than we know; we should respond to differences with care and openness rather than indifference. Award 1 mark for attitude identification + 1 mark for textual evidence each.',
+    tags: ['critical-reading', 'attitude', 'tone', 'theme', 'moral-lesson', 'Kilgoris'],
+    learningObjective: 'Analyse authorial attitude and extract life lessons from narrative texts',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Read the passage about the Kilgoris market (the air in Kilgoris market buzzed...) and answer:\n(i) What is the main theme of the passage? Support your answer with evidence from the text. (2 marks)\n(ii) Identify TWO examples of expressive reading elements that Juma would have used in his storytelling, and explain how each element enriches his performance. (2 marks)',
+    answerGuide: '(i) The main theme is the importance of cultural heritage and storytelling — evidence: Juma carries "tales passed down through generations"; Mama Zawadi\'s reaction "You remind us of who we are"; she challenges the tourists who disrupt. (ii) Any two from: pace (he would slow down for dramatic effect), pitch (varying voice for different characters), volume (softening for suspense, raising for climax), intonation (rising for questions, falling for conclusions), pausing for effect. Award 1 mark each for element + explanation.',
+    tags: ['comprehension', 'cultural-heritage', 'storytelling', 'oral-literature', 'Kilgoris-market'],
+    learningObjective: 'Identify themes and analyse expressive reading techniques in literary passages',
+  },
+
+  // ── SUMMARY WRITING ────────────────────────────────────────────
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Study Skills',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Read the following passage carefully. In not more than 80 words, summarise the challenges that face young people growing up in urban areas today. Use your own words as far as possible.\n\nModern cities offer young people a dazzling array of opportunities: universities, employment, cultural exposure and social connection. Yet beneath the bright surface, urban life confronts adolescents and young adults with a distinct set of pressures. Perhaps the most pervasive challenge is economic. In cities like Nairobi, Lagos and Accra, the cost of basic necessities has risen sharply while entry-level wages remain low. Young people find themselves trapped in a cycle of precarious employment. Alongside economic hardship, urban youth are exposed to elevated levels of violence and crime. Poorly planned neighbourhoods and weak community structures create environments in which gangs thrive. The explosion of social media has introduced psychological difficulty — young urban dwellers are bombarded with curated images of success, fuelling anxiety and diminished self-worth. Finally, rapid urbanisation has eroded traditional support structures. Extended family networks and cultural ceremonies that once anchored young people\'s sense of identity have weakened. Many young urban residents feel isolated, navigating complex modern life without adequate guidance.',
+    answerGuide: 'Award marks as follows: Content (6 marks): 1 mark each for identifying: (1) economic hardship/low wages; (2) precarious/informal employment; (3) violence and crime/gang environment; (4) social media pressure/anxiety/mental health; (5) erosion of traditional support/family networks; (6) isolation/lack of guidance. Language (2 marks): own words, clear expression. Organisation (1 mark): coherent, logical summary. Mechanics (1 mark): correct punctuation, no errors. Penalise 2 marks if over 80 words (count carefully). Do NOT award marks for lifted sentences.',
+    tags: ['summary-writing', 'urban-youth', 'challenges', 'Nairobi', 'own-words', '80-words'],
+    learningObjective: 'Write a focused summary within a word limit using own words',
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // WRITING — FUNCTIONAL AND CREATIVE
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a formal letter of complaint to the Manager of a sports equipment store, complaining about a defective football you purchased last week. Your letter should:\n(i) Follow full formal letter format (your address, date, recipient\'s address, salutation, body, sign-off)\n(ii) Clearly describe the defect\n(iii) State the impact of the defect\n(iv) Request specific action (replacement or refund)\n(v) Use appropriate formal tone throughout\n\nYour composition will be marked on: Content (8 marks), Organisation/Format (6 marks), Language (4 marks), Mechanics (2 marks).',
+    answerGuide: 'Content (8): complaint clearly stated (2), defect described specifically (2), impact explained (2), clear reasonable request (2). Format (6): correct sender address (1), date (1), recipient address (1), formal salutation (1), correct sign-off "Yours sincerely" — only if name used (1), paragraphed body (1). Language (4): formal register throughout (2), varied vocabulary (1), sentence variety (1). Mechanics (2): spelling (1), punctuation (1). Deduct up to 2 marks for informal language. Accept either British or American format consistently applied.',
+    tags: ['formal-letter', 'complaint', 'letter-writing', 'format', 'functional-writing'],
+    learningObjective: 'Write a correctly formatted formal letter of complaint using appropriate tone and structure',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'You are a Grade 10 student at Thika High School. Write a formal letter to the County Director of Education, expressing concern about the lack of sports facilities in your school. Your letter should:\n(i) Follow full formal letter format\n(ii) Clearly state the problem and its extent\n(iii) Explain the impact on learners\n(iv) Make specific, reasonable requests\nWrite approximately 300–350 words.\n\nYour writing will be marked on: Content (8 marks), Organisation (6 marks), Language (4 marks), Mechanics (2 marks).',
+    answerGuide: 'Content (8): problem stated clearly (2), extent/evidence described (2), impact on learners (2), specific requests (2). Organisation (6): full letter format with all components (3), logical paragraphing (2), appropriate length (1). Language (4): formal register (2), varied sentence structures (1), appropriate vocabulary (1). Mechanics (2): spelling (1), punctuation (1). Award up to 20 marks.',
+    tags: ['formal-letter', 'request', 'school', 'sports', 'County-Director', 'Thika'],
+    learningObjective: 'Write a formal letter of request to an authority using appropriate format and persuasive content',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a formal letter of inquiry to the Admissions Officer of a Sports Academy, requesting information about: membership requirements, training schedules, fees, and the application process. Use full formal letter format. Write approximately 250–300 words.\n\nYour writing will be marked on: Content (8), Format (6), Language (4), Mechanics (2).',
+    answerGuide: 'Content (8): all four areas of inquiry addressed (2 each). Format (6): correct addresses, date, salutation, paragraphed body, correct sign-off (1 each). Language (4): formal, polite tone (2); appropriate vocabulary and sentence variety (2). Mechanics (2). Award up to 20 marks.',
+    tags: ['formal-letter', 'inquiry', 'sports-academy', 'functional-writing'],
+    learningObjective: 'Write a formal letter of inquiry requesting specific information using correct format',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Meetings — Notice, Agenda and Minutes',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Write a notice for a meeting of the Grade 10 Environmental Club to be held in Room 8 at 2:30 PM next Tuesday. The meeting will discuss plans to clean up the school compound and plant trees.',
+    answerGuide: 'Award marks: Heading — "NOTICE OF MEETING" (1 mark). Name of organisation (1 mark). Date, time, venue clearly stated (1 mark). Purpose/agenda items mentioned (1 mark). Signature of secretary/chairperson and date of notice (1 mark). Deduct marks for missing components. Accept reasonable formats.',
+    tags: ['notice', 'meeting-documents', 'functional-writing', 'environmental-club'],
+    learningObjective: 'Write a correctly formatted meeting notice with all essential elements',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Meetings — Notice, Agenda and Minutes',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Prepare a meeting agenda for the Grade 10 Environmental Club meeting (in Room 8, Tuesday, 2:30 PM) that will discuss: clean-up activities and tree planting.',
+    answerGuide: 'Award marks: Title — "AGENDA" (1 mark). Standard opening items: apologies, minutes of previous meeting (1 mark). Main agenda items clearly listed and numbered (1 mark). Any other business (A.O.B.) item (1 mark). Date of next meeting as last item (1 mark). Accept reasonable format.',
+    tags: ['agenda', 'meeting-documents', 'functional-writing', 'environmental-club'],
+    learningObjective: 'Draft a correctly structured meeting agenda with standard items in correct order',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Meetings — Notice, Agenda and Minutes',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: 'Write the minutes of the Grade 10 Environmental Club meeting based on the following summary:\nThe meeting was chaired by the class teacher, Mrs Wangari. Present were 18 members. The secretary was James Njoroge. Members discussed three clean-up activities. Resolutions: (i) Each class takes responsibility for one section. (ii) Tree planting on the last Friday of the month. (iii) A fundraising drive to be launched. Next meeting: following Tuesday. Meeting ended at 3:45 PM.',
+    answerGuide: 'Award marks: Heading — "MINUTES OF MEETING" with name of body (1). Date, time, venue, chairperson, attendance/apologies (2). Previous minutes confirmation (1). Main discussion points recorded in formal past tense/passive (2). Resolutions clearly numbered and recorded (2). Date of next meeting and time of closure (1). Signed by secretary (1). Total 10 marks. Deduct for informal language or wrong tense.',
+    tags: ['minutes', 'meeting-documents', 'functional-writing', 'Mrs-Wangari', 'environmental-club'],
+    learningObjective: 'Write formal meeting minutes from a summary, using appropriate format and language',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Memos',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'You are the Secretary of Thika High School Environmental Club. Write a MEMO to all club members about a tree-planting day next Saturday at the school shamba. The memo should include: purpose, date, venue, reporting time, and what members should bring. Use correct memo format.',
+    answerGuide: 'Memo format (3): TO, FROM, DATE, SUBJECT headings correctly labelled (0.5 each). Content (4): purpose stated (1), date and venue (1), reporting time (1), items to bring (1). Language (1): clear, concise, professional. Award up to 8 marks. Note: memos do not have a salutation or sign-off like letters — deduct 1 mark if letter format used.',
+    tags: ['memo', 'functional-writing', 'format', 'environmental-club', 'Thika'],
+    learningObjective: 'Write a correctly formatted memo with all required components and concise professional language',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Creative Writing: Narrative and Descriptive Essays',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a story beginning with:\n"My first day in Grade 10 felt like stepping into a brand-new world…"\n\nYour composition should be 300–400 words. It will be marked on:\nContent (8 marks) — ideas, development, relevance\nOrganisation (4 marks) — clear structure, paragraphing, beginning/middle/end\nLanguage (6 marks) — vocabulary, sentence variety, narrative techniques\nMechanics (2 marks) — spelling, punctuation, grammar',
+    answerGuide: 'Content (8): creative, relevant narrative that develops the opening meaningfully (ideas, characters, events); mark on quality of content not length. Organisation (4): clear beginning introducing setting/character, developed middle with events, satisfying ending; paragraphed. Language (6): varied vocabulary beyond basic (2), narrative techniques — figurative language, dialogue, description (2), sentence variety — short for impact, long for flow (2). Mechanics (2): spelling (1), punctuation (1). Total 20 marks.',
+    tags: ['narrative', 'creative-writing', 'composition', 'Grade-10', 'story-beginning'],
+    learningObjective: 'Write a creative narrative composition with effective use of narrative techniques',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Creative Writing: Argumentative and Expository Essays',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a speech arguing FOR OR AGAINST the following motion:\n"Social media does more harm than good to young people in Kenya."\n\nYour speech should be 300–400 words and addressed to a school debate audience. It will be marked on:\nContent (8): clear argument, supporting points, evidence\nOrganisation (4): speech format (salutation, introduction, body, conclusion), logical flow\nLanguage (6): persuasive devices, vocabulary, rhetorical questions\nMechanics (2): spelling, punctuation, grammar',
+    answerGuide: 'Content (8): clear position stated (2), at least 3 supported arguments (2 each up to 6). Organisation (4): correct speech salutation "Honourable chairperson, fellow debaters..." (1), introduction with motion stated (1), paragraphed arguments (1), strong conclusion (1). Language (6): persuasive techniques — rhetorical questions, repetition, statistics (2), varied vocabulary (2), sentence variety (2). Mechanics (2). Award up to 20 marks.',
+    tags: ['argumentative', 'debate', 'speech', 'social-media', 'Kenya', 'persuasive'],
+    learningObjective: 'Write a persuasive debate speech using appropriate format, structure and persuasive language',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Paragraphing Skills',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Write an effective topic sentence for each of the following paragraph topics. Your topic sentence should introduce the main idea clearly and invite the reader to continue:\n(i) The importance of reading books\n(ii) Challenges facing young people in Kenya today\n(iii) The role of technology in modern education',
+    answerGuide: 'Award marks based on: clarity of main idea (1 mark each), appropriate scope — not too broad or narrow (0.5 each), engagement — the sentence should invite further reading (0.5 each). Examples: (i) "Books are not merely collections of words on a page; they are windows into other worlds that expand our understanding of ourselves and humanity." (ii) "Young Kenyans today face a complex web of challenges that previous generations could scarcely have imagined." (iii) "Technology has fundamentally transformed the learning experience, making education more accessible, interactive and personalised than ever before." Award 1–2 marks per topic sentence based on quality.',
+    tags: ['paragraphing', 'topic-sentences', 'writing-skills', 'organisation'],
+    learningObjective: 'Write effective topic sentences that clearly introduce a paragraph\'s main idea',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Paragraphing Skills',
+    questionType: 'long_answer', difficulty: 'medium', marks: 12,
+    questionText: 'Write a well-organised paragraph (10–12 sentences) on ONE of the following topics:\n(a) The importance of preserving cultural heritage in a rapidly changing world.\n(b) How technology has changed the way young people communicate.\n\nYour paragraph must include:\n(i) At least ONE noun phrase (underline it)\n(ii) At least ONE verb phrase (underline it)\n(iii) ONE relative clause (underline it)\n(iv) ONE adverbial clause (underline it)',
+    answerGuide: 'Content (4): clear topic sentence, well-developed supporting sentences, concluding sentence — relevant to topic. Language use (4): varied vocabulary (2), varied sentence structures (2). Grammar features (4): noun phrase correctly identified (1), verb phrase correctly identified (1), relative clause correctly used and identified (1), adverbial clause correctly used and identified (1). Award up to 12 marks.',
+    tags: ['paragraphing', 'grammar-in-writing', 'cultural-heritage', 'technology', 'sentence-structures'],
+    learningObjective: 'Write a coherent paragraph demonstrating correct use of key grammatical structures',
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // LISTENING AND SPEAKING
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Speaking: Etiquette and Telephone Conversations',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'Read the telephone conversation below and answer the questions that follow.\n\nReceptionist: Good morning, Kilgoris Grand Hotel, Jane speaking. How may I assist you today?\nCaller (Mr. Kamau): Good morning, my name is John Kamau, and I have a reservation for two nights starting this Friday.\nReceptionist: Thank you for calling, Mr. Kamau. Just a moment while I retrieve your booking information.\nCaller: I was wondering if it would be possible to request a room with a garden view?\nReceptionist: We do have rooms with a garden view available. I will do my best to assign you one. Is there anything else I can help you with?\n\n(i) Identify THREE examples of polite language used in the conversation. (3 marks)\n(ii) Explain the role of etiquette in a telephone conversation. (2 marks)',
+    answerGuide: '(i) Any 3: "Good morning" (greeting), "How may I assist you today?" (polite offer), "Thank you for calling, Mr. Kamau" (acknowledgement by name), "Just a moment while I retrieve your booking" (polite hold), "I will do my best to assign you one" (polite commitment), "Is there anything else I can help you with?" (polite closure). Award 1 mark each. (ii) Etiquette ensures both parties feel respected and valued; it creates a professional image; it ensures clear and efficient communication; it makes interactions pleasant and productive. Award 1 mark per valid point up to 2.',
+    tags: ['etiquette', 'telephone', 'polite-language', 'listening-and-speaking', 'Kilgoris'],
+    learningObjective: 'Identify polite language in telephone conversations and explain the role of etiquette',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Speaking: Etiquette and Telephone Conversations',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Describe the expected etiquette behaviour in EACH of the following situations:\n(a) Checking in at a hotel (at least TWO behaviours)\n(b) Making a purchase at the market (at least TWO behaviours)\n(c) Answering a professional phone call (at least TWO behaviours)',
+    answerGuide: '(a) Hotel: greet staff first; give name clearly; wait patiently; speak calmly and politely; have documents ready; thank staff. (b) Market: greet the seller; negotiate respectfully; not to handle goods unnecessarily; accept prices or negotiate politely; say thank you after purchase. (c) Phone call: answer promptly; state name/organisation; listen attentively; speak clearly; avoid interrupting; conclude professionally. Award 1 mark per valid behaviour, up to 2 per situation = 6 marks maximum, award 5.',
+    tags: ['etiquette', 'hotel', 'market', 'telephone', 'social-contexts'],
+    learningObjective: 'Demonstrate knowledge of appropriate etiquette in different social and professional contexts',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Conversational Skills: Meetings and Debates',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Identify TWO expressions you would use for EACH of the following in a conversation:\n(i) To introduce a conversation\n(ii) To give a point during a conversation\n(iii) To introduce an example',
+    answerGuide: '(i) Introducing: "By the way..."; "I was thinking about..."; "Have you heard about..."; "I wanted to mention..."; "Could I bring something up?" (ii) Giving a point: "I think that..."; "In my view..."; "My point is that..."; "As I see it..."; "What I mean is..." (iii) Introducing example: "For example,"; "For instance,"; "To illustrate,"; "A case in point is"; "Take, for example,...". Award 1 mark per section for any 2 correct expressions.',
+    tags: ['conversational-skills', 'discourse-markers', 'expressions', 'politeness'],
+    learningObjective: 'Use appropriate discourse markers to introduce topics, give points and provide examples in conversation',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Speaking Fluency: Pronunciation and Enunciation',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Explain how word stress can change the meaning of a word. Illustrate with FOUR examples of words that are stressed differently depending on whether they are used as nouns or verbs. (Use the pattern: NOUN = stress on 1st syllable, VERB = stress on 2nd syllable)',
+    answerGuide: 'Explanation (1 mark): stress shifts forward (to 1st syllable) for nouns and back (to 2nd syllable) for verbs. Examples (3 marks, any 3 of the following, 1 mark each): REcord (noun) / reCORD (verb); PREsent (noun) / preSENT (verb); PERmit (noun) / perMIT (verb); OBject (noun) / obJECT (verb); INcrease (noun) / inCREASE (verb); PROduce (noun) / proDUCE (verb).',
+    tags: ['word-stress', 'pronunciation', 'noun-verb-pairs', 'phonology'],
+    learningObjective: 'Demonstrate how word stress distinguishes between noun and verb forms of the same word',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Speaking Fluency: Pronunciation and Enunciation',
+    questionType: 'short_answer', difficulty: 'medium', marks: 4,
+    questionText: '(a) Identify the odd one out in terms of the underlined sound in each group of words and explain why:\n(i) br̲ead, h̲ead, l̲ead (verb), r̲ead (past tense)\n(ii) c̲ough, th̲ough, r̲ough, eno̲ugh\n\n(b) Mark the stress on the following words by placing an apostrophe (ˈ) before the stressed syllable:\n(i) pho-tog-ra-phy\n(ii) e-co-nom-ic',
+    answerGuide: '(a)(i) "lead (verb)" is the odd one out — it has the vowel sound /iːd/ while "bread", "head" and "read (past)" all have /ɛd/. (a)(ii) "though" is the odd one out — it has the /əʊ/ sound while "cough", "rough" and "enough" all have /ʌf/ sound. (b)(i) phoˈtography — stress on second syllable "tog". (b)(ii) ecoˈnomic — stress on third syllable "nom". Award 1 mark each.',
+    tags: ['pronunciation', 'vowel-sounds', 'word-stress', 'odd-one-out', 'phonology'],
+    learningObjective: 'Identify irregular vowel sounds and mark word stress in multi-syllabic words',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Conversational Skills: Meetings and Debates',
+    questionType: 'structured', difficulty: 'medium', marks: 3,
+    questionText: 'For each situation below, write an appropriate response using the register indicated in brackets:\n(i) You have accidentally bumped into a stranger at a shopping centre. (Formal apology)\n(ii) You need to excuse yourself from a business meeting to take an urgent call. (Formal)\n(iii) A friend texts you asking if you can help them move furniture this weekend. (Informal refusal)',
+    answerGuide: '(i) Any formal apology: "I sincerely apologise — I should have been more careful. Are you alright?" or similar. Key features: formal vocabulary, direct apology, concern for other. (ii) Any formal excuse: "Please excuse me for a moment — I need to take an urgent call. I\'ll return shortly." Key features: request permission, brief explanation, assurance of return. (iii) Any informal refusal: "Sorry mate, can\'t make it this weekend — got other plans. Maybe next time?" Key features: informal tone, honest reason, friendly close. Award 1 mark each for appropriate register and content.',
+    tags: ['register', 'formal', 'informal', 'apology', 'refusal', 'situations'],
+    learningObjective: 'Use appropriate register (formal and informal) in different social and professional situations',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Critical Listening: Facts and Opinions',
+    questionType: 'structured', difficulty: 'medium', marks: 3,
+    questionText: 'Explain the meaning of each of the following idiomatic expressions as they might be used in everyday speech. Then use each in a sentence of your own:\n(i) bite the bullet\n(ii) burn the midnight oil\n(iii) the ball is in your court',
+    answerGuide: '(i) bite the bullet: to endure a painful or difficult situation with courage and without complaint e.g. "The student decided to bite the bullet and sit the repeat exam." (ii) burn the midnight oil: to work or study very late into the night e.g. "She burned the midnight oil to finish her assignment before the deadline." (iii) the ball is in your court: it is now your turn to take action or make a decision e.g. "I\'ve submitted my application; the ball is now in their court." Award 1 mark each for correct meaning + appropriate sentence.',
+    tags: ['idioms', 'idiomatic-expressions', 'vocabulary', 'figurative-language'],
+    learningObjective: 'Interpret common idiomatic expressions and use them correctly in context',
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // LITERATURE — POETRY
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Poetry Analysis',
+    questionType: 'structured', difficulty: 'medium', marks: 25,
+    questionText: 'Read the following poem carefully and then answer ALL the questions that follow.\n\nTHE LAST FARMER\nBy A. Wanjiku Ndegwa\n\nHe does not check the weather on a screen;\nHe reads it in the language of the clouds,\nThe way a cow stands still before the rain,\nThe particular silence of November afternoons.\n\nHis hands are a record no archive holds:\nTwenty seasons pressed into the palms,\nCallus on callus, the layered autobiography\nOf a man who answered the earth\'s repeated question.\n\nThe sons are gone to the city. They send money.\nIt is not the same as staying.\nHe knows the difference.\n\nEach furrow he opens is a sentence\nIn a language only the soil remembers.\nHe is not afraid of being the last speaker.\n\nAt dusk he walks the boundary of his shamba,\nTouching the fence posts like a man counting his blessings,\nOr perhaps — his losses.\n\nHe plants still.\nNot because he believes the harvest will be great,\nBut because silence, like soil,\nMust be broken to be useful.\n\n1. What is the poem about? Write a brief prose statement of the poem\'s subject matter. (2 marks)\n2. What does the poet mean by "He reads it in the language of the clouds"? What does this tell us about the farmer? (3 marks)\n3. Explain the phrase "Twenty seasons pressed into the palms". What does it suggest about the farmer\'s life? (3 marks)\n4. Comment on the effect of the short stanza: "The sons are gone to the city. They send money. / It is not the same as staying." Why might the poet have chosen to write it this way? (4 marks)\n5. Identify and explain ONE figure of speech in the line "Each furrow he opens is a sentence." (3 marks)\n6. What is the mood of the poem? Use evidence from at least TWO stanzas to support your answer. (4 marks)\n7. Examine the use of contrast in the poem. Identify at least TWO contrasts and explain their significance. (4 marks)\n8. What is the theme of the poem? Discuss how the poet develops this theme through specific images and language choices. (2 marks)',
+    answerGuide: '1. The poem is about an elderly farmer who continues to farm alone after his sons have left for the city. It explores themes of tradition, isolation, perseverance and the value of indigenous knowledge. (2 marks — 1 for subject, 1 for theme). 2. The phrase means the farmer understands natural signs — animal behaviour, cloud patterns, seasonal silences — without technology. It tells us he has deep traditional ecological knowledge passed down through generations. (3 marks: meaning 1, implication 2). 3. "Twenty seasons" = many years of farming; "pressed into the palms" = the physical evidence — calluses, scars — that farming has literally shaped his body. It suggests a life of hard, continuous labour and dedication to the land. (3 marks). 4. The short stanza creates a sense of isolation and emotional weight through brevity. The very short sentences mirror the bluntness of the situation. "They send money" is juxtaposed with "It is not the same as staying" — the poet suggests that money cannot replace presence, love or continuity. The brevity makes this the emotional heart of the poem. (4 marks). 5. Metaphor: "Each furrow he opens is a sentence" — the furrow (a physical groove in soil) is compared to a sentence (a unit of language). This suggests farming is a form of communication, of writing in the language of the earth. It also implies the farmer is one of the last "speakers" of this language. (3 marks: figure identified 1, explanation 2). 6. Mood is melancholic/quietly defiant — stanza 3: "The sons are gone to the city...It is not the same as staying" (loss and loneliness); stanza 5: "Touching the fence posts...counting his blessings, Or perhaps — his losses" (contemplation, sadness). Accept any two relevant stanzas. (4 marks: mood identified 1, two stanza references 3). 7. Contrasts: traditional knowledge vs modern technology ("does not check the weather on a screen" vs "reads it in the language of the clouds"); presence vs absence (farmer on shamba vs sons gone to city); continuity vs change (he plants still vs harvest may not come). Significance: the contrasts highlight what is being lost as Kenya modernises. (4 marks: 2 contrasts × 2 each). 8. Theme: the passing of traditional knowledge/ways of life; perseverance in the face of change and loss. Developed through: the metaphor of language ("language only the soil remembers", "last speaker"), images of the body (calloused hands), and the defiant final lines about breaking silence. (2 marks).',
+    tags: ['poetry', 'The-Last-Farmer', 'Wanjiku-Ndegwa', 'metaphor', 'theme', 'mood', 'contrast', 'figure-of-speech', 'farming'],
+    learningObjective: 'Analyse poetry through comprehension, figurative language, mood, theme and structural choices',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Literary Devices and Techniques',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'From "The Last Farmer" poem:\n(a) Identify ONE example of personification and explain its effect. (2 marks)\n(b) Explain how the final stanza ("He plants still...") serves as a fitting conclusion to the poem. (2 marks)',
+    answerGuide: '(a) "the earth\'s repeated question" — the earth is personified as asking a question that the farmer answers (through farming). Effect: it elevates farming to a dialogue, suggests the land is alive and communicates with those who tend it. Accept other valid examples from the poem with clear explanation. (b) The final stanza resolves the tension of the poem — after establishing isolation and loss, the farmer\'s continued planting becomes an act of defiance and hope. "Silence, like soil, must be broken to be useful" brings together the poem\'s two main metaphors (language/silence and soil/farming) in a statement that validates persistence even without guaranteed reward. Award 2 marks each for identification + developed explanation.',
+    tags: ['poetry', 'personification', 'conclusion', 'figurative-language', 'The-Last-Farmer'],
+    learningObjective: 'Identify and analyse literary devices in poetry and evaluate structural choices',
+  },
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Poetry Analysis',
+    questionType: 'structured', difficulty: 'easy', marks: 2,
+    questionText: 'From "The Last Farmer":\n(a) What is the poem about? Write a brief prose statement of the poem\'s subject matter in TWO sentences. (2 marks)',
+    answerGuide: 'The poem is about an elderly farmer who continues to work his land alone after his sons have migrated to the city. It explores themes of perseverance, the erosion of traditional farming knowledge, and the quiet dignity of those who choose to remain connected to the land. Award 1 mark for identifying the subject (lonely farmer/migration) and 1 mark for identifying a theme.',
+    tags: ['poetry', 'subject', 'theme', 'The-Last-Farmer'],
+    learningObjective: 'Identify the subject matter and main theme of a poem',
+  },
+
+  // ══════════════════════════════════════════════════════════════════
+  // GRAMMAR IN USE — ADDITIONAL BATCH 2
+  // ══════════════════════════════════════════════════════════════════
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Nouns — Count and Non-count',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'Write FIVE original sentences, each containing a different type of noun. Underline the noun and label its type: (i) common noun (ii) proper noun (iii) abstract noun (iv) collective noun (v) non-count noun.',
+    answerGuide: 'Award 1 mark for each sentence with correct type, underlined and labelled. Accept Kenyan context. (i) common: "The teacher marked our books." (ii) proper: "Nairobi is a vibrant city." (iii) abstract: "Her courage inspired everyone." (iv) collective: "A flock of flamingos flew over Lake Nakuru." (v) non-count: "She gave me advice about my studies."',
+    tags: ['nouns', 'types', 'sentence-writing'], learningObjective: 'Write sentences demonstrating knowledge of different noun types',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Correct the adjective order in the following sentences. Rewrite each sentence correctly:\n(i) She wore a silk beautiful blue dress.\n(ii) He drives an old Italian red sports car.\n(iii) The young tired Kenyan athletes rested.\n(iv) They bought a wooden large square table.\n(v) She carried a leather expensive small handbag.',
+    answerGuide: 'Adjective order: Opinion→Size→Age→Shape→Colour→Origin→Material. (i) beautiful blue silk dress. (ii) old red Italian sports car. (iii) tired young Kenyan athletes. (iv) large square wooden table. (v) expensive small leather handbag. Award 1 mark each.',
+    tags: ['adjective-order', 'correction'], learningObjective: 'Place adjectives in the correct order within noun phrases',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Adjectives — Descriptive, Comparative, Superlative',
+    questionType: 'short_answer', difficulty: 'easy', marks: 6,
+    questionText: 'Write the comparative and superlative forms:\n(i) good (ii) far (iii) careful (iv) bad (v) little (vi) modern',
+    answerGuide: '(i) better/best. (ii) farther/farthest or further/furthest. (iii) more careful/most careful. (iv) worse/worst. (v) less/least. (vi) more modern/most modern. Award 1 mark each for both forms correct.',
+    tags: ['comparatives', 'superlatives', 'irregular', 'adjectives'], learningObjective: 'Form comparative and superlative forms of regular and irregular adjectives',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Word Classes: Prepositions — Place, Time, Direction',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'Fill in the blanks with the correct preposition (at, in, on, by, for, since, during, between):\n(i) The match starts ________ 3:00 PM.\n(ii) She has been studying ________ 6 o\'clock.\n(iii) He sat ________ John and Mary.\n(iv) The students revised ________ the holidays.\n(v) We have not eaten ________ this morning.',
+    answerGuide: '(i) at. (ii) since. (iii) between. (iv) during. (v) since. Award 1 mark each.',
+    tags: ['prepositions', 'time', 'place', 'fill-gap'], learningObjective: 'Use prepositions of time and place correctly',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Relative Clauses',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Combine each pair using an appropriate relative pronoun (who, which, whose, where, when):\n(i) The woman is a doctor. She won the award.\n(ii) The book is very informative. I bought it last week.\n(iii) I visited the hospital. My mother works there.\n(iv) The student passed all exams. Her father is a teacher.\n(v) I remember the day. I first went to Nairobi on that day.',
+    answerGuide: '(i) The woman who won the award is a doctor. (ii) The book that/which I bought last week is very informative. (iii) I visited the hospital where my mother works. (iv) The student whose father is a teacher passed all exams. (v) I remember the day when I first went to Nairobi. Award 1 mark each.',
+    tags: ['relative-clauses', 'sentence-combination', 'who', 'which', 'whose', 'where', 'when'], learningObjective: 'Combine sentences using appropriate relative pronouns',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Sentences — Types and Structures',
+    questionType: 'short_answer', difficulty: 'medium', marks: 4,
+    questionText: 'Identify the sentence type (simple, compound, complex, compound-complex):\n(i) The rain fell heavily.\n(ii) The teacher explained and students listened attentively.\n(iii) Although she was tired, she continued to study.\n(iv) She had prepared well, and because she was confident, she passed.',
+    answerGuide: '(i) Simple. (ii) Compound. (iii) Complex. (iv) Compound-complex. Award 1 mark each.',
+    tags: ['sentence-types', 'simple', 'compound', 'complex', 'identification'], learningObjective: 'Identify sentence types based on clause structure',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Spelling and Commonly Confused Words',
+    questionType: 'short_answer', difficulty: 'easy', marks: 6,
+    questionText: 'Apply the correct spelling rule:\n(i) hope + -ing\n(ii) study + -ed\n(iii) plan + -er\n(iv) happy + -ness\n(v) mis- + spell\n(vi) climate + -ic',
+    answerGuide: '(i) hoping. (ii) studied. (iii) planner. (iv) happiness. (v) misspell. (vi) climatic. Award 1 mark each.',
+    tags: ['spelling', 'affixes', 'spelling-rules'], learningObjective: 'Apply spelling rules when adding affixes',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Clause Patterns',
+    questionType: 'structured', difficulty: 'hard', marks: 5,
+    questionText: 'Rewrite each sentence using the clause type in brackets:\n(i) She went to the market. She needed vegetables. [purpose]\n(ii) He failed. He had studied hard. [contrast]\n(iii) The crowd cheered. The runner crossed. [time]\n(iv) You water the plants. They grow. [condition]\n(v) She was appointed prefect. She is responsible. [reason]',
+    answerGuide: '(i) She went to the market so that she could get vegetables. (ii) Although he had studied hard, he failed. (iii) When the runner crossed, the crowd cheered. (iv) If you water the plants, they will grow. (v) She was appointed prefect because she is responsible. Award 1 mark each.',
+    tags: ['clause-patterns', 'adverbial-clauses', 'purpose', 'contrast', 'time', 'condition', 'reason'], learningObjective: 'Transform sentences to incorporate specified clause patterns',
+  },
+
+  // ── MORE READING ───────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Reading Fluency: Scanning',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Explain the difference between skimming and scanning. Give ONE situation where you would use each strategy.',
+    answerGuide: 'Skimming: reading quickly for general idea/gist — e.g. skimming a newspaper to see if relevant. Scanning: moving eyes rapidly to find specific information — e.g. scanning a timetable for a bus time. Award 1 mark for definition + 1 mark for example each.',
+    tags: ['skimming', 'scanning', 'reading-strategies'], learningObjective: 'Distinguish between skimming and scanning and apply appropriately',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Extensive Reading: Reference Materials',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Explain the importance of reference materials in academic study. Name FOUR types and state how each helps a learner.',
+    answerGuide: 'Any four: Dictionary (word meanings/pronunciation), Thesaurus (synonyms to improve vocabulary), Encyclopaedia (background research information), Atlas (geographical data/maps), Textbook index (locate specific topics quickly), Online databases (current/wide-ranging information). Award 1 mark each for type + valid explanation.',
+    tags: ['reference-materials', 'dictionary', 'thesaurus', 'research'], learningObjective: 'Identify and use different reference materials in academic research',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Read the passage and answer questions.\n\nIn Kisumu County, the Lake Victoria fishing industry has long been the backbone of the local economy. Thousands of fishermen wake before dawn each day launching boats onto the vast lake in search of tilapia and Nile perch. However, the industry has faced significant challenges. Invasive species, overfishing, and water hyacinth have drastically reduced fish stocks. Many fishermen return with empty nets. In response, the County Government launched a programme promoting fish farming, training over two thousand farmers in aquaculture techniques.\n\n(a) State the main economic activity described. (1 mark)\n(b) Identify THREE challenges facing the fishing industry. (3 marks)\n(c) What solution has the County Government proposed? (1 mark)\n(d) Explain the meaning of "invasive species". (1 mark)',
+    answerGuide: '(a) Fishing/Lake Victoria fishing industry. (b) Invasive species; overfishing; water hyacinth. (c) Fish farming/aquaculture — training farmers. (d) Foreign organisms that harm the existing ecosystem. Award as specified.',
+    tags: ['comprehension', 'Lake-Victoria', 'Kisumu', 'fishing', 'aquaculture'], learningObjective: 'Answer comprehension questions testing retrieval and vocabulary',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Intensive Reading: Comprehension',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Read the passage and answer questions.\n\nEvery year millions of young Kenyans sit national examinations that will determine their futures. Examination fever sets in weeks before — not merely anxiety but a full-spectrum shutdown of normal life. Friendships are paused. Sleep becomes a luxury. Yet research shows that sacrificing rest for more study hours is counterproductive. A brain deprived of sleep consolidates memories poorly and is prone to panic. The most effective examination strategy, paradoxically, may be to study less — but more efficiently.\n\n(a) What is the main idea of the passage? (2 marks)\n(b) What does "examination fever" mean? (2 marks)\n(c) Identify ONE language technique and explain its effect. (2 marks)',
+    answerGuide: '(a) Sacrificing sleep to study more is counterproductive; efficient study with adequate rest is more effective. (b) Intense anxiety and total disruption to normal life caused by approaching exams — metaphor comparing stress to an illness. (c) Metaphor "examination fever"; Listing "friendships paused...sleep a luxury"; Paradox "study less — more efficiently." Award 2 marks each.',
+    tags: ['comprehension', 'examinations', 'sleep', 'language-features', 'metaphor'], learningObjective: 'Identify main ideas and analyse language techniques in informational texts',
+  },
+
+  // ── MORE WRITING ───────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
+    questionType: 'short_answer', difficulty: 'easy', marks: 3,
+    questionText: 'State FIVE things that must be included in the body of a formal letter of complaint.',
+    answerGuide: 'Any five: clear statement of what was purchased/when; specific description of the defect; evidence/reference number; impact/inconvenience caused; specific request (replacement/refund); deadline for response; threat of further action. Award 1 mark each.',
+    tags: ['complaint-letter', 'body', 'content'], learningObjective: 'Identify essential content of a formal complaint letter',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Meetings — Notice, Agenda and Minutes',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'Explain the purpose of meeting minutes and identify FIVE pieces of information that must be recorded.',
+    answerGuide: 'Purpose: official written record of decisions, actions and attendance providing accountability and reference. Five items: (1) Name of organisation. (2) Date, time, venue. (3) Attendance and apologies. (4) Discussion summary per agenda item. (5) Decisions/resolutions. Also accept: chairperson, secretary, time of closure, next meeting date. Award 1 mark for purpose + 1 each for any 4 items.',
+    tags: ['minutes', 'meeting-documents', 'purpose', 'content'], learningObjective: 'State purpose of minutes and identify essential information to record',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Creative Writing: Narrative and Descriptive Essays',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a descriptive composition about ONE of the following:\n(a) A busy Kenyan market on a Saturday morning\n(b) Sunrise over a Kenyan landscape\n\n300–350 words. Marked on: Content (8) — sensory details, atmosphere; Organisation (4); Language (6) — descriptive/figurative; Mechanics (2).',
+    answerGuide: 'Content (8): sensory details — sight/sound/smell/touch (2), vivid atmosphere (2), specific Kenyan details (2), coherent overall picture (2). Organisation (4): opening setting scene (1), developed middle (2), ending (1). Language (6): figurative language (2), varied vocabulary (2), sentence variety (2). Mechanics (2).',
+    tags: ['descriptive', 'market', 'Kenya', 'sensory', 'figurative'], learningObjective: 'Write a vivid descriptive composition using sensory details and figurative language',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Paragraphing Skills',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Rewrite the paragraph improving coherence with appropriate connectors. Fix any errors.\n\n"The internet has changed education. Students access information. Teachers use technology. Some students have no smartphones. Schools in rural areas lack internet. The government should invest in ICT. Students in cities have advantages. Every learner deserves equal opportunities."',
+    answerGuide: 'Rewritten paragraph should use connectors: "however", "furthermore", "in addition", "therefore", "on the other hand", "nonetheless". Logical flow: internet benefits → challenges → solution → conclusion. Award: connectors used appropriately (2), logical flow (2), grammatical correctness (1), clear topic sentence (1).',
+    tags: ['paragraphing', 'connectors', 'coherence', 'rewriting'], learningObjective: 'Improve paragraph coherence through connectors and logical organisation',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Diary and Journal Entries',
+    questionType: 'essay', difficulty: 'medium', marks: 15,
+    questionText: 'Write a diary entry about a significant experience at school recently. Include date, greeting, detail, feelings and reflection. Write 200–250 words.\n\nMarked on: Content (6), Organisation (3), Language (4), Mechanics (2)',
+    answerGuide: 'Content (6): clear event described (3), feelings and reflection (3). Organisation (3): format with date and "Dear Diary" (1), logical structure (1), closing thought (1). Language (4): first-person maintained (1), varied vocab (1), expressive (1), sentence variety (1). Mechanics (2).',
+    tags: ['diary', 'personal-writing', 'first-person', 'reflection'], learningObjective: 'Write a correctly formatted personal diary entry',
+  },
+
+  // ── MORE LISTENING AND SPEAKING ────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Critical Listening',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Define "critical listening" and distinguish it from ordinary listening. Explain THREE key skills a critical listener must develop.',
+    answerGuide: 'Critical listening: active, analytical listening evaluating the speaker\'s message — identifying purpose, bias and logic. Ordinary: passive reception. Three skills (1 each): identifying speaker\'s purpose; evaluating evidence; distinguishing fact from opinion. Also accept: recognising bias, noting context, non-verbal cues. Award 2 marks for definitions + 1 each for skills.',
+    tags: ['critical-listening', 'skills', 'fact-opinion', 'purpose'], learningObjective: 'Define critical listening and identify skills for analytical listening',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Interactive Listening',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Explain FOUR turn-taking strategies used in workplace meetings and discussions.',
+    answerGuide: 'Any four: (1) Listen without interrupting. (2) Use verbal signals "Could I add...?" (3) Non-verbal signals — lean forward. (4) Acknowledge previous speaker "Building on what X said..." (5) Keep contributions concise. (6) Paraphrase to confirm before adding. Award 1 mark each.',
+    tags: ['turn-taking', 'meetings', 'interactive-listening'], learningObjective: 'Apply turn-taking strategies in formal discussions',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Selective Listening: Filtering and Extracting Information',
+    questionType: 'structured', difficulty: 'easy', marks: 4,
+    questionText: 'Explain the difference between "extensive listening" and "intensive listening". Give a specific example of each.',
+    answerGuide: 'Extensive: listening to wide material for general understanding and enjoyment — e.g. listening to a radio programme about current events. Intensive: focused detailed listening for specific information — e.g. listening to a speech and recording all key points about climate change. Award 2 marks each for correct definition + valid example.',
+    tags: ['extensive-listening', 'intensive-listening', 'distinction'], learningObjective: 'Distinguish between extensive and intensive listening with examples',
+  },
+
+  // ── MORE LITERATURE ────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Literary Devices and Techniques',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Identify and explain the literary device in each extract. State its effect:\n(i) "The morning sun crept over the hills like a shy animal peering round a corner."\n(ii) "The city never sleeps — it pulses and breathes and groans."\n(iii) "His words were a knife — sharp, precise, and cutting."',
+    answerGuide: '(i) Simile — "like a shy animal." Effect: creates gentle, tentative image of dawn; makes sunrise seem alive. (ii) Personification — city given human qualities. Effect: makes city seem alive and overwhelming. (iii) Metaphor — words compared to knife directly. Effect: vivid image of precision and pain; implies both intelligence and cruelty. Award 2 marks each: device (1) + effect (1).',
+    tags: ['simile', 'personification', 'metaphor', 'effect', 'literary-devices'], learningObjective: 'Identify literary devices and explain their effect on the reader',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Oral Literature',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain the importance of oral literature in Kenyan cultural life. Discuss THREE types and explain the cultural function of each.',
+    answerGuide: 'Importance: preserves cultural values, history and identity; entertainment and education; transmits moral lessons. Three types (2 marks each): (1) Folktales/proverbs — teach moral lessons and cultural values. (2) Songs — used in ceremonies (weddings, funerals) to mark life events. (3) Riddles — sharpen critical thinking, introduce children to cultural knowledge. Award 2 marks per type: definition (1) + function (1).',
+    tags: ['oral-literature', 'folktales', 'songs', 'riddles', 'cultural-heritage', 'Kenya'], learningObjective: 'Explain the cultural significance of oral literature types',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Literary Devices and Techniques',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Define each literary device and give ONE example:\n(a) Alliteration\n(b) Onomatopoeia\n(c) Irony\n(d) Symbol',
+    answerGuide: '(a) Alliteration: repetition of consonant sounds e.g. "She sells seashells." (b) Onomatopoeia: word sounds like what it describes e.g. "The bees buzzed." (c) Irony: actual meaning opposite to expected e.g. "The fire station burned down." (d) Symbol: object representing something beyond literal meaning e.g. dove = peace. Award 1 mark each.',
+    tags: ['alliteration', 'onomatopoeia', 'irony', 'symbolism', 'definitions'], learningObjective: 'Define common literary devices with examples',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Poetry Analysis',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Explain the difference between the "mood" of a poem and the "tone" of a poem. How are they different? Give a brief example of each from "The Last Farmer".',
+    answerGuide: 'Mood: emotional atmosphere created in the reader — how the poem makes reader feel. "The Last Farmer" creates quiet melancholy and dignified sadness. Tone: poet\'s attitude towards subject — how poet expresses feeling. In "The Last Farmer" tone is respectful, admiring and gently mournful. Difference: mood = effect on reader; tone = speaker\'s/poet\'s attitude. Award 2 marks each for correct definition with textual example.',
+    tags: ['mood', 'tone', 'poetry', 'distinction', 'The-Last-Farmer'], learningObjective: 'Distinguish between mood and tone in poetry',
+  },
+
+
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Phrases',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Identify and underline the adjective phrase in each sentence. Explain what noun it modifies:\n(i) The student, tired after the long examination, slept immediately.\n(ii) She wore a dress suitable for the formal occasion.\n(iii) The teacher, very pleased with the results, congratulated the class.\n(iv) A journey dangerous but necessary awaited him.',
+    answerGuide: '(i) "tired after the long examination" — modifies "student". (ii) "suitable for the formal occasion" — modifies "dress". (iii) "very pleased with the results" — modifies "teacher". (iv) "dangerous but necessary" — modifies "journey". Award 1 mark each for correctly identifying the adjective phrase and the noun it modifies.',
+    tags: ['adjective-phrases', 'phrases', 'post-modification'], learningObjective: 'Identify adjective phrases and the nouns they modify',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Phrases',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'Expand each simple sentence by adding an appropriate prepositional phrase in the space indicated:\n(i) The students gathered ________ for the assembly. [place]\n(ii) She submitted her assignment ________ . [time]\n(iii) The athlete trained ________ every morning. [place]\n(iv) He spoke ________ during the debate. [manner/place]\n(v) The letter was delivered ________ . [time]',
+    answerGuide: 'Accept any grammatically correct, contextually appropriate prepositional phrase for each. Examples: (i) in the school hall / on the field. (ii) before the deadline / on time. (iii) at the stadium / near the school. (iv) in front of the panel / with great confidence. (v) in the morning / by Friday. Award 1 mark each for any correct prepositional phrase.',
+    tags: ['prepositional-phrases', 'phrases', 'expansion'], learningObjective: 'Expand sentences by adding appropriate prepositional phrases',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Clause Patterns',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Describe the qualities of effective minutes of a meeting. What language style should be used when writing minutes?\n(Also) Explain FIVE clause patterns (SV, SVO, SVA, SVC, SVOO) with an original example sentence for each.',
+    answerGuide: 'Clause patterns: SV (subject+verb): "The children slept." SVO (subject+verb+object): "The teacher marked the scripts." SVA (subject+verb+adverbial): "The meeting took place in Room 8." SVC (subject+verb+complement): "She became a doctor." SVOO (subject+verb+indirect object+direct object): "The principal gave students medals." Award 1 mark each. Minutes language: formal, past tense, passive voice, third person, concise, no personal opinions.',
+    tags: ['clause-patterns', 'SV', 'SVO', 'SVA', 'SVC', 'SVOO'], learningObjective: 'Identify and use the five basic clause patterns in English',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Relative Clauses',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Rewrite each sentence adding a DEFINING relative clause to give more information about the underlined noun:\n(i) The woman is my aunt. [she won a national award]\n(ii) The car broke down on the highway. [my father bought it]\n(iii) The school produces top students. [I attended it]\n(iv) The day was unforgettable. [we graduated on that day]',
+    answerGuide: '(i) The woman who won a national award is my aunt. (ii) The car that/which my father bought broke down on the highway. (iii) The school that/which I attended produces top students. (iv) The day when we graduated was unforgettable. Award 1 mark each for correct relative pronoun and grammatical sentence.',
+    tags: ['defining-relative-clauses', 'relative-pronouns', 'sentence-expansion'], learningObjective: 'Add defining relative clauses to expand noun phrases',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Grammar in Use',
+    subStrand: 'Mechanics of Writing: Abbreviations and Acronyms',
+    questionType: 'short_answer', difficulty: 'easy', marks: 4,
+    questionText: 'Write the full form of each abbreviation or acronym below. Then write ONE sentence using it correctly:\n(i) KCSE\n(ii) KNEC\n(iii) ICT\n(iv) MOU',
+    answerGuide: '(i) Kenya Certificate of Secondary Education. (ii) Kenya National Examinations Council. (iii) Information and Communications Technology. (iv) Memorandum of Understanding. Award 0.5 marks for full form + 0.5 marks for appropriate sentence, per item (total 4).',
+    tags: ['acronyms', 'Kenyan-context', 'KCSE', 'KNEC', 'ICT'], learningObjective: 'Expand Kenyan education-related acronyms and use them in sentences',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Reading Fluency: Previewing',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Explain the SQ4R study technique. Describe each step and explain how it helps understanding when studying a Geography chapter on Climate Change.',
+    answerGuide: 'S — Survey: skim headings, images, summary to get overview (e.g. note "Effects on Agriculture" heading). Q — Question: turn headings into questions (e.g. "How does climate change affect Kenyan farms?"). R — Read: read carefully to answer questions, take notes. R — Reflect: connect new information to what you already know about Kenya\'s climate. R — Recite: explain key points in own words without looking. R — Review: revisit notes after 24 hours to consolidate. Award 1 mark per step with valid Climate Change application (up to 5).',
+    tags: ['SQ4R', 'study-skills', 'reading-strategy', 'climate-change'], learningObjective: 'Apply the SQ4R reading strategy to a subject-specific text',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Critical/Close Reading',
+    questionType: 'structured', difficulty: 'hard', marks: 5,
+    questionText: 'Read the extract and answer the questions.\n\n"Every phone in the room was face-down. Not because anyone had been asked — but because the conversation had finally become more interesting than the screen. The school counsellor had been speaking for forty minutes about the gap between the Kenya most young people see on social media and the Kenya that actually exists. One learner raised her hand. \'But sir,\' she said, \'whose version is real?\'"\n\n(a) What technique does the writer use in "every phone was face-down"? Explain its significance. (2 marks)\n(b) What does the learner\'s question reveal about her? (2 marks)\n(c) Identify the theme of this extract and support with one piece of evidence. (1 mark)',
+    answerGuide: '(a) Irony/contrast — phones face-down voluntarily signals genuine engagement; the writer uses the phone detail to show that real conversation can still compete with technology. (2 marks) (b) She is perceptive and critically aware — she questions reality rather than accepting information at face value; shows intellectual maturity and social awareness. (2 marks) (c) Theme: technology vs reality / the danger of social media misrepresentation. Evidence: "the gap between the Kenya most young people see on social media and the Kenya that actually exists." (1 mark)',
+    tags: ['close-reading', 'irony', 'theme', 'inference', 'social-media', 'Kenya'], learningObjective: 'Identify literary techniques, make inferences and identify themes in short prose extracts',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Reading',
+    subStrand: 'Extensive Reading',
+    questionType: 'structured', difficulty: 'easy', marks: 4,
+    questionText: 'Explain FOUR benefits of extensive reading for a Grade 10 learner.',
+    answerGuide: 'Any four: (1) Builds vocabulary — exposure to many words in context. (2) Improves comprehension — regular reading develops ability to understand complex texts. (3) Enhances writing skills — learners absorb sentence structures, style and organisation. (4) Broadens general knowledge — reading widely expands world knowledge. (5) Improves spelling and grammar naturally through exposure. (6) Develops critical thinking — encountering different perspectives in texts. Award 1 mark each.',
+    tags: ['extensive-reading', 'benefits', 'vocabulary', 'comprehension'], learningObjective: 'Explain the benefits of extensive reading for language development',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Memos',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE structural differences between a formal letter and a memo.',
+    answerGuide: 'Any five: (1) Letter has full addresses; memo has TO/FROM/DATE/SUBJECT headings only. (2) Letter has "Dear Mr/Ms..." salutation; memo has none. (3) Letter has "Yours sincerely/faithfully" sign-off; memo has none. (4) Memo uses concise bullet-style language; letter uses full paragraphs. (5) Letter identifies sender and recipient through addresses; memo uses job title/department. (6) Memos are internal documents; formal letters are external. Award 1 mark each.',
+    tags: ['memo', 'formal-letter', 'difference', 'format', 'structure'], learningObjective: 'Distinguish between the format of a memo and a formal letter',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Creative Writing: Argumentative and Expository Essays',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write an expository article for your school magazine on: THE IMPORTANCE OF CAREER PLANNING FOR YOUNG KENYANS IN GRADE 10.\n\nYour article should: have a clear title and introduction; develop at least FOUR main points; use Kenyan examples; have a strong conclusion. Write 300–400 words.\n\nMarked on: Content (8), Organisation (4), Language (6), Mechanics (2)',
+    answerGuide: 'Content (8): clear understanding of career planning (2), at least four valid points developed — e.g. self-awareness, research, setting goals, seeking guidance (4), Kenyan context/examples (2). Organisation (4): title (1), introduction (1), paragraphed body (1), conclusion (1). Language (6): expository tone (2), vocabulary (2), discourse markers (2). Mechanics (2).',
+    tags: ['expository', 'careers', 'article', 'magazine', 'Kenya'], learningObjective: 'Write an expository article presenting ideas in a clear organised structure',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Critical Listening',
+    questionType: 'structured', difficulty: 'medium', marks: 4,
+    questionText: 'Explain FOUR common barriers to effective listening and suggest how each can be overcome.',
+    answerGuide: 'Any four (1 mark each, 0.5 for barrier + 0.5 for solution): (1) Environmental noise — find a quieter location; sit closer to speaker. (2) Personal distractions / wandering mind — focus intentionally; note key words. (3) Prejudice/bias about speaker — suspend judgement; focus on content. (4) Language difficulty — request repetition; ask for clarification. (5) Information overload — note main points only; use abbreviations. (6) Emotional state — take a moment to calm before listening sessions.',
+    tags: ['barriers-to-listening', 'critical-listening', 'distractions', 'overcoming-barriers'], learningObjective: 'Identify barriers to effective listening and strategies to overcome them',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Listening and Speaking',
+    subStrand: 'Speaking Fluency: Public Speaking',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Explain the importance of correct intonation in oral communication. What are the intonation patterns for:\n(i) Statements\n(ii) Yes/No questions\n(iii) Wh- questions\n(iv) Lists\n(v) Exclamations',
+    answerGuide: 'Importance of intonation (1 mark): conveys meaning beyond words — changes attitude, emphasis and even the meaning of a sentence. Patterns (1 mark each): (i) Statements — falling intonation (voice drops at end). (ii) Yes/No questions — rising intonation (voice rises at end). (iii) Wh- questions — falling intonation. (iv) Lists — rising on each item, falling on the final item. (v) Exclamations — falling with wide pitch range.',
+    tags: ['intonation', 'pronunciation', 'public-speaking', 'rising', 'falling'], learningObjective: 'Identify and apply intonation patterns for different sentence types',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Prose Analysis',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain the following narrative techniques and give ONE example of how each could be used in a Kenyan story:\n(i) Flashback (2 marks)\n(ii) Foreshadowing (2 marks)\n(iii) Dialogue (2 marks)',
+    answerGuide: '(i) Flashback: narrative moves back to a past event. Example: character at Kenyatta National Hospital remembers growing up in Nyeri — explains why she became a nurse. (ii) Foreshadowing: earlier hints that prepare reader for later events. Example: farmer notices wilting crops despite rain — foreshadows discovery of soil disease. (iii) Dialogue: conversation between characters reveals personality and advances plot. Example: two Grade 10 students discussing career paths reveals different ambitions. Award 2 marks each: definition (1) + Kenyan example (1).',
+    tags: ['narrative-techniques', 'flashback', 'foreshadowing', 'dialogue', 'prose'], learningObjective: 'Define and apply narrative techniques in Kenyan story contexts',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Poetry Analysis',
+    questionType: 'structured', difficulty: 'hard', marks: 6,
+    questionText: 'Read the short poem and answer the questions below.\n\nTHE MARKET WOMAN\nShe rises before the sun,\nher back a question mark\ncurved under the weight\nof what she carries and what she does not say.\nAt the roadside she arranges mangoes\nlike small bright promises.\nBy noon she has sold\nthe morning.\n\n(a) Identify and explain ONE figure of speech in the poem. (2 marks)\n(b) What is the mood of the poem? Support with evidence. (2 marks)\n(c) What do you think the poet means by "she has sold the morning"? (2 marks)',
+    answerGuide: '(a) Metaphor — "her back a question mark" compares her bent posture to a question mark; suggests she carries unspoken burdens and unresolved struggles. OR Metaphor — "mangoes like small bright promises" (simile) — suggests hope and the fragility of her income. (b) Mood: quiet, dignified melancholy — evidence: "what she does not say" (suppressed suffering), "rises before the sun" (toil), back "curved under the weight". (c) "Sold the morning" means she has traded her effort, time and early hours for money — by noon the productive part of her day is gone; implies the toll of informal trade on her time and body. Award 2 marks each.',
+    tags: ['poetry', 'metaphor', 'mood', 'women', 'market', 'Kenya', 'figure-of-speech'], learningObjective: 'Analyse a short poem for figurative language, mood and meaning',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Literature',
+    subStrand: 'Drama Analysis',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Explain FIVE ways in which a playwright uses dramatic techniques to engage the audience in a play.',
+    answerGuide: 'Any five: (1) Dramatic irony — audience knows something characters do not, creating tension. (2) Soliloquy — character speaks thoughts aloud, giving audience insight into mind. (3) Conflict — disagreement between characters creates tension and drives plot. (4) Dramatic climax — high-tension moment where conflict peaks. (5) Foreshadowing — hints of future events create suspense. (6) Setting/stage directions — create atmosphere and context. (7) Dialogue — reveals character and advances plot. Award 1 mark each.',
+    tags: ['drama', 'dramatic-irony', 'soliloquy', 'conflict', 'climax', 'dramatic-techniques'], learningObjective: 'Identify and explain dramatic techniques used by playwrights to engage audiences',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Functional Writing: Formal Letters — Complaint, Request, Inquiry',
+    questionType: 'essay', difficulty: 'hard', marks: 20,
+    questionText: 'Write a formal letter to a well-known Kenyan sports personality, requesting their appearance at your school sports day as a guest of honour. Your letter should:\n(i) Follow full formal letter format\n(ii) Introduce your school\n(iii) Describe the event\n(iv) State why you chose this person\n(v) Make a clear, polite request\nWrite approximately 250–300 words.\n\nMarked on: Content (8), Format (6), Language (4), Mechanics (2)',
+    answerGuide: 'Content (8): school introduction (2), clear event description including date/theme (2), reason for choosing this personality (2), clear polite request (2). Format (6): sender address (1), date (1), recipient address (1), salutation (1), paragraphed body (1), "Yours sincerely" + signature (1). Language (4): formal register maintained (2), appropriate vocabulary and sentence variety (2). Mechanics (2).',
+    tags: ['formal-letter', 'request', 'sports', 'Kenyan-sports', 'guest-of-honour'], learningObjective: 'Write a persuasive formal letter of request to a public figure',
+  },
+  {
+    grade: 'Grade 10', subject: 'English',
+    strand: 'Writing',
+    subStrand: 'Paragraphing Skills',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'Write ONE effective topic sentence for each paragraph topic below. Then write TWO supporting sentences for ONE of them:\n(i) The importance of reading books\n(ii) Challenges facing young people in Kenya\n(iii) The role of technology in modern education',
+    answerGuide: 'Topic sentences — assess clarity of main idea, appropriate scope, engagement. Examples: (i) "Books are windows into other worlds that expand our understanding of humanity." (ii) "Young Kenyans today face a complex web of challenges that previous generations could scarcely have imagined." (iii) "Technology has fundamentally transformed the learning experience." Award 1 mark each for quality topic sentence (3 marks). Supporting sentences (2 marks): two sentences that develop the topic sentence with evidence/explanation, not merely repeat it. Deduct if sentences are too vague or off-topic.',
+    tags: ['topic-sentences', 'paragraphing', 'supporting-sentences', 'organisation'], learningObjective: 'Write effective topic sentences and develop them with supporting sentences',
+  },
+
+
+
+  // ── GRADE 10 — CRE ADDITIONAL (New Testament + Church in Action) ─────────
+
+  // ── GRADE 10 — CRE ADDITIONAL (New Testament + Church in Action) ─────────
+  // Source: KLB Topical Revision Booklet + Term 2 Schemes + Opener Term 2 2026
+
+  // NEW TESTAMENT — Infancy and Early Life
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Describe EIGHT aspects of human dignity revealed in the two accounts of creation in Genesis 1 and 2. (8 marks)\n(b) Explain SEVEN consequences of the Fall of Man as recorded in Genesis 3. (7 marks)\n(c) State FIVE ways in which Christians today can be responsible stewards of God\'s creation. (5 marks)',
+    answerGuide: '(a) Any 8: created in God\'s image (imago Dei); given dominion over creation; created male and female in equality; breathed into by God (life from God); placed in garden to tend it; given the gift of relationship/companionship; given freedom of choice; uniquely named by God — 1 mark each. (b) Any 7: spiritual death/separation from God; physical death; shame and guilt; broken relationship between man and woman; painful childbirth; toil and hardship in work; expelled from Eden/loss of paradise; cursed ground; enmity between humans and serpent — 1 mark each. (c) Any 5: conserving environment/planting trees; reducing pollution; responsible use of natural resources; supporting environmental policies; educating others on conservation; recycling; protecting wildlife — 1 mark each.',
+    tags: ['creation', 'human dignity', 'Fall of Man', 'stewardship', 'Genesis'], learningObjective: 'Explain human dignity in creation and consequences of the Fall',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Describe the baptism and temptation of Jesus Christ as recorded in Luke 3:21-22 and Luke 4:1-13. (6 marks)\n(b) Explain FIVE lessons that Christians can draw from the way Jesus responded to temptation in the wilderness. (5 marks)\n(c) State FOUR ways in which the baptism of Jesus is significant to Christians in their spiritual lives today. (4 marks)',
+    answerGuide: '(a) At baptism: Jesus was baptised in the Jordan by John; Holy Spirit descended in form of dove; voice from heaven: "You are my Son, whom I love; with you I am well pleased"; Jesus full of Holy Spirit led into wilderness; First temptation: stones to bread — Jesus refused: "Man shall not live on bread alone" (Deut 8:3); Second: worship Satan for kingdoms — refused: "Worship the Lord your God only" (Deut 6:13); Third: throw himself from temple — refused: "Do not put the Lord to test" (Deut 6:16) — 1 mark each for any 6. (b) Any 5: use scripture to overcome temptation; rely on the Holy Spirit; pray and fast; resist the devil; trust God\'s provision; know God\'s Word deeply; stand firm in identity/calling — 1 mark each. (c) Any 4: commissioning by God for service; affirmation of Jesus Christ divine identity; model for Christian baptism; outpouring of Holy Spirit; public declaration of faith — 1 mark each.',
+    tags: ['baptism of Jesus', 'temptation', 'Luke', 'Holy Spirit', 'wilderness'], learningObjective: 'Describe the baptism and temptation of Jesus and draw lessons',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Describe how Old Testament prophecies were fulfilled in the birth and early life of Jesus Christ. Give FOUR specific examples. (4 marks)\n(b) Explain FOUR lessons Christians learn from the role of John the Baptist in preparing the way for Jesus. (4 marks)',
+    answerGuide: '(a) Any 4: born of a virgin (Isaiah 7:14 → Matt 1:23); born in Bethlehem (Micah 5:2 → Luke 2:4-7); flight to Egypt (Hosea 11:1 → Matt 2:15); massacre of infants (Jeremiah 31:15 → Matt 2:18); messenger to prepare the way (Malachi 3:1 → Luke 1:17); came from line of David (Isaiah 11:1 → Luke 3:31) — 1 mark each. (b) Any 4: humility in service — John acknowledged he was not worthy to untie Jesus Christ sandals; commitment to calling; calling people to repentance; pointing others to Christ rather than self; courage to speak truth — 1 mark each.',
+    tags: ['prophecy-fulfilled', 'John-the-Baptist', 'birth-of-Jesus', 'OT-prophecy'], learningObjective: 'Identify OT prophecies fulfilled in Jesus birth and role of John the Baptist',
+  },
+
+  // NEW TESTAMENT — Galilean Ministry
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Galilean Ministry',
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Describe the call and commissioning of Isaiah as recorded in Isaiah 6:1-13 and outline the main message he was sent to deliver. (6 marks)\n(b) Explain FIVE ways in which the message of the Old Testament prophets is relevant to Christians and their societies today. (5 marks)\n(c) State FOUR characteristics that distinguished true prophets from false prophets in the Old Testament. (4 marks)',
+    answerGuide: '(a) Isaiah saw the Lord on a high throne; seraphim worshipped with "Holy, holy, holy"; seraph touched Isaiah\'s lips with coal saying sin atoned; God asked "Whom shall I send?"; Isaiah responded "Here am I, send me!"; message: people would hear but not understand; continue until land desolate; holy remnant would remain — 1 mark each for any 6. (b) Any 5: warns against corruption and injustice in government; calls for social justice and care for the poor; warns of consequences of disobedience; encourages repentance; gives hope of restoration; challenges exploitation of the vulnerable; relevant to Kenya\'s political/social challenges — 1 mark each. (c) Any 4: true prophets\' messages came to pass; spoke in the name of YHWH; called people to obedience; suffered for their message; performed genuine miracles; their message was consistent with the Law — 1 mark each.',
+    tags: ['Isaiah', 'call of Isaiah', 'OT prophets', 'true vs false prophets'], learningObjective: 'Describe Isaiah\'s call and explain relevance of prophetic message today',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Galilean Ministry',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Explain FIVE lessons that Christians can learn from Jesus Christ rejection at Nazareth (Luke 4:16-30). (5 marks)\n(b) State THREE characteristics of a true disciple of Jesus as revealed in the Galilean ministry. (3 marks)',
+    answerGuide: '(a) Any 5: rejection does not invalidate God\'s calling; familiarity can breed contempt; Jesus continued His mission despite rejection; the Gospel is for all people regardless of background; true prophets are often rejected by their own; Christians should not be discouraged by opposition; God\'s grace extends beyond one community — 1 mark each. (b) Any 3: willingness to leave everything and follow; obedience to Jesus Christ call; faith in His teaching; commitment to service; love for others; willingness to learn — 1 mark each.',
+    tags: ['rejection at Nazareth', 'discipleship', 'Galilean ministry', 'Luke'], learningObjective: 'Draw lessons from Jesus Christ rejection and identify marks of true discipleship',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Galilean Ministry',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Explain the significance of the transfiguration of Jesus (Luke 9:28-36) and state THREE lessons for Christians. (5 marks)\n(b) State FIVE reasons why Jesus used parables to teach. (5 marks)',
+    answerGuide: '(a) Significance: confirmed Jesus Christ divine identity; Moses and Elijah representing Law and Prophets; voice of God affirming Jesus; Jesus Christ face and clothes became dazzling white; disciples saw His glory before the cross — any 3 for 3 marks. Lessons: Jesus is the fulfillment of OT; prayer transforms; Jesus Christ glory is real; disciples should listen to Him; there is life after death — any 2 for 2 marks. (b) Any 5: to explain spiritual truths using everyday situations; to make abstract truths concrete; to test those who were truly seeking; to reveal truth to the humble and conceal from the proud; to make truth memorable; to avoid direct confrontation with authorities; to invite personal reflection — 1 mark each.',
+    tags: ['transfiguration', 'parables', 'Galilean ministry', 'Luke 9'], learningObjective: 'Explain the significance of the transfiguration and purpose of parables',
+  },
+
+  // NEW TESTAMENT — Paul\'s 1 Corinthians
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Explain the divisions in the Corinthian church as described by Paul in 1 Corinthians 1-3 and state how Paul responded. (6 marks)\n(b) Explain FIVE ways in which Paul\'s teachings on unity in 1 Corinthians are relevant to the church in Kenya today. (5 marks)\n(c) State FOUR moral challenges that Paul addressed in the Corinthian church that are still relevant to young people in Kenya today. (4 marks)',
+    answerGuide: '(a) Divisions: church split into factions following Paul, Apollos, Cephas, or Christ (1 Cor 1:12); came from spiritual pride; some claimed superior wisdom; Paul responded: Is Christ divided?; boast only in the Lord; he planted, Apollos watered, God gave growth; the church is God\'s temple — 1 mark each for any 6. (b) Any 5: denominational divisions in Kenya should be avoided; all Christians serve the same Lord; spiritual gifts should not cause pride; unity in worship; cooperation across denominations; shared mission; church should be one body — 1 mark each. (c) Any 4: sexual immorality; lawsuits between Christians; idolatry; abuse of Holy Communion; spiritual pride; gluttony at church gatherings — 1 mark each.',
+    tags: ['1 Corinthians', 'church divisions', 'Paul', 'unity', 'moral challenges', 'Kenya'], learningObjective: 'Explain church divisions in Corinth and apply Paul\'s teachings to Kenya',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Describe Paul\'s teaching on the body of Christ and spiritual gifts in 1 Corinthians 12. (5 marks)\n(b) State THREE lessons Christians learn from Paul\'s teaching that the body must be kept holy (1 Corinthians 6:19-20). (3 marks)',
+    answerGuide: '(a) Church is one body with many members; different members have different functions; all gifts come from the same Spirit (1 Cor 12:4-6); no gift is more important; all gifts needed for the body to function; diversity creates unity; body suffers/rejoices together; lists gifts: wisdom, knowledge, faith, healing, miracles, prophecy, discernment, tongues, interpretation — 1 mark each for any 5. (b) Any 3: the body is the temple of the Holy Spirit; Christians should avoid sexual immorality; we are bought with a price (Christ\'s blood); glorify God in your body; physical health matters to God — 1 mark each.',
+    tags: ['body of Christ', 'spiritual gifts', 'holy body', '1 Corinthians 12', '1 Corinthians 6'], learningObjective: 'Explain Paul\'s teaching on spiritual gifts and bodily holiness',
+  },
+
+  // CHURCH IN ACTION — Holy Spirit
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Describe the outpouring of the Holy Spirit on the Day of Pentecost as recorded in Acts 2:1-41 and state the key points of Peter\'s sermon. (6 marks)\n(b) Explain FIVE roles of the Holy Spirit in the life of a believer today. (5 marks)\n(c) State FOUR ways in which Christians can distinguish true spiritual gifts from counterfeit ones. (4 marks)',
+    answerGuide: '(a) Disciples gathered in upper room; sound like rushing wind filled the house; tongues of fire appeared on each person; all filled with Holy Spirit; began speaking in other tongues; crowd marvelled but some mocked; Peter stood and preached: Jesus of Nazareth confirmed by miracles; crucified by plan of God; raised from the dead; exalted at God\'s right hand; poured out Holy Spirit; call to repentance and baptism; 3,000 added that day — 1 mark each for any 6. (b) Any 5: guides into all truth (John 16:13); convicts of sin; empowers for service (Acts 1:8); intercedes for believers (Romans 8:26); produces fruit of the Spirit (Gal 5:22-23); gifts for ministry; comforter/advocate; sanctifies believers — 1 mark each. (c) Any 4: consistent with scripture; brings glory to Jesus not to self; produces fruit of the Spirit; verified by mature church leaders; does not contradict God\'s character; leads to repentance and holiness — 1 mark each.',
+    tags: ['Pentecost', 'Acts 2', 'Holy Spirit', 'Peter\'s sermon', 'spiritual gifts', 'true vs false'], learningObjective: 'Describe Pentecost and explain the role of the Holy Spirit in believers',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) List and classify the gifts of the Holy Spirit as described in 1 Corinthians 12:7-11. (5 marks)\n(b) State THREE lessons Christians learn from the teaching that the Holy Spirit distributes gifts as He wills. (3 marks)',
+    answerGuide: '(a) Gifts: wisdom; knowledge; faith; healing; miracles; prophecy; discernment of spirits; speaking in tongues; interpretation of tongues — 1 mark each for any 5. Classification: revelation gifts (wisdom, knowledge, discernment); power gifts (faith, healing, miracles); vocal gifts (prophecy, tongues, interpretation). (b) Any 3: no Christian should feel superior because of their gift; gifts come from God not human effort; every believer has at least one gift; gifts are given for the common good not personal glory; Christians should use their gifts in service — 1 mark each.',
+    tags: ['gifts of Holy Spirit', '1 Corinthians 12', 'classification of gifts'], learningObjective: 'Identify and classify spiritual gifts from 1 Corinthians 12',
+  },
+
+  // CHURCH IN ACTION — Holy Trinity
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Trinity',
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Explain the meaning of the doctrine of the Holy Trinity and describe the distinct role of each Person. (6 marks)\n(b) Explain FIVE ways in which belief in the Holy Trinity shapes the Christian life. (5 marks)\n(c) State FOUR Bible passages that clearly reveal the Trinity working together. (4 marks)',
+    answerGuide: '(a) Trinity: one God existing as three co-equal, co-eternal Persons — Father, Son, Holy Spirit; not three Gods but one God in three Persons; Father: Creator, source of all life, initiates salvation plan; Son (Jesus): second Person, became human, accomplished redemption, mediator; Holy Spirit: third Person, present and active in believers, applies salvation, guides and empowers — 2 marks each for any 3 Persons. (b) Any 5: baptism is in the name of the Trinity (Matt 28:19); prayer is offered to the Father through the Son in the Spirit; models community and unity; inspires humble service; grounds Christian identity; enables worship; motivates evangelism — 1 mark each. (c) Any 4: baptism of Jesus (Luke 3:21-22); Great Commission (Matt 28:19); benediction (2 Cor 13:14); creation (Gen 1:1-2 + John 1:3); annunciation to Mary (Luke 1:35); outpouring at Pentecost (Acts 2) — 1 mark each.',
+    tags: ['Holy Trinity', 'Father Son Holy Spirit', 'doctrine', 'Trinity in Scripture'], learningObjective: 'Explain the doctrine of the Trinity and its significance for Christian life',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Trinity',
+    questionType: 'short_answer', difficulty: 'easy', marks: 5,
+    questionText: 'State FIVE reasons why the doctrine of the Holy Trinity is central to Christian belief.',
+    answerGuide: 'Any 5: defines the unique nature of God in Christianity; basis for baptismal formula (Matt 28:19); explains how God is both transcendent and immanent; grounds relationship within the Godhead as a model for community; explains the Incarnation (Son becoming human); explains ongoing work of the Spirit; distinguishes Christianity from Judaism and Islam — 1 mark each.',
+    tags: ['Holy Trinity', 'doctrine', 'importance', 'central belief'], learningObjective: 'State reasons why the Trinity is central to Christianity',
+  },
+
+  // CHURCH IN ACTION — Sacraments
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'Sacraments',
+    questionType: 'structured', difficulty: 'medium', marks: 15,
+    questionText: '(a) Explain the meaning and spiritual significance of the sacrament of Baptism as ordained by Jesus Christ. (6 marks)\n(b) Describe FIVE ways in which the Lord\'s Supper (Holy Communion) strengthens the faith of Christians. (5 marks)\n(c) State FOUR reasons why Christians should approach the sacraments with reverence and preparation. (4 marks)',
+    answerGuide: '(a) Baptism: an outward sign of an inward grace; water represents washing away of sins (Acts 2:38); death to old life and resurrection to new life (Romans 6:3-4); public declaration of faith in Christ; entrance into the body of Christ/church; gift of the Holy Spirit; instituted by Christ (Matt 28:19); John the Baptist\'s baptism of repentance prepared the way — 1 mark each for any 6. (b) Any 5: remembrance of Christ\'s death and resurrection (1 Cor 11:24-25); spiritual nourishment; reaffirmation of faith; communion with Christ and other believers; proclamation of salvation until Christ returns; renewal of covenant; forgiveness of sins — 1 mark each. (c) Any 4: they are ordained by Christ Himself; holy acts that should not be treated lightly; Paul warns of eating unworthily (1 Cor 11:27-29); preparation deepens spiritual benefit; reverence honours God; self-examination required — 1 mark each.',
+    tags: ['baptism', 'Lord\'s Supper', 'Holy Communion', 'sacraments', 'faith'], learningObjective: 'Explain the meaning of sacraments and their role in strengthening faith',
+  },
+
+  // CHRISTIAN LIVING TODAY — Additional
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+    questionType: 'structured', difficulty: 'medium', marks: 10,
+    questionText: '(a) Explain FIVE ways in which Christians can respond to Gender-Based Violence (GBV) in Kenyan communities. (5 marks)\n(b) State FIVE human rights that every person is entitled to as a child of God according to Christian teaching. (5 marks)',
+    answerGuide: '(a) Any 5: speak out against GBV; support survivors through counselling; educate communities on dignity and respect; work with legal authorities; establish safe shelters; pray and advocate for victims; report cases to authorities; use church as a safe space; model healthy relationships — 1 mark each. (b) Any 5: right to life (created in God\'s image); right to dignity; right to equality before God (Gal 3:28); right to justice; right to family; right to worship; right to education; right to protection from harm — 1 mark each.',
+    tags: ['GBV', 'human rights', 'Christian response', 'Kenya', 'dignity'], learningObjective: 'Explain Christian response to GBV and identify fundamental human rights',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Marriage and Family',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Describe the Christian understanding of marriage as instituted by God in Genesis 2:18-25. (4 marks)\n(b) State FOUR challenges facing Christian families in Kenya today and suggest how the church can help. (4 marks)',
+    answerGuide: '(a) Marriage instituted by God at creation; "It is not good for man to be alone"; God made woman from man\'s rib; the two become one flesh; marriage is between man and woman; leave father and mother; foundation of family; God blessed them — 1 mark each for any 4. (b) Challenges: poverty and financial stress; infidelity; domestic violence; breakdown of communication; influence of technology; single-parent families. Church helps: counselling, marriage enrichment, financial guidance, prayer support, mentorship — 1 mark per challenge + solution up to 4.',
+    tags: ['marriage', 'family', 'Genesis 2', 'Christian marriage', 'Kenya'], learningObjective: 'Explain the Christian understanding of marriage and family challenges in Kenya',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Christian Response to Medicine and Technology',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: '(a) Explain FOUR ethical issues that arise from modern medicine and technology that Christians must address. (4 marks)\n(b) State FOUR Christian principles that should guide decision-making in medical and technological issues. (4 marks)',
+    answerGuide: '(a) Any 4: abortion and sanctity of life; euthanasia/assisted dying; genetic engineering/cloning; use of contraception; organ transplantation; artificial intelligence in healthcare; surrogacy — 1 mark each. (b) Any 4: sanctity of human life (imago Dei); stewardship of the body (1 Cor 6:19-20); love of neighbour; do no harm; respect for God\'s design; seek guidance from scripture and prayer; responsibility for others\' wellbeing — 1 mark each.',
+    tags: ['medicine', 'technology', 'Christian ethics', 'bioethics', 'sanctity of life'], learningObjective: 'Apply Christian principles to ethical issues in medicine and technology',
+  },
+
+
+
+  // ── GRADE 10 — CRE ADDITIONAL QUESTIONS (targeting weak substrands) ───────────────────────
+
+
+  // ══════════════════════════════════════════════════════════════════
+  // CRE — ADDITIONAL QUESTIONS (targeting weak substrands)
+  // Source: Term 1 & 2 Schemes + Opener Exam Term 2, 2026
+  // ══════════════════════════════════════════════════════════════════
+
+  // ── Methods of Studying the Bible ─────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Methods of Studying the Holy Bible',
+    questionType: 'long_answer', difficulty: 'medium', marks: 8,
+    questionText: 'Describe EIGHT methods used to study the Holy Bible.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) Inductive method — Observation, Interpretation, Application. (2) Topical method — studying a theme e.g. prayer across the Bible. (3) Biographical method — studying a Bible character e.g. Moses or Jonah. (4) Book method — studying one entire book. (5) Devotional method — reading for personal spiritual growth. (6) Historical method — studying events in their historical context. (7) Geographical method — using Bible maps to understand locations. (8) Chapter method — studying one chapter in detail. (9) Verse method — in-depth study of a single verse. (10) Word study — tracing a specific word through the Bible using a Concordance.',
+    tags: ['Bible-study-methods', 'inductive', 'topical', 'biographical'],
+    learningObjective: 'Identify and describe different methods of studying the Holy Bible',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Methods of Studying the Holy Bible',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN benefits of studying the Holy Bible for a Christian today.',
+    answerGuide: 'Award 1 mark each for any seven of: (1) The Bible is a guide for daily living and decision-making. (2) It provides spiritual nourishment and strengthens faith. (3) It reveals the nature and character of God. (4) It offers comfort and hope during difficult times. (5) It teaches moral values and ethics. (6) It helps Christians resist temptation. (7) It reveals God\'s plan of salvation through Jesus Christ. (8) It equips Christians to share their faith with others. (9) It promotes unity among Christians through shared truth. (10) It helps Christians understand their identity and purpose in God.',
+    tags: ['Bible', 'benefits', 'Christian-life'],
+    learningObjective: 'Explain the benefits of regular Bible study for Christian growth',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Methods of Studying the Holy Bible',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'State FIVE steps of the inductive method of Bible study.',
+    answerGuide: 'Award 1 mark each for: (1) Select the passage to study. (2) Observation — read carefully and note what the text says. (3) Interpretation — understand what the text means in its context. (4) Correlation — relate the passage to other Bible texts. (5) Application — decide how to apply the passage to daily life.',
+    tags: ['inductive-method', 'Bible-study', 'observation', 'interpretation', 'application'],
+    learningObjective: 'Describe the steps of the inductive method of Bible study',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Methods of Studying the Holy Bible',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE challenges that Christians face when studying the Holy Bible today.',
+    answerGuide: 'Award 1 mark each for any five of: (1) Language barrier — the Bible was originally written in Hebrew, Greek and Aramaic. (2) Cultural differences — biblical culture differs from modern Kenyan culture. (3) Lack of time due to busy schedules. (4) Spiritual distractions and lack of discipline. (5) Difficulty in understanding complex theological concepts. (6) Influence of false teachers who misinterpret scripture. (7) Limited access to study materials such as commentaries and concordances. (8) Inability to read or low literacy levels in some communities.',
+    tags: ['Bible-study', 'challenges', 'barriers'],
+    learningObjective: 'Identify challenges Christians face when studying the Bible',
+  },
+
+  // ── Redemption after the Fall ──────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Redemption after the fall of man',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe how God created human beings as recorded in Genesis 1 and 2, highlighting EIGHT key aspects of human dignity revealed in the two accounts.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) God created human beings in His own image (Genesis 1:26) — showing dignity and worth. (2) God gave humans dominion over all creation (Genesis 1:28). (3) God breathed life directly into man (Genesis 2:7) — a unique act not done for other creatures. (4) God formed man from the dust of the ground — showing intimacy in creation. (5) God placed humans in the Garden of Eden to care for it (Genesis 2:15). (6) God created the woman as a suitable helper (Genesis 2:18) — showing humans need community. (7) God blessed human beings (Genesis 1:28). (8) God gave humans the ability to name animals (Genesis 2:19-20) — showing intelligence and authority. (9) Human beings were the last and highest act of creation. (10) Both male and female were created in God\'s image (Genesis 1:27).',
+    tags: ['creation', 'Genesis', 'human-dignity', 'image-of-God'],
+    learningObjective: 'Describe the creation of human beings and identify aspects of human dignity',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Redemption after the fall of man',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN consequences of the Fall of Man as recorded in Genesis 3.',
+    answerGuide: 'Award 1 mark each for any seven of: (1) Adam and Eve experienced shame and nakedness. (2) They hid from God — broken relationship with God/spiritual death. (3) Adam and Eve were expelled from the Garden of Eden. (4) Pain in childbirth was introduced (Genesis 3:16). (5) The ground was cursed — farming became difficult (Genesis 3:17-18). (6) Spiritual death — separation from God. (7) Physical death was introduced (Genesis 3:19). (8) The serpent was cursed and made to crawl on its belly. (9) Enmity was established between humans and the serpent. (10) Man was barred from the Tree of Life.',
+    tags: ['Fall', 'Genesis-3', 'consequences', 'sin', 'death'],
+    learningObjective: 'Explain the consequences of the Fall of Man as recorded in Genesis 3',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Redemption after the fall of man',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE ways in which God demonstrated His love for human beings after the Fall of Man (Genesis 3).',
+    answerGuide: 'Award 1 mark each for any five of: (1) God sought out Adam and Eve even after they sinned and hid. (2) God provided clothing for them from animal skins. (3) God gave the protevangelium (Genesis 3:15) — the first promise of salvation through the seed of woman. (4) God expelled them from Eden to prevent them from eating the Tree of Life and living in eternal sin. (5) God provided a plan of redemption through Jesus Christ. (6) God continued to be in relationship with humanity despite the sin. (7) God gave Noah and his family a second chance through the ark. (8) God made a covenant with Abraham promising blessing to all nations.',
+    tags: ['redemption', 'God\'s-love', 'Genesis', 'salvation', 'covenant'],
+    learningObjective: 'Identify ways God showed love and initiated redemption after the Fall',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Redemption after the fall of man',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain SIX ways in which Christians today respond to God\'s redemptive work through Jesus Christ.',
+    answerGuide: 'Award 1 mark each for any six of: (1) Repentance — turning away from sin. (2) Faith — believing in Jesus Christ as Lord and Saviour. (3) Baptism — a public declaration of faith. (4) Prayer and regular fellowship with God. (5) Living a transformed, holy life. (6) Sharing the Gospel with others (evangelism). (7) Serving others in love as a response to God\'s grace. (8) Forgiving others as God has forgiven them. (9) Participating in the Lord\'s Supper in remembrance of Christ. (10) Stewardship of resources and creation.',
+    tags: ['redemption', 'Christian-response', 'repentance', 'faith', 'baptism'],
+    learningObjective: 'Describe how Christians respond to God\'s redemptive work',
+  },
+
+  // ── Stewardship Over Creation ──────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Stewardship Over Creation',
+    questionType: 'long_answer', difficulty: 'medium', marks: 8,
+    questionText: 'Describe EIGHT ways in which Christians in Kenya today can be responsible stewards of God\'s creation.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) Planting trees and participating in afforestation programmes. (2) Proper disposal of waste and recycling to protect the environment. (3) Avoiding overexploitation of natural resources such as forests and water. (4) Using renewable energy sources to reduce pollution. (5) Educating others about environmental conservation. (6) Advocating for environmental protection policies. (7) Caring for animals and wildlife as part of God\'s creation. (8) Reducing pollution in rivers, lakes and oceans. (9) Practising sustainable farming methods. (10) Using water responsibly and reducing wastage.',
+    tags: ['stewardship', 'creation', 'environmental-care', 'Kenya'],
+    learningObjective: 'Describe ways Christians can exercise stewardship over God\'s creation',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Stewardship Over Creation',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN principles of good stewardship as taught in the Bible (Genesis 1:26-28; 2:15-16).',
+    answerGuide: 'Award 1 mark each for any seven of: (1) God is the ultimate owner of all creation (Psalm 24:1). (2) Humans are managers, not owners — accountable to God. (3) Stewardship involves taking care of what God has entrusted to us. (4) Good stewards use resources wisely and do not waste them. (5) Stewardship includes caring for other people, especially the vulnerable. (6) Christians should be honest and transparent in managing resources. (7) Good stewardship glorifies God and serves others. (8) Stewardship includes time, talents and finances — not just the environment. (9) Stewards will give an account to God for how they managed His resources. (10) Stewardship involves working and tending (Genesis 2:15) — active involvement.',
+    tags: ['stewardship', 'principles', 'Genesis', 'creation-care'],
+    learningObjective: 'Explain the biblical principles of good stewardship',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Stewardship Over Creation',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'State FIVE qualities of a good steward as taught in the Bible.',
+    answerGuide: 'Award 1 mark each for any five of: (1) Faithfulness — trustworthy in managing what is given. (2) Accountability — willing to give an account to God. (3) Wisdom — using resources carefully and thoughtfully. (4) Selflessness — prioritising others\' needs over personal gain. (5) Humility — recognising that everything belongs to God. (6) Diligence — working hard and not being lazy. (7) Integrity — honest and transparent in all dealings. (8) Gratitude — thankful for what God has provided.',
+    tags: ['stewardship', 'qualities', 'faithfulness', 'accountability'],
+    learningObjective: 'Identify qualities of a good steward as taught in scripture',
+  },
+
+  // ── Prophet Amos ───────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe EIGHT social injustices that were condemned by Prophet Amos in Israel.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) The rich selling the poor for a pair of sandals (Amos 2:6). (2) Trampling on the heads of the poor (Amos 2:7). (3) Sexual immorality — a man and his father sharing the same woman (Amos 2:7). (4) Wearing garments taken as pledges by the altar (Amos 2:8). (5) Drinking wine taken as fines in the house of their God (Amos 2:8). (6) Silencing the prophets and Nazirites (Amos 2:12). (7) Selling the needy for a pair of sandals. (8) Bribery and corruption in the courts (Amos 5:12). (9) False weights and scales used by merchants (Amos 8:5). (10) Religious hypocrisy — elaborate worship while oppressing the poor (Amos 5:21-24).',
+    tags: ['Amos', 'social-injustice', 'oppression', 'poor', 'justice'],
+    learningObjective: 'Describe the social injustices condemned by Prophet Amos'
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN ways in which the message of Prophet Amos is relevant to Kenyan society today.',
+    answerGuide: 'Award 1 mark each for any seven of: (1) The call for justice condemns corruption in Kenyan government and public service. (2) The condemnation of false weights applies to dishonest business practices in Kenya. (3) The call to care for the poor is relevant given the high poverty levels in Kenya. (4) The condemnation of religious hypocrisy challenges churches in Kenya to match worship with action. (5) The Day of the Lord warns Kenyans to live righteously and prepare for God\'s judgment. (6) The faithful remnant encourages Christians not to give up despite societal moral decline. (7) The call for social justice challenges Christians to advocate for the rights of the marginalised. (8) The condemnation of bribery challenges Kenya\'s legal and judicial system. (9) God\'s universal authority over all nations reminds Kenyans that no leader is above God.',
+    tags: ['Amos', 'Kenya', 'relevance', 'social-justice', 'contemporary'],
+    learningObjective: 'Apply the message of Amos to contemporary Kenyan society',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'Old Testament Prophets and Prophet Amos',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE lessons that Christians can learn from the concept of the "Day of the Lord" as taught by Prophet Amos.',
+    answerGuide: 'Award 1 mark each for any five of: (1) God will judge all nations and people impartially. (2) Christians should live righteously at all times since judgment is coming. (3) Social injustice and oppression will not go unpunished. (4) The Day of the Lord will be a day of darkness, not light, for the unrighteous (Amos 5:18). (5) Christians should seek God and live justly to avoid judgment. (6) God\'s justice extends even to His chosen people — no one is exempt. (7) The Day of the Lord calls Christians to repentance and preparation.',
+    tags: ['Day-of-the-Lord', 'Amos', 'judgment', 'repentance'],
+    learningObjective: 'Identify lessons from the concept of the Day of the Lord in Amos',
+  },
+
+  // ── Paul's First Letter to the Corinthians ──────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: "Describe EIGHT moral challenges that Paul addressed in his First Letter to the Corinthians that are also faced by young Christians in Kenya today.",
+    answerGuide: 'Award 1 mark each for any eight of: (1) Sexual immorality — Paul condemned fornication and called the body the temple of the Holy Spirit (1 Cor 6:18-20). (2) Divisions and factions in the church (1 Cor 1:10-13). (3) Pride and arrogance — some members thought they were superior (1 Cor 4:6-7). (4) Taking fellow Christians to court (1 Cor 6:1-6). (5) Issues around marriage, divorce and celibacy (1 Cor 7). (6) Idolatry — eating food sacrificed to idols (1 Cor 8). (7) Disorder in worship services (1 Cor 14). (8) Abuse of the Lord\'s Supper (1 Cor 11:17-22). (9) Denial of the resurrection of the dead (1 Cor 15:12). (10) Misuse of spiritual gifts for personal glory rather than building up the church.',
+    tags: ['Corinthians', 'moral-challenges', 'Paul', 'Kenya', 'youth'],
+    learningObjective: "Describe the moral challenges Paul addressed in 1 Corinthians and their relevance today",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: "Explain SEVEN ways in which Paul\'s teachings on love in 1 Corinthians 13 are relevant to Christians in Kenya today.",
+    answerGuide: 'Award 1 mark each for any seven of: (1) Love is patient — Christians in Kenya should be patient with others. (2) Love is kind — Christians should show kindness to all, including those of different tribes. (3) Love does not envy — Christians should not be jealous of others\' success. (4) Love is not proud — Christians should be humble. (5) Love forgives — Christians should forgive enemies and those who wrong them. (6) Love is not self-seeking — Christians should serve others sacrificially. (7) Love rejoices in truth — Christians should be honest and upright. (8) Love never fails — the love of God through Christ is eternal and should motivate Christians. (9) Love overcomes tribalism and division in Kenyan churches and society.',
+    tags: ['1-Corinthians-13', 'love', 'agape', 'Kenya', 'Christian-living'],
+    learningObjective: "Apply Paul\'s teaching on love from 1 Corinthians 13 to contemporary Kenyan life",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: "Paul's First Letter to the Corinthians",
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: "State FIVE ways in which Paul encouraged unity in the Corinthian church (1 Corinthians 1:10-17; 12:12-27).",
+    answerGuide: 'Award 1 mark each for any five of: (1) He urged them to agree with one another and avoid divisions (1 Cor 1:10). (2) He reminded them that Christ is not divided — there is only one Gospel. (3) He used the analogy of the body — all members are different but belong to one body (1 Cor 12:12-27). (4) He reminded them that the Spirit is the same for all Christians (1 Cor 12:13). (5) He taught that every member is important and needs the others. (6) He reminded them that baptism was in Christ\'s name, not in the name of any leader. (7) He taught that spiritual gifts should be used for the common good, not for division. (8) He emphasised love as the greatest bond of unity (1 Cor 13).',
+    tags: ['unity', 'Corinthians', 'Paul', 'church', 'body-of-Christ'],
+    learningObjective: "Identify Paul\'s strategies for encouraging unity in the Corinthian church",
+  },
+
+  // ── New Testament Books ────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'New Testament Books',
+    questionType: 'long_answer', difficulty: 'medium', marks: 8,
+    questionText: 'Describe EIGHT ways in which the New Testament is important to Christians in their daily lives.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) Reveals Jesus Christ — His life, death and resurrection as the fulfilment of salvation. (2) Provides the teachings of Jesus (Gospels) for Christian living. (3) Records the work of the Holy Spirit in the early church (Acts). (4) Contains Paul\'s letters which give practical guidance on Christian living. (5) Reveals the nature of the Church and its purpose. (6) Provides a model of prayer (Lord\'s Prayer in Matthew 6). (7) Gives moral and ethical guidelines for Christians. (8) Reveals the Second Coming of Christ and the end times (Revelation). (9) Gives comfort and hope to Christians in trials. (10) Provides the basis for Christian doctrines such as justification by faith.',
+    tags: ['New-Testament', 'importance', 'Christian-life', 'Gospels', 'Epistles'],
+    learningObjective: 'Explain the importance of the New Testament to Christians',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'New Testament Books',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'State FIVE categories of New Testament books and give ONE example book from each category.',
+    answerGuide: 'Award 1 mark each for any five correct category + example combinations: (1) Gospels — Matthew / Mark / Luke / John. (2) History — Acts of the Apostles. (3) Pauline Epistles (Paul\'s Letters) — Romans / Galatians / 1 Corinthians / Ephesians etc. (4) General/Catholic Epistles — James / Peter / John / Jude / Hebrews. (5) Prophecy/Apocalyptic — Revelation (Book of Revelation). Deduct 0.5 marks if the category is correct but the example is wrong.',
+    tags: ['NT-books', 'categories', 'Gospels', 'Epistles', 'Revelation'],
+    learningObjective: 'Identify and classify the books of the New Testament',
+  },
+
+  // ── Holy Spirit ────────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe EIGHT events that took place on the Day of Pentecost as recorded in Acts 2:1-47.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) The disciples were all gathered together in one place. (2) A sound like a rushing wind came from heaven (Acts 2:2). (3) Tongues of fire appeared and rested on each of them (Acts 2:3). (4) They were all filled with the Holy Spirit. (5) They began to speak in other tongues as the Spirit enabled them (Acts 2:4). (6) Devout Jews from many nations heard them speaking in their own languages. (7) Some mocked, saying they were drunk on wine (Acts 2:13). (8) Peter stood up and addressed the crowd. (9) Peter preached about Jesus\' death, resurrection and exaltation. (10) About three thousand people accepted the message and were baptised (Acts 2:41). (11) The believers devoted themselves to teaching, fellowship, breaking of bread and prayer. (12) The Lord added to their number daily.',
+    tags: ['Pentecost', 'Holy-Spirit', 'Acts-2', 'early-church'],
+    learningObjective: 'Describe events on the Day of Pentecost as recorded in Acts 2',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN gifts of the Holy Spirit as described in 1 Corinthians 12:1-31 and state their importance to the church.',
+    answerGuide: 'Award 1 mark each for any seven gifts correctly identified with brief explanation: (1) Wisdom — ability to apply knowledge godly in complex situations. (2) Knowledge — supernatural understanding of spiritual truths. (3) Faith — extraordinary trust in God for miracles. (4) Gifts of healing — supernatural healing of the sick. (5) Working of miracles — extraordinary acts of God. (6) Prophecy — speaking a message from God to the church. (7) Distinguishing spirits — ability to tell whether a spirit is from God or not. (8) Speaking in tongues — praying/worshipping in a language unknown to the speaker. (9) Interpretation of tongues — explaining what was spoken in tongues. All gifts edify the church. Award 1 mark each.',
+    tags: ['spiritual-gifts', '1-Corinthians-12', 'Holy-Spirit', 'church'],
+    learningObjective: 'Identify and explain the gifts of the Holy Spirit from 1 Corinthians 12',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Spirit and Gifts of the Holy Spirit',
+    questionType: 'structured', difficulty: 'easy', marks: 5,
+    questionText: 'State FIVE ways in which the Holy Spirit guides and empowers Christians in their daily lives today.',
+    answerGuide: 'Award 1 mark each for any five of: (1) The Holy Spirit convicts of sin and leads to repentance. (2) He guides believers into all truth (John 16:13). (3) He empowers Christians to witness boldly (Acts 1:8). (4) He intercedes for believers in prayer (Romans 8:26). (5) He produces the fruits of the Spirit in the believer\'s character (Galatians 5:22-23). (6) He gifts believers for service in the church. (7) He gives assurance of salvation to believers (Romans 8:16). (8) He comforts believers in times of trouble (John 14:16). (9) He illuminates scripture during Bible study.',
+    tags: ['Holy-Spirit', 'guidance', 'empowerment', 'Christian-life'],
+    learningObjective: 'Explain how the Holy Spirit guides and empowers Christians today',
+  },
+
+  // ── Galilean Ministry ──────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Galilean Ministry',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: "Describe EIGHT features of Jesus' Galilean ministry as recorded in the Gospels.",
+    answerGuide: 'Award 1 mark each for any eight of: (1) Jesus began His ministry after His baptism and temptation. (2) He was rejected at Nazareth (Luke 4:16-30). (3) He called His first disciples — Peter, Andrew, James and John (Mark 1:16-20). (4) He preached the Sermon on the Mount/Plain (Matthew 5-7; Luke 6:17-49). (5) He performed many miracles — healing the sick, casting out demons. (6) He taught in parables — The Sower, The Prodigal Son, The Good Samaritan. (7) He demonstrated compassion for the poor, sick and marginalised. (8) He trained the twelve disciples for ministry. (9) He was transfigured on the mountain before Peter, James and John (Mark 9:2-13). (10) He challenged religious leaders — Pharisees and scribes. (11) He showed power over nature — calming the storm (Mark 4:35-41).',
+    tags: ['Galilean-ministry', 'miracles', 'parables', 'disciples', 'rejection-Nazareth'],
+    learningObjective: "Describe the features of Jesus' Galilean ministry",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Galilean Ministry',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: 'Explain SEVEN lessons that Christians today can learn from the parables of Jesus taught during His Galilean ministry.',
+    answerGuide: 'Award 1 mark each for any seven of: (1) The Parable of the Sower — the importance of hearing and responding to God\'s word with receptive hearts. (2) The Parable of the Prodigal Son — God\'s unconditional love and readiness to forgive repentant sinners. (3) The Parable of the Good Samaritan — love for neighbour transcends racial and ethnic boundaries. (4) The Parable of the Lost Sheep — God values every individual and seeks the lost. (5) The Parable of the Mustard Seed — the Kingdom of God grows from small beginnings. (6) The Parable of the Talents — Christians must use their God-given gifts faithfully. (7) The Parable of the Ten Virgins — Christians must always be prepared for Christ\'s return. (8) Parables show that Jesus meets people where they are, using everyday situations.',
+    tags: ['parables', 'lessons', 'Galilean-ministry', 'Christian-life'],
+    learningObjective: "Extract Christian lessons from Jesus' parables in the Galilean ministry",
+  },
+
+  // ── Holy Trinity ───────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Trinity',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe EIGHT Bible passages or events that reveal the nature of the Holy Trinity (God as Father, Son and Holy Spirit).',
+    answerGuide: 'Award 1 mark each for any eight of: (1) Baptism of Jesus — Father\'s voice, Son in water, Spirit as dove (Matthew 3:16-17). (2) The Great Commission — "baptise in the name of Father, Son and Holy Spirit" (Matthew 28:19). (3) Creation — Spirit of God hovering, God speaking, Word creating (Genesis 1:1-3). (4) John 1:1-3 — the Word (Son) was with God and was God from the beginning. (5) John 14:16-17 — Jesus promises the Comforter (Holy Spirit) from the Father. (6) 2 Corinthians 13:14 — the grace of Christ, love of God, fellowship of the Spirit. (7) The Annunciation — the Holy Spirit overshadowing Mary; the Son being conceived; God\'s purpose fulfilled (Luke 1:35). (8) John 17:21 — Jesus prays that believers may be one as He and the Father are one. (9) Acts 2:33 — Jesus exalted by the Father poured out the Holy Spirit. (10) Isaiah 61:1 — the Spirit of the Sovereign Lord is upon me (prophetically about Jesus).',
+    tags: ['Trinity', 'Father', 'Son', 'Holy-Spirit', 'doctrine'],
+    learningObjective: 'Identify Bible passages that reveal the nature of the Holy Trinity',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'The Holy Trinity',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE ways in which belief in the Holy Trinity is important to Christians.',
+    answerGuide: 'Award 1 mark each for any five of: (1) It affirms that God is one — monotheism. (2) It reveals that God is relational — existing in community within Himself. (3) It provides the basis for baptism in the name of Father, Son and Holy Spirit. (4) It shows that God is personally involved in salvation — Father sends, Son redeems, Spirit applies. (5) It models unity in diversity for the church. (6) It provides a foundation for Christian prayer addressed to the Father through the Son in the Spirit. (7) Belief in the Trinity distinguishes Christianity from other world religions. (8) It affirms the full divinity of Jesus Christ and the Holy Spirit.',
+    tags: ['Trinity', 'importance', 'doctrine', 'Christianity'],
+    learningObjective: 'Explain why belief in the Holy Trinity is important to Christians',
+  },
+
+  // ── Sacraments ──────────────────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'Sacraments',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: "Describe EIGHT ways in which the sacrament of Holy Communion (The Lord\'s Supper) is observed and explain its importance to the Christian faith.",
+    answerGuide: 'Award 1 mark each for any eight of: (1) Instituted by Jesus on the night of His arrest (Matthew 26:26-29). (2) Bread represents Christ\'s body broken for us. (3) Wine/fruit of the vine represents Christ\'s blood shed for forgiveness. (4) It is done "in remembrance" of Christ (1 Cor 11:24-25). (5) It proclaims the Lord\'s death until He comes (1 Cor 11:26). (6) It involves self-examination before participation (1 Cor 11:28). (7) Unworthy participation brings judgment (1 Cor 11:29). (8) It fosters unity among believers as they share one bread and one cup. (9) It is observed in churches worldwide every Sunday or on special occasions. (10) It foreshadows the messianic banquet in the Kingdom of God.',
+    tags: ['Lord\'s-Supper', 'Holy-Communion', 'sacraments', '1-Corinthians-11'],
+    learningObjective: "Describe the sacrament of Holy Communion and explain its significance",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Church in Action', subStrand: 'Sacraments',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE ways in which baptism is significant to a Christian.',
+    answerGuide: 'Award 1 mark each for any five of: (1) It marks the beginning of the Christian life — initiation into the body of Christ. (2) It symbolises death to the old sinful life and resurrection to a new life in Christ (Romans 6:3-4). (3) It is an outward declaration of an inward faith. (4) It forgives sins and marks the gift of the Holy Spirit (Acts 2:38). (5) It incorporates the believer into the Church. (6) It obeys the command of Jesus to be baptised (Matthew 28:19). (7) It provides assurance of God\'s grace and covenant relationship.',
+    tags: ['baptism', 'significance', 'sacraments', 'Romans-6'],
+    learningObjective: 'Explain the significance of baptism to a Christian',
+  },
+
+  // ── Abraham / Sinai Covenant ───────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: "Describe God\'s call and covenant with Abraham as recorded in Genesis 12:1-9 and Genesis 15:1-21.",
+    answerGuide: 'Award 1 mark each for any six of: (1) God called Abraham (then Abram) to leave his country, his people and his father\'s household. (2) God promised to make Abraham into a great nation. (3) God promised to bless Abraham and make his name great. (4) God promised that Abraham would be a blessing to others. (5) God promised to bless those who bless Abraham and curse those who curse him. (6) God promised that all peoples on earth would be blessed through Abraham. (7) Abraham obeyed and left Haran at age 75 (Genesis 12:4). (8) In Genesis 15, God confirmed the covenant through a smoking firepot and blazing torch passing between animal pieces. (9) God promised Abraham descendants as numerous as the stars. (10) God promised the land of Canaan to Abraham\'s descendants.',
+    tags: ['Abraham', 'covenant', 'Genesis-12', 'Genesis-15', 'call'],
+    learningObjective: "Describe God\'s call and covenant with Abraham",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The Old Testament', subStrand: 'The Sinai Covenant',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'State FIVE qualities of Abraham that Christians should emulate in their faith journey today.',
+    answerGuide: 'Award 1 mark each for any five of: (1) Obedience — Abraham obeyed God without question. (2) Faith — he trusted God for what he could not see (Hebrews 11:8-10). (3) Courage — he left his homeland at an advanced age. (4) Patience — he waited many years for the promised son. (5) Hospitality — he welcomed three strangers (Genesis 18). (6) Intercession — he prayed for Sodom and Gomorrah (Genesis 18:22-33). (7) Willingness to sacrifice — he was ready to offer Isaac (Genesis 22). (8) Trust in God\'s provision — "The Lord Will Provide" (Genesis 22:14).',
+    tags: ['Abraham', 'qualities', 'faith', 'obedience', 'Christian-life'],
+    learningObjective: 'Identify qualities of Abraham that Christians should emulate',
+  },
+
+  // ── Baptism and Temptation of Jesus ───────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+    questionType: 'long_answer', difficulty: 'hard', marks: 6,
+    questionText: 'Describe the baptism and temptation of Jesus Christ as recorded in Luke 3:21-22 and Luke 4:1-13.',
+    answerGuide: 'BAPTISM (award up to 3 marks): (1) When all the people were being baptised, Jesus was baptised too (Luke 3:21). (2) As He was praying, heaven was opened. (3) The Holy Spirit descended on Him in bodily form like a dove. (4) A voice from heaven said: "You are my Son, whom I love; with you I am well pleased." TEMPTATION (award up to 3 marks): (1) Jesus was full of the Holy Spirit and was led into the desert for 40 days. (2) First temptation — the devil told Jesus to turn stones into bread; Jesus replied: "Man shall not live on bread alone." (3) Second temptation — the devil showed all kingdoms and offered them if Jesus would worship him; Jesus replied: "Worship the Lord your God only." (4) Third temptation — the devil took Jesus to the temple pinnacle and told Him to throw Himself down; Jesus replied: "Do not put the Lord your God to the test." (5) The devil left Jesus until an opportune time. Award marks as allocated.',
+    tags: ['baptism', 'temptation', 'Luke', 'Jesus', 'Holy-Spirit'],
+    learningObjective: 'Describe the baptism and temptation of Jesus as recorded in Luke',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'The New Testament', subStrand: 'Infancy and Early Life of Jesus Christ',
+    questionType: 'structured', difficulty: 'medium', marks: 5,
+    questionText: 'Explain FIVE lessons that Christians can draw from the way Jesus responded to temptation in the wilderness.',
+    answerGuide: 'Award 1 mark each for any five of: (1) Christians should use scripture (the Word of God) to overcome temptation, as Jesus quoted scripture in each response. (2) Physical needs should not override spiritual obedience — Jesus refused to turn stones to bread. (3) Christians should not compromise their worship — worship belongs to God alone. (4) Christians should not test God by deliberately placing themselves in danger. (5) Temptation is a normal part of Christian life — Jesus himself was tempted. (6) The Holy Spirit empowers Christians to overcome temptation. (7) The devil will leave when resisted (James 4:7).',
+    tags: ['temptation', 'lessons', 'scripture', 'Holy-Spirit', 'overcoming'],
+    learningObjective: 'Extract lessons from the temptation of Jesus for Christian living',
+  },
+
+  // ── Christian Living Today ─────────────────────────────────────────
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Christian Ethics',
+    questionType: 'long_answer', difficulty: 'hard', marks: 8,
+    questionText: 'Describe EIGHT ways in which Christians in Kenya can respond to the challenge of corruption and dishonesty in society.',
+    answerGuide: 'Award 1 mark each for any eight of: (1) Refuse to participate in bribery or corrupt practices even when pressured. (2) Report corruption to relevant authorities such as the EACC. (3) Pray for the nation and its leaders for moral transformation. (4) Preach and teach against corruption from the pulpit and in CRE lessons. (5) Model integrity in their personal and professional lives. (6) Vote for leaders of proven moral character. (7) Raise morally upright children through Christian homes and education. (8) Join or support organisations that fight corruption. (9) Take a prophetic stand — speak out against injustice as the Old Testament prophets did. (10) Live above reproach in financial dealings, business and government service.',
+    tags: ['Christian-ethics', 'corruption', 'Kenya', 'integrity', 'witness'],
+    learningObjective: 'Describe Christian responses to corruption and dishonesty in Kenya',
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Human Sexuality',
+    questionType: 'structured', difficulty: 'medium', marks: 7,
+    questionText: "Explain SEVEN ways in which Christian teachings guide young people in Kenya in matters of human sexuality.",
+    answerGuide: 'Award 1 mark each for any seven of: (1) The Bible teaches that sex is a gift from God designed for marriage between a man and a woman. (2) Christians are called to flee sexual immorality (1 Corinthians 6:18). (3) The body is the temple of the Holy Spirit and must be treated with respect. (4) Christian teaching encourages abstinence before marriage. (5) Christianity condemns pornography as it degrades human dignity. (6) Christians are to respect the dignity of all people regardless of gender. (7) Christian teaching promotes equal respect and dignity in relationships. (8) The church provides moral guidance and counselling for young people facing sexual pressures. (9) Biblical examples (Joseph fleeing Potiphar\'s wife) model how to handle sexual temptation.',
+    tags: ['human-sexuality', 'Christian-teaching', 'youth', 'Kenya', 'abstinence'],
+    learningObjective: "Explain how Christian teaching guides young people in matters of sexuality",
+  },
+  {
+    grade: 'Grade 10', subject: 'CRE',
+    strand: 'Christian Living Today', subStrand: 'Human Rights and Gender-Based Violence',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain SIX ways in which the Church in Kenya can respond to Gender-Based Violence (GBV) in society.',
+    answerGuide: 'Award 1 mark each for any six of: (1) Preach and teach against GBV from the pulpit. (2) Provide counselling and support services for survivors. (3) Offer safe houses or shelters for victims in partnership with government. (4) Educate congregations on women\'s and children\'s rights. (5) Train church leaders to recognise and respond to signs of GBV. (6) Advocate for policy changes and stronger enforcement of laws against GBV. (7) Engage men and boys in programmes promoting gender equality. (8) Partner with government and NGOs in GBV response programmes. (9) Pray for victims and perpetrators and for societal transformation.',
+    tags: ['GBV', 'gender-based-violence', 'church', 'Kenya', 'human-rights'],
+    learningObjective: 'Describe how the Church in Kenya can respond to Gender-Based Violence',
+  },
+
+
+];
+
+async function seed() {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log('Connected to MongoDB');
+
+    // Clear existing bank (optional — comment out to preserve existing data)
+    // await QuestionBank.deleteMany({});
+    // console.log('Cleared existing question bank');
+
+    const inserted = await QuestionBank.insertMany(seedQuestions);
+    console.log(`✅ Inserted ${inserted.length} seed questions into question bank`);
+
+    const breakdown = {};
+    inserted.forEach(q => {
+      const key = `${q.grade} — ${q.subject}`;
+      breakdown[key] = (breakdown[key] || 0) + 1;
+    });
+
+    console.log('\nBreakdown by Grade/Subject:');
+    Object.entries(breakdown).forEach(([k, v]) => console.log(`  ${k}: ${v} questions`));
+
+    console.log('\nQuestion bank seeded successfully. Run "node scripts/seedQuestionBank.js" again to add more.');
+  } catch (err) {
+    console.error('Seed error:', err);
+    process.exit(1);
+  } finally {
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
+  }
+}
+
+seed();
