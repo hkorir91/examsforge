@@ -151,8 +151,9 @@ export const CBC_CURRICULUM = {
         'Deaf Culture and History',
       ],
       'History and Citizenship': [
-        'Pre-Colonial African History',
-        'Colonial History of Kenya',
+        'Themes in Kenyan History and Citizenship',
+        'Themes in African History and Citizenship',
+        'Themes in World History and Citizenship',
         'Governance and Citizenship',
         'Economic History',
       ],
@@ -1112,8 +1113,29 @@ export const SUBSTRANDS = {
   'Optics': ['Reflection of Light', 'Refraction and Lenses', 'Optical Instruments', 'Dispersion of Light'],
 
   // History
-  'Pre-Colonial African History': ['African Political Systems', 'Trade and Economy', 'Social Organisation', 'African Religions'],
-  'Colonial History of Kenya': ['European Exploration', 'Establishment of Colonial Rule', 'African Resistance', 'Colonial Economic Policies'],
+  // History and Citizenship — Official KICD Grade 10 Strands and Sub-strands
+  // Source: Term 1 and Term 2 Schemes of Work (2024-2026)
+  'Themes in Kenyan History and Citizenship': [
+    // Term 1
+    'Linguistic Groups in Kenya',
+    'Establishment of Colonial Rule',
+    'The Constitution of Kenya 2010',
+    'Political Developments and Challenges',
+  ],
+  'Themes in African History and Citizenship': [
+    // Term 2
+    'Human Developments in Africa',
+    'African Civilisations up to 19th Century',
+    'Colonisation of Africa',
+    'Modern Nationalism in Africa',
+    'Global Wars',
+  ],
+  'Themes in World History and Citizenship': [
+    // Term 2
+    'Enlightenment Ideas and the American Revolution',
+    'Democracy and Human Rights',
+    'International Relations',
+  ],
   'Nationalism and Independence': ['African Nationalism', 'Kenya African Union', 'Mau Mau', 'Independence Negotiations'],
   'Post-Independence Kenya': ['Constitutional Developments', 'Political Parties', 'Economic Policies', 'Social Development'],
   'Governance and Citizenship': ['Structures of Government', 'Rights and Responsibilities', 'Rule of Law', 'Democratic Governance'],
@@ -1259,14 +1281,14 @@ export const CAT_MARKS_OPTIONS = [20, 25, 30, 40]
 const SUBJECT_EXAM_MARKS = {
   'Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'Essential Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
-  'English': { 'CAT': 30, 'Midterm': 50, 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
-  'Kiswahili': { 'CAT': 30, 'Midterm': 50, 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'English': { 'CAT': 30, 'Midterm': 50, 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'Kiswahili': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'Biology': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Chemistry': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Physics': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Geography': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
-  'History and Citizenship': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
-  'CRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'History and Citizenship': { 'CAT': 40, 'Midterm': 50, 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
+  'CRE': { 'CAT': 40, 'Midterm': 50, 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'IRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'HRE': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Business Studies': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
