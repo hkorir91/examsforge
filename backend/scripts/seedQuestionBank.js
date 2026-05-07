@@ -3146,23 +3146,41 @@ async function seed() {
     await mongoose.connect(MONGO_URI);
     console.log('Connected to MongoDB');
 
-    // Clear existing bank (optional — comment out to preserve existing data)
-    // await QuestionBank.deleteMany({});
-    // console.log('Cleared existing question bank');
+    // ── Safe upsert — never inserts duplicates ──────────────────────
+    // Matches on questionText + subject + grade.
+    // If the question already exists → skip it.
+    // If it is new → insert it.
+    let inserted = 0;
+    let skipped = 0;
 
-    const inserted = await QuestionBank.insertMany(seedQuestions);
-    console.log(`✅ Inserted ${inserted.length} seed questions into question bank`);
+    for (const q of seedQuestions) {
+      const exists = await QuestionBank.findOne({
+        questionText: q.questionText,
+        subject: q.subject,
+        grade: q.grade,
+      });
+      if (exists) {
+        skipped++;
+      } else {
+        await QuestionBank.create(q);
+        inserted++;
+      }
+    }
 
-    const breakdown = {};
-    inserted.forEach(q => {
-      const key = `${q.grade} — ${q.subject}`;
-      breakdown[key] = (breakdown[key] || 0) + 1;
-    });
+    console.log(`✅ Inserted ${inserted} new questions (${skipped} already existed — skipped)`);
 
-    console.log('\nBreakdown by Grade/Subject:');
-    Object.entries(breakdown).forEach(([k, v]) => console.log(`  ${k}: ${v} questions`));
+    // Final counts per subject
+    const pipeline = [
+      { $group: { _id: { grade: '$grade', subject: '$subject' }, count: { $sum: 1 } } },
+      { $sort: { '_id.subject': 1 } },
+    ];
+    const stats = await QuestionBank.aggregate(pipeline);
+    console.log('\nTotal in bank by Subject:');
+    stats.forEach(s => console.log(`  ${s._id.grade} — ${s._id.subject}: ${s.count}`));
 
-    console.log('\nQuestion bank seeded successfully. Run "node scripts/seedQuestionBank.js" again to add more.');
+    const total = await QuestionBank.countDocuments();
+    console.log(`\nGrand total in bank: ${total} questions`);
+
   } catch (err) {
     console.error('Seed error:', err);
     process.exit(1);
