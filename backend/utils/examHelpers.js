@@ -47,8 +47,9 @@ const SUBJECT_TYPES = {
   // CRE/IRE/HRE — religious education with specific 6-question exam format
   cre: ['CRE', 'IRE', 'HRE'],
   // Humanities — require case studies, source analysis, essays
-  humanities: ['History and Citizenship',
-    'Business Studies', 'Life Skills Education', 'Community Service Learning'],
+  humanities: ['Business Studies', 'Life Skills Education', 'Community Service Learning'],
+  // History — has its own 3-section structure (A: short answer, B: structured, C: essays/any two)
+  history: ['History and Citizenship'],
   // Geography — has its own specific rules
   geography: ['Geography'],
   // Technical — require practical procedures, tools, safety
@@ -105,105 +106,109 @@ MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
 - SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with marks`,
 
     english: `
-ENGLISH EXAM REQUIREMENTS — CBC GRADE 10 (KLB/KICD):
+ENGLISH EXAM STRUCTURE — CBC GRADE 10 (VERIFIED FROM ACTUAL KNEC PAPER):
 
-━━━ EXAM STRUCTURE ━━━
-A Grade 10 English written exam has FIVE sections. Scale marks to total requested:
+Standard English End Term = 100 marks, 2.5 hours, FIVE sections.
+Scale all marks proportionally for other totals (e.g. 80-mark paper = multiply by 0.8).
 
-SECTION A — READING COMPREHENSION (≈20% of total marks)
-- Include a COMPLETE prose narrative or expository passage of 200–300 words IN the paper
-- The passage MUST be written in full — not referenced or described
-- Passage theme must align with selected unit (Etiquette, Climate Change, AI/Healthcare, Careers, etc.)
-- Passage style: lively, literary, Kenyan setting, real names and places
-- Questions must test (allocate marks as shown):
-  * Atmosphere/mood — "What was the atmosphere...? Use evidence from the text." (3 marks)
-  * Characterisation — "How does the writer convey...? Refer to the passage." (3 marks)
-  * Paraphrase — "Describe in your own words..." (3 marks)
-  * Multiple examples — "Give THREE examples of... from the passage." (3 marks)
-  * Figurative language — "What does the phrase '...' tell you about...?" (2 marks)
-  * Irony/literary device — "Explain the irony in..." (2 marks)
-  * Significance — "Comment on the significance of..." (2 marks)
-  * Vocabulary in context — "(a) explain '...' (b) explain '...'" (2 marks)
-- TOTAL comprehension questions: 7–8 questions
+━━━ SECTION A: COMPREHENSION (20 marks) ━━━
+- Include a COMPLETE prose narrative passage of 300–400 words written IN the paper
+- Kenyan setting, real names, literary style — NOT a simple information text
+- EXACTLY 8 questions in this order:
+  Q1. "What was the atmosphere...? Use evidence from the text." (3 marks)
+  Q2. "How does the writer convey [range of experience/character]? Refer to the passage." (3 marks)
+  Q3. "Describe in your own words [specific event from passage]." (3 marks)
+  Q4. "What [pressures/reasons/examples] are given? Give THREE examples from the passage." (3 marks)
+  Q5. "What does the phrase '[figurative phrase]' tell you about [subject]?" (2 marks)
+  Q6. "Explain the irony in [event]." (2 marks)
+  Q7. "Comment on the significance of [character action or final scene]." (2 marks)
+  Q8. "Explain the meaning of: (a) '[word/phrase]' (b) '[word/phrase]'" (2 marks)
 
-SECTION B — SUMMARY WRITING (≈10% of total marks)
-- Provide a SEPARATE passage of 200–280 words (different from Section A)
-- Give a specific summary task: "In not more than 80 words, summarise the [challenges/benefits/causes] of..."
-- State: "Use your own words as far as possible"
-- Provide a lined space labeled "Summary" after the passage
+━━━ SECTION B: SUMMARY WRITING (10 marks) ━━━
+- Provide a SEPARATE passage of 300–400 words on a different topic from Section A
+- Urban/social/contemporary Kenyan theme — challenges, issues, development
+- Instruction: "In not more than 80 words, summarise [specific aspect e.g. challenges facing urban youth].
+  Use your own words as far as possible."
+- Include "ROUGH COPY" and "FAIR COPY" labels with lined spaces
 
-SECTION C — GRAMMAR IN USE (≈25% of total marks)
-- Test grammar ALWAYS in context — never in isolation
-- Each question MUST embed the grammar point in a sentence or short paragraph
-- Question types (mix these):
-  * Fill in the gap: "Complete the sentence with the correct word: Amina took a deep ___ (breath/breathe)"
-  * Identify and correct: "Identify the error in this sentence and rewrite it correctly: She go to school everyday."
-  * Rewrite/transform: "Rewrite in the correct tense: By tomorrow, she ___ (complete) the project."
-  * Identify and label: "Underline all the nouns in: The teacher asked Wanjiku to read the letter aloud."
-  * Spelling: "Identify the correctly spelled word: necessary / necessery / neccesary"
-  * Homophones: "Circle the correct word: The farmer's field was (bear/bare) after the drought."
-  * Sentence correction: "Rewrite the following run-on sentence correctly: The rain fell hard it flooded the streets."
-  * Pronunciation: "Provide a word with a different vowel sound that rhymes with: stock → stork"
-- Grammar topics by unit (match to selected strands):
-  Unit 1 → Nouns (count/non-count, common/proper), Pronouns, Determiners
-  Unit 2 → Verbs/Tense/Aspect, Adverbs (time/place/manner)
-  Unit 3 → Adjectives (order, comparative, superlative), Prepositions
-  Unit 4 → Noun Phrases, Verb Phrases, Determiners
-  Unit 5 → Phrases (adjective, adverb, prepositional), Adverbs
-  Unit 6 → Relative Pronouns, Relative Clauses
-  Unit 7 → Clauses (relative, adverbial)
-  Unit 8 → Clause Patterns
-  Unit 9 → Sentence Types and Structures
+━━━ SECTION C: GRAMMAR AND LANGUAGE USE (30 marks) ━━━
+Include ALL SEVEN of these sub-questions:
+  C1. Tense rewriting — 5 sentences, rewrite in tense shown in brackets (5 marks)
+  C2. Direct/Reported speech — 6 sentences, mix of both directions (6 marks)
+  C3. Subject-verb agreement — 4 sentences, choose correct verb form (4 marks)
+  C4. Phrasal verbs — 5 gaps, fill with correct particle from given list (5 marks)
+  C5. Active/Passive voice — 4 sentences, change as directed (4 marks)
+  C6. Punctuation — 3 unpunctuated sentences, rewrite correctly (3 marks)
+  C7. Vocabulary — (a) write SYNONYM for 3 words (1.5 marks) + (b) write ANTONYM for 3 words (1.5 marks) (3 marks total)
+- Total Section C = 30 marks
 
-SECTION D — WRITING COMPOSITION (≈35% of total marks)
-- Give a choice of TWO topics — learner answers ONE
-- Writing type must match selected Writing strand:
-  FUNCTIONAL WRITING:
-    * Formal letter: "Write a letter to the Principal of your school requesting..."
-    * Email: "Write an email to your friend describing..."
-    * Memo: "Write a memo from the School Captain to all students about..."
-    * Report: "Write a short report on the recent sports day held at your school..."
-    * Apology letter: "Write a letter of apology to your teacher for..."
-    * Notice: "Write a notice to be posted on the school notice board about..."
-    * Minutes: "Write the minutes of a meeting held by the school Environmental Club..."
-  CREATIVE WRITING:
-    * Narrative: "Write a story beginning with: The day I discovered the old photograph..."
-    * Descriptive: "Describe a busy market scene in your town on a Saturday morning."
-    * Argumentative: "Write a speech arguing for OR against: Social media does more harm than good."
-    * Expository: "Write an article explaining the importance of career planning for young people in Kenya."
-- Always include: "Your composition will be marked on: Content (10 marks), Organisation (10 marks), Language (10 marks), Mechanics (5 marks)"
-- For functional writing specify EXACTLY: format required (letter heading, date, salutation, body, sign-off)
-- Word count guidance: compositions 250–350 words, letters/memos 150–200 words
+━━━ SECTION D: ORAL SKILLS (10 marks) ━━━
+This section IS in the written paper — it tests knowledge of oral skills through written questions:
+  D1(a). Odd one out — identify word with different vowel sound from a group (2 marks — 2 groups)
+  D1(b). Word stress — mark stress on 4 multi-syllabic words using apostrophe before stressed syllable (2 marks)
+  D2. Register — write appropriate response for 3 situations (formal apology, formal excuse, informal refusal) (3 marks — 1 mark each)
+  D3. Idiomatic expressions — explain meaning + use in sentence for 3 idioms (3 marks — 1 mark each)
+- Total Section D = 10 marks
 
-SECTION E — LISTENING AND SPEAKING ORAL (assessed separately — do NOT include in written paper)
-- This strand is tested orally by the teacher
-- Do NOT include listening and speaking questions in the written exam JSON
+━━━ SECTION E: POETRY (30 marks) ━━━
+- Include a COMPLETE original poem of 20–30 lines IN the paper
+- Poem must have literary depth: figurative language, imagery, theme, mood, contrast
+- Kenyan/African authorship and context
+- EXACTLY 9 questions in this order:
+  E1. "What is the poem about? Write a brief prose statement." (2 marks)
+  E2. Explain a specific line — what it means + what it tells us about the subject (3 marks)
+  E3. Explain a specific phrase — what it suggests about the subject (3 marks)
+  E4. Comment on the effect of a short/unusual stanza — why the poet chose this structure (4 marks)
+  E5. "Identify and explain ONE figure of speech in the line '...'." (3 marks)
+  E6. "What is the mood of the poem? Use evidence from at least TWO stanzas." (4 marks)
+  E7. "Examine the use of contrast. Identify at least TWO contrasts and explain their significance." (4 marks)
+  E8. "What is the theme? Discuss how the poet develops it through images and language." (4 marks)
+  E9. "How does the final stanza serve as a fitting conclusion?" (3 marks)
+- Total Section E = 30 marks
 
-━━━ KENYAN CONTEXT RULES ━━━
-- Comprehension passages must feature Kenyan settings, names, institutions
-- Names: Amina, Wanjiku, Kipchoge, Baraka, Njeri, Otieno, Fatuma, Mwangi, Chebet, Kamau, Achieng, Moraa
-- Institutions: Ministry of Health, Kenya Wildlife Service, Safaricom, Kenya Power, county governments, KNEC, hospitals, schools
-- Places: Nairobi, Mombasa, Kisumu, Nakuru, Eldoret, Nyeri, Garissa, Kericho, Thika, Kisii, Athi River
-- Current Kenyan issues: climate change, career choices, AI in healthcare, etiquette, sports, incomes
-- CBC Competencies to embed: Critical Thinking, Communication, Citizenship, Creativity, Self-Efficacy
+━━━ MARK SCALING FOR DIFFERENT EXAM TYPES ━━━
+End Term/Mock/Pre-Mock (100 marks): A=20, B=10, C=30, D=10, E=30
+80-mark paper: A=16, B=8, C=24, D=8, E=24
+CAT 30 marks: A=12 (short passage, 4 questions), B=omit, C=12 (tense + SVA + phrasal verbs), D=6, E=omit
+Midterm 50 marks: A=14, B=8, C=16, D=6, E=omit or include shortened
+
+━━━ KENYAN CONTEXT ━━━
+Passage names: Amina, Wanjiku, Kipchoge, Baraka, Njeri, Otieno, Fatuma, Mwangi, Chebet, Kamau
+Places: Nairobi, Mombasa, Kisumu, Nakuru, Kericho, Thika, Nyeri, Eldoret, Garissa
+Themes: healthcare ethics, career choices, environmental issues, youth challenges, cultural heritage
+Tense questions: use Kenyan school and work scenarios
+Idioms: select universally understood idioms, not British-specific slang
 
 ━━━ CRITICAL RULES ━━━
-- Comprehension passage MUST appear in full in the exam — not "read the passage on page 3"
-- Grammar questions must ALWAYS give a sentence/context first, then ask
-- Never test grammar by asking "define a noun" — always embed in context
-- Summary must specify a word limit (80 words) and a specific focus aspect
-- Writing task must specify: audience, purpose, format, and marking rubric
-- Use KNEC-style marking language: "Award 1 mark for each correct point. Accept any reasonable answer."`,
+- Section A passage MUST appear in full — no "read the passage on page 3"
+- Section B passage is ALWAYS different from Section A — never same passage
+- Section E poem MUST appear in full in the paper
+- Grammar always in context — never test definitions in isolation
+- Poetry questions follow the EXACT ORDER above — do not rearrange
+- NEVER include a writing composition section — this is NOT part of the Grade 10 written paper`,
 
     cre: `
 CRE EXAM REQUIREMENTS — CBC GRADE 10 (KNEC/KICD):
 
-━━━ EXAM STRUCTURE ━━━
+━━━ EXAM TYPE AND MARKS ━━━
+CAT: 40 marks, 6–8 questions — SINGLE-PART questions (no a/b/c sub-parts)
+  - Each question = 1 direct question, 5–7 marks each
+  - Example: "Describe FIVE ways in which the Bible is important to Christians." (5 marks)
+  - Example: "State SIX consequences of the Fall of Man as recorded in Genesis 3." (6 marks)
+
+Midterm: 50 marks, 8–10 questions — mix of single and two-part questions
+
+End Term / Mock / Pre-Mock / Series: 100 marks, 18–20 questions
+  - Use 6 main questions × 3 sub-parts each = 18 sub-questions
+  - Q1–Q2: (a) 8 marks + (b) 7 marks + (c) 5 marks = 20 marks each
+  - Q3–Q6: (a) 6 marks + (b) 5 marks + (c) 4 marks = 15 marks each
+  - Total: 20+20+15+15+15+15 = 100 marks
+
+━━━ EXAM STRUCTURE (End Term/Mock) ━━━
 A Grade 10 CRE written exam has EXACTLY 6 questions. Answer ALL.
 Each question MUST have exactly THREE sub-parts: (a), (b), (c).
 Scale marks to total requested but maintain the 6-question 3-part structure.
 
-STANDARD MARK ALLOCATION PER QUESTION:
 For a 100-mark exam: 6 questions × varying marks = 100 total
 - Q1–Q2: (a) 8 marks + (b) 7 marks + (c) 5 marks = 20 marks each
 - Q3–Q6: (a) 6 marks + (b) 5 marks + (c) 4 marks = 15 marks each
@@ -320,9 +325,75 @@ ARTS AND PHYSICAL EDUCATION REQUIREMENTS:
 - Sports and Recreation: include biomechanics, training methods, sports psychology basics
 - Questions must test both knowledge AND practical understanding
 - Include questions that reference Kenyan cultural arts, sports personalities, or local events`,
+
+    history: `
+HISTORY AND CITIZENSHIP EXAM STRUCTURE — CBC GRADE 10 (KNEC Standard):
+
+━━━ EXAM TYPE AND MARKS ━━━
+CAT: 40 marks, 10–12 short answer questions (Section A format only)
+Midterm: 50 marks, Sections A and B
+End Term / Mock / Pre-Mock / Series: 100 marks, THREE sections, 2 hours
+
+━━━ END TERM STRUCTURE (100 marks) ━━━
+
+SECTION A — SHORT ANSWER (20 marks, Answer ALL):
+- 10 questions × 2 marks each
+- ONLY these verbs: "Define", "List TWO", "Name TWO", "State TWO", "Identify TWO", "Give TWO"
+- No explanations — concise factual point-form answers only
+- 1 mark per correct point (2 marks = 2 points expected)
+- Cover ALL selected strands
+- Examples:
+  "Define the term History." (2 marks)
+  "Name TWO linguistic groups found in Kenya." (2 marks)
+  "State TWO causes of the Mau Mau Movement in Kenya." (2 marks)
+  "Identify TWO forms of democracy." (2 marks)
+  "Give TWO human rights provided in the Constitution of Kenya 2010." (2 marks)
+
+SECTION B — STRUCTURED QUESTIONS (40 marks, Answer ALL):
+- 3 questions, each with sub-parts (a) and (b)
+- Use verbs: "Explain", "Describe", "Discuss", "Outline" + EXACT number of points
+- Always specify: "Explain THREE...", "Describe FOUR...", "Discuss FIVE..."
+- 1 mark per valid point — marks = number of points required
+- Examples:
+  Q11. (a) Explain THREE reasons why the British established colonial rule in Kenya. (6 marks)
+       (b) Describe FOUR methods the British used to establish colonial rule in Kenya. (8 marks)
+  Q12. (a) Explain THREE social effects of the Trans-Atlantic Slave Trade. (6 marks)
+       (b) Discuss FIVE factors that led to the Scramble and Partition of Africa. (10 marks)
+  Q13. Describe FIVE causes of the Mau Mau Movement in Kenya. (10 marks)
+
+SECTION C — ESSAY QUESTIONS (40 marks, Answer ANY TWO):
+- Provide 3 questions — learner answers ANY TWO
+- Each question = 20 marks, TWO sub-parts: (a) 10 marks + (b) 10 marks
+- Verbs: "Discuss FIVE...", "Explain FIVE...", "Examine FIVE...", "Analyse FIVE..."
+- Always 5 points × 2 marks each = 10 marks per sub-part
+- Examples:
+  Q14. (a) Discuss FIVE contributions of Jomo Kenyatta to Kenya's independence and nation-building. (10 marks)
+       (b) Explain FIVE features of the Constitution of Kenya 2010. (10 marks)
+  Q15. (a) Explain FIVE ways through which citizens can participate in governance in Kenya. (10 marks)
+       (b) Describe FIVE economic activities of early man in Africa. (10 marks)
+
+━━━ STRAND COVERAGE ━━━
+Strand 1 (Kenyan History): Linguistic Groups, Colonial Rule, Constitution 2010, Political Developments
+Strand 2 (African History): Human Developments, African Civilisations, Colonisation, Nationalism, Global Wars
+Strand 3 (World History): Enlightenment, American Revolution, Democracy
+
+━━━ KENYAN CONTEXT RULES ━━━
+- Always use real Kenyan leaders: Jomo Kenyatta, Dedan Kimathi, Me Katilili, Koitalel arap Samoei, Oginga Odinga
+- Real communities: Gikuyu, Luo, Maasai, Kamba, Luhya, Kalenjin, Somali, Mijikenda, Swahili
+- Real events: Mau Mau, Lancaster House, Independence 1963, 2010 Constitution, Multiparty 1991
+- For Section B structured questions: include a brief Kenyan scenario or context before asking
+- For Section C essays: always ask about specific Kenyan leaders, events or institutions
+
+━━━ CRITICAL RULES ━━━
+- Section A: ONLY "TWO" per question — never one point, never three
+- Section B/C: points requested MUST match marks (5 points = 5 marks, not 6)
+- Marking guide: list each acceptable point separately
+- Use: "Award 1 mark for each correct point. Award any [X] correct points."
+- NEVER ask the same sub-topic in both Section B and Section C
+- Section C must have 3 questions so learner can choose 2`,
   };
 
-  return base[type] || base[subject === 'English' ? 'english' : subject === 'CRE' || subject === 'IRE' || subject === 'HRE' ? 'cre' : 'humanities'];
+  return base[type] || base[subject === 'English' ? 'english' : subject === 'CRE' || subject === 'IRE' || subject === 'HRE' ? 'cre' : subject === 'History and Citizenship' ? 'history' : 'humanities'];
 }
 
 // ── Subject-specific question format rules ───────────────
@@ -363,43 +434,61 @@ Section C (Long Answer / Extended Calculation — 10–15 marks):
   - Applied problems requiring interpretation`,
 
     english: `
-QUESTION FORMAT FOR ENGLISH (CBC Grade 10 — KLB structure):
+ENGLISH QUESTION FORMAT — verified from actual KNEC Grade 10 paper:
 
-SECTION A — READING COMPREHENSION:
-  Full passage (200–300 words) followed by:
-  Q1. What was the atmosphere/mood in [opening scene]? Use evidence. (3 marks)
-  Q2. How does the writer convey [character's experience]? Refer to passage. (3 marks)
-  Q3. Describe in your own words [specific event]. (3 marks)
-  Q4. What [pressures/reasons/examples] are given? State THREE. (3 marks)
-  Q5. What does the phrase "[figurative phrase]" tell you about [subject]? (2 marks)
-  Q6. Explain the [irony/contrast/significance] of [event]. (2 marks)
-  Q7. Comment on the significance of [character's/narrator's action]. (2 marks)
-  Q8. Explain the meaning: (a) "[word/phrase]" (b) "[word/phrase]" (2 marks)
+SECTION A — COMPREHENSION (passage + 8 questions):
+  Q1. What was the atmosphere/mood in [scene]? Use evidence from the text. (3 marks)
+  Q2. How does the writer convey [range/character/experience]? Refer to the passage. (3 marks)
+  Q3. Describe in your own words [specific event/problem]. (3 marks)
+  Q4. What [pressures/reasons/examples] are given? Give THREE. (3 marks)
+  Q5. What does the phrase "[figurative expression]" tell you about [subject]? (2 marks)
+  Q6. Explain the irony in [situation/event]. (2 marks)
+  Q7. Comment on the significance of [character action/final scene]. (2 marks)
+  Q8. Explain the meaning of: (a) "[word]" (b) "[phrase]" (2 marks)
 
-SECTION B — SUMMARY WRITING:
-  Separate passage (200–280 words) + instruction:
+SECTION B — SUMMARY (separate passage + 1 instruction):
   "Read the passage carefully. In not more than 80 words, summarise [specific aspect].
    Use your own words as far as possible."
-  [Leave lined space for answer]
+  ROUGH COPY: [lines]   FAIR COPY: [lines]
 
-SECTION C — GRAMMAR IN USE (in-context only):
-  Fill gap: "Complete with correct word: She could not ___ (accept/except) the terms."
-  Identify/correct: "Identify and correct the error: The boys has left the classroom."
-  Rewrite/transform: "Rewrite in reported speech: She said, 'I will return tomorrow.'"
-  Underline: "Underline the relative clause: The man who spoke yesterday is my uncle."
-  Spelling: "Circle the correctly spelled word: committee / comittee / commitee"
-  Homophones: "Choose correct word: The (weather/whether) in Nairobi was unpredictable."
-  Run-on/splice: "Rewrite as two correct sentences: The learners were tired, they kept studying."
+SECTION C — GRAMMAR (7 sub-questions, 30 marks total):
+  C1: "Rewrite each sentence using the tense indicated in brackets. Do not alter the meaning. (5 marks)"
+      (5 sentences × 1 mark each — use varied tenses: Simple Past, Present Perfect, Future Continuous etc.)
+  C2: "Change the following sentences from direct to reported speech OR from reported to direct speech. (6 marks)"
+      (6 sentences × 1 mark — mix both directions)
+  C3: "Choose the correct form of the verb in brackets to complete each sentence. (4 marks)"
+      (4 sentences × 1 mark — subject-verb agreement with collective nouns, indefinite pronouns, correlatives)
+  C4: "Fill in the blank with the correct particle to complete the phrasal verb. (5 marks)"
+      (5 gaps × 1 mark — give list of particles: up, out, off, down, into, on, away)
+  C5: "Rewrite the following sentences by changing from active to passive voice or vice versa. (4 marks)"
+      (4 sentences × 1 mark)
+  C6: "Punctuate the following sentences correctly and rewrite them in full. (3 marks)"
+      (3 unpunctuated sentences × 1 mark — mix capitals, commas, colons, apostrophes)
+  C7: "(a) Write a SYNONYM for each: [3 academic words] (1½ marks)"
+      "(b) Write an ANTONYM for each: [3 academic words] (1½ marks)"
 
-SECTION D — WRITING COMPOSITION:
-  Functional writing task:
-    "You are the Secretary of Thika High School Environmental Club.
-     Write a MEMO to all club members about a tree-planting day next Saturday.
-     Your memo should include: date, venue, time, and what to bring.
-     (Your writing will be marked on: Content 10 marks, Organisation 10 marks,
-      Language 10 marks, Mechanics 5 marks)"
-  OR Creative writing task:
-    "Write a story that begins: The envelope had been sitting on the table for three days..."`,
+SECTION D — ORAL SKILLS (10 marks):
+  D1(a): "Identify the odd one out in terms of the underlined sound in each group: (2 marks)"
+         (2 groups of 4 words with underlined vowels — identify word with different sound)
+  D1(b): "Mark the stress on the following words by placing an apostrophe (ˈ) before the stressed syllable: (2 marks)"
+         (4 multi-syllabic words: e.g. pho-tog-ra-phy, e-co-nom-ic, ca-fe-te-ri-a, re-cord)
+  D2: "For each situation, write an appropriate response using the register in brackets: (3 marks, 1 each)"
+      (i) [situation] (Formal apology)
+      (ii) [situation] (Formal)
+      (iii) [situation] (Informal refusal)
+  D3: "Explain the meaning of each expression. Then use each in a sentence of your own: (3 marks, 1 each)"
+      (3 idiomatic expressions e.g. bite the bullet / burn the midnight oil / the ball is in your court)
+
+SECTION E — POETRY (full poem + 9 questions, 30 marks):
+  E1. What is the poem about? Write a brief prose statement. (2 marks)
+  E2. What does the poet mean by "[specific line]"? What does this tell us about [subject]? (3 marks)
+  E3. Explain the phrase "[specific phrase]". What does it suggest about [subject]? (3 marks)
+  E4. Comment on the effect of the [short/unusual] stanza: "[quote]". Why might the poet have chosen this? (4 marks)
+  E5. Identify and explain ONE figure of speech in the line "[quote]". (3 marks)
+  E6. What is the mood of the poem? Use evidence from at least TWO stanzas. (4 marks)
+  E7. Examine the use of contrast. Identify at least TWO contrasts and explain their significance. (4 marks)
+  E8. What is the theme? Discuss how the poet develops it through images and language choices. (4 marks)
+  E9. How does the final stanza serve as a fitting conclusion? Discuss its meaning and relationship to the poem. (3 marks)`,
 
     humanities: `
 QUESTION FORMAT FOR HUMANITIES:
@@ -409,14 +498,34 @@ Section A (Short Answer — 2 marks each):
 
 Section B (Structured — 5–8 marks):
   - Multi-part questions with source, map, or data stimulus
-  - (a) From the source/map, identify ___ (2 marks)
-  - (b) Explain ___ (3 marks)
-  - (c) Suggest how ___ (2 marks)
+  - (a) Identify ___ (2 marks) (b) Explain ___ (3 marks) (c) Suggest how ___ (2 marks)
 
 Section C (Essay / Extended Response — 10–15 marks):
   - "Discuss", "Analyse", "Evaluate", "Examine"
-  - Clear marking guide: 1 mark per valid point, up to maximum
-  - Introduction, body points, conclusion expected`,
+  - 1 mark per valid point, up to maximum`,
+
+    history: `
+HISTORY QUESTION FORMAT — verified from KNEC Grade 10 papers:
+
+SECTION A (10 × 2 marks = 20 marks — ALL questions):
+  Q1. Define the term [concept]. (2 marks)
+  Q2. Name/List/State/Identify/Give TWO [items]. (2 marks)
+  [continue for all 10 questions — each covers a different topic from selected strands]
+
+SECTION B (3 questions — ALL questions):
+  Q11. (a) Explain THREE [reasons/effects/causes] of [event/topic]. (6 marks)
+       (b) Describe FOUR [functions/methods/characteristics] of [institution/process]. (8 marks)
+  Q12. (a) Explain THREE [social/economic/political] effects of [event]. (6 marks)
+       (b) Discuss FIVE [factors/causes/reasons] that led to [event]. (10 marks)
+  Q13. Describe FIVE [causes/effects/features] of [Kenyan/African event]. (10 marks)
+
+SECTION C (3 questions — Answer ANY TWO — 20 marks each):
+  Q14. (a) Discuss FIVE [contributions/roles/ways] of [person/institution] in [context]. (10 marks)
+       (b) Explain FIVE [features/challenges/ways] of [topic]. (10 marks)
+  Q15. (a) Examine FIVE ways through which [group] [action] in [context]. (10 marks)
+       (b) Describe FIVE [activities/causes/effects] of [historical topic]. (10 marks)
+  Q16. (a) Analyse FIVE [factors/reasons] that led to [historical event]. (10 marks)
+       (b) Discuss FIVE [challenges/ways/effects] facing [group/institution] today. (10 marks)`,
 
     cre: `
 CRE QUESTION FORMAT — Kenya CBC Grade 10 (KNEC Standard):
@@ -523,7 +632,7 @@ Section C (Extended — 10–15 marks):
   - Planning/choreography/composition question`,
   };
 
-  return formats[type] || formats.humanities;
+  return formats[type] || formats[subject === 'History and Citizenship' ? 'history' : 'humanities'];
 }
 
 // ── Validate exam params ─────────────────────────────────
