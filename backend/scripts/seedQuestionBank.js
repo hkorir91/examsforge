@@ -2806,6 +2806,339 @@ const seedQuestions = [
   },
 
 
+
+  // ── GRADE 10 — HISTORY AND CITIZENSHIP ──────────────────────────────────────
+  // Source: End Term 1 2026, Opener Term 2 2026, Term 1+2 Schemes of Work
+
+
+  // ══════════════════════════════════════════════════════════════════
+  // HISTORY AND CITIZENSHIP — GRADE 10 (80 questions)
+  // Source: End Term 1 2026, Opener Term 2 2026, Term 1+2 Schemes
+  // ══════════════════════════════════════════════════════════════════
+
+  // ── SECTION A TYPE QUESTIONS (2 marks each) ──────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Define the term History.',
+    answerGuide: 'History is the study of man\'s past events in relation to his environment (1 mark). It helps us understand how past events have shaped the present (1 mark). Accept any reasonable definition.',
+    tags: ['definition', 'history', 'Section-A'], learningObjective: 'Define the term History' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'List TWO sources of information in History.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Written sources — books, documents, newspapers, archives. (2) Unwritten/oral sources — oral traditions, songs, legends, myths. (3) Electronic sources — internet, audio-visual recordings. (4) Physical/material sources — artefacts, monuments, tools.',
+    tags: ['sources', 'information', 'Section-A'], learningObjective: 'Identify sources of information used in History' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Name TWO linguistic groups found in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Bantu. (2) Nilotic. (3) Cushitic. All three are correct answers — any two.',
+    tags: ['linguistic-groups', 'Kenya', 'Section-A'], learningObjective: 'Identify the linguistic groups found in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO causes of migration of linguistic groups into Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Population pressure/overpopulation. (2) Drought and famine. (3) Internal conflicts and wars. (4) Search for better pasture and water for livestock. (5) Search for fertile land for farming. (6) Natural disasters — floods, volcanic eruptions. (7) Epidemic diseases affecting livestock or people.',
+    tags: ['migration', 'causes', 'linguistic-groups', 'Section-A'], learningObjective: 'Identify causes of migration of linguistic groups into Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO effects of migration and settlement on Kenyan communities.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Cultural exchange and intermarriage between communities. (2) Displacement of smaller/weaker communities. (3) Introduction of new farming techniques and crops. (4) Formation of alliances between communities. (5) Development of trade between communities. (6) Spread of languages and customs.',
+    tags: ['migration', 'effects', 'communities', 'Section-A'], learningObjective: 'Describe effects of migration on Kenyan communities' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Name TWO Kenyan communities that are classified as Nilotic.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Luo. (2) Maasai. (3) Samburu. (4) Turkana. (5) Kalenjin (Kipsigis, Nandi, Tugen, Pokot). (6) Teso. Accept any correct Nilotic community.',
+    tags: ['Nilotic', 'communities', 'Kenya', 'Section-A'], learningObjective: 'Identify Nilotic communities in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Give TWO benefits of cultural diversity in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Promotes national unity and cohesion. (2) Promotes cultural exchange and learning. (3) Provides a rich cultural heritage for tourism. (4) Encourages creativity and innovation through diverse perspectives. (5) Strengthens national identity while celebrating uniqueness.',
+    tags: ['cultural-diversity', 'benefits', 'Kenya', 'Section-A'], learningObjective: 'Identify benefits of cultural diversity in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Establishment of Colonial Rule',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO reasons why the British established colonial rule in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) To exploit Kenya\'s natural resources and raw materials. (2) To find new markets for British manufactured goods. (3) To establish political control and expand their empire. (4) To spread Christianity and Western civilization. (5) To stop the slave trade. (6) To settle excess European population. (7) Strategic interests — to protect the route to India.',
+    tags: ['colonial-rule', 'reasons', 'British', 'Kenya', 'Section-A'], learningObjective: 'State reasons for the establishment of British colonial rule in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Establishment of Colonial Rule',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Name TWO methods used by the British to establish colonial rule in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Military force/conquest. (2) Treaties and diplomacy. (3) Collaboration — using local chiefs as allies. (4) Deception — misleading African leaders. (5) Economic manipulation — controlling trade.',
+    tags: ['colonial-rule', 'methods', 'British', 'Section-A'], learningObjective: 'Identify methods used by the British to establish colonial rule' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Identify TWO types of government in Kenya.',
+    answerGuide: 'Award 1 mark each for: (1) National/Central Government. (2) County Government. Note: Kenya uses a devolved system of government with these two levels.',
+    tags: ['government', 'Kenya', 'devolution', 'Section-A'], learningObjective: 'Identify the types of government in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Give TWO roles of the Judiciary in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Interpreting the Constitution and laws of Kenya. (2) Resolving disputes and conflicts between individuals or institutions. (3) Protecting human rights and freedoms. (4) Checking abuse of power by the Executive and Legislature. (5) Administering justice fairly and impartially.',
+    tags: ['judiciary', 'Kenya', 'Constitution-2010', 'Section-A'], learningObjective: 'Describe the roles of the Judiciary in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Name TWO human rights provided in the Constitution of Kenya 2010.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Right to life. (2) Right to education. (3) Right to health. (4) Freedom of speech/expression. (5) Freedom of assembly. (6) Right to a fair trial. (7) Right to own property. (8) Right to privacy. Accept any right from the Bill of Rights.',
+    tags: ['human-rights', 'Constitution-2010', 'Bill-of-Rights', 'Section-A'], learningObjective: 'Identify human rights in the Constitution of Kenya 2010' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Identify TWO forms of democracy.',
+    answerGuide: 'Award 1 mark each for: (1) Direct democracy — citizens vote directly on issues/policies. (2) Representative/Indirect democracy — citizens elect representatives to make decisions on their behalf.',
+    tags: ['democracy', 'forms', 'governance', 'Section-A'], learningObjective: 'Identify different forms of democracy' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO responsibilities of a Kenyan citizen.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Paying taxes. (2) Obeying the law. (3) Participating in elections by voting. (4) Protecting public property. (5) Conserving the environment. (6) Defending the country. (7) Respecting the rights of other citizens.',
+    tags: ['citizenship', 'responsibilities', 'Kenya', 'Section-A'], learningObjective: 'Identify responsibilities of Kenyan citizens' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Name TWO early forms of trade practised in East Africa before colonialism.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Barter trade — exchanging goods for goods. (2) Long distance trade — between the interior and the coast. (3) Local/regional trade — between neighbouring communities. (4) Indian Ocean trade — between East Africa and Arabia/India/China.',
+    tags: ['trade', 'pre-colonial', 'East-Africa', 'Section-A'], learningObjective: 'Identify early forms of trade in East Africa' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO reasons for the coming of the Portuguese to the East African Coast.',
+    answerGuide: 'Award 1 mark each for any two of: (1) To find a sea route to India to trade in spices. (2) To spread Christianity/evangelism. (3) To establish control of Indian Ocean trade. (4) To break the Arab monopoly of trade on the coast. (5) To find gold and other valuable resources.',
+    tags: ['Portuguese', 'East-Africa', 'reasons', 'Section-A'], learningObjective: 'State reasons for the coming of the Portuguese to the East African Coast' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'Identify TWO factors that led to the rise of nationalism in Kenya.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Land alienation by the British which dispossessed Africans. (2) Racial discrimination and social segregation. (3) The role of African political parties like KAU and later KANU. (4) The impact of World War II — returning African soldiers demanded rights. (5) Education and the influence of educated African elites. (6) The example of India\'s independence (1947). (7) United Nations advocacy for self-determination.',
+    tags: ['nationalism', 'Kenya', 'factors', 'Section-A'], learningObjective: 'Identify factors that led to the rise of nationalism in Kenya' },
+
+  // ── SECTION B TYPE QUESTIONS ────────────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE importance of studying History and Citizenship in school.',
+    answerGuide: 'Award 2 marks each for any three of: (1) History helps us understand our past and how it has shaped the present society. (2) It promotes national unity and patriotism by creating a shared sense of identity and pride. (3) History teaches us important lessons from past mistakes, helping us avoid repeating them. (4) It provides career opportunities in fields like law, politics, journalism, teaching and research. (5) History promotes cultural awareness and appreciation of diversity. (6) It develops critical thinking, research and analytical skills.',
+    tags: ['importance-of-history', 'Section-B', 'critical-thinking'], learningObjective: 'Explain the importance of studying History and Citizenship' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE effects of the migration and settlement of Nilotic communities in Kenya.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Displacement of other communities — the Nilotic groups pushed some Bantu and Cushitic communities from their areas. (2) Intermarriage and cultural exchange — the Nilotic communities intermarried with neighbouring communities, enriching culture. (3) Development of trade — migration promoted exchange of goods and ideas between communities. (4) Formation of alliances — some communities formed defensive alliances against common enemies e.g. Maasai-Agikuyu relations. (5) Spread of the Nilotic language and culture across East Africa. (6) Population increase in areas of settlement, leading to competition for resources.',
+    tags: ['Nilotic', 'migration', 'effects', 'Section-B'], learningObjective: 'Describe effects of Nilotic migration on Kenyan communities' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Establishment of Colonial Rule',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'Describe FOUR functions of Parliament in Kenya.',
+    answerGuide: 'Award 2 marks each for any four of: (1) Legislation — making and amending laws for the country. (2) Representation — representing the interests of the citizens in the counties and nationally. (3) Oversight — supervising the work of the Executive (Cabinet and government). (4) Budget approval — approving the national budget and authorising government spending. (5) Ratifying appointments — approving presidential appointments of Cabinet Secretaries and other officers. (6) Amending the Constitution — with required special majority.',
+    tags: ['Parliament', 'functions', 'Kenya', 'Section-B'], learningObjective: 'Describe the functions of Parliament in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Establishment of Colonial Rule',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE ways in which the establishment of British colonial rule affected Africans in Kenya negatively.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Land alienation — the British took large areas of fertile land from Africans and gave it to white settlers, particularly in the Rift Valley and Central Province. (2) Taxation — Africans were forced to pay hut tax and poll tax, forcing them into labour to earn money. (3) Forced labour — Africans were made to work on settler farms and in building railways for low or no pay. (4) Racial discrimination — Africans were treated as second-class citizens, denied rights and segregated. (5) Destruction of traditional political systems — chiefs were replaced or made puppets of the colonial administration. (6) Cultural erosion — missionaries discouraged African traditions, customs and dances.',
+    tags: ['colonialism', 'negative-effects', 'Kenya', 'Section-B'], learningObjective: 'Explain negative effects of British colonialism on Africans in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE social effects of the Trans-Atlantic Slave Trade on Africa.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Depopulation — millions of young, able-bodied Africans were removed, reducing the workforce. (2) Social disruption — families were broken apart, communities were weakened. (3) Increased warfare — African kingdoms raided each other to capture slaves for sale to Europeans. (4) Development of racial prejudice — the trade promoted racism against African people globally. (5) Psychological trauma — generations of Africans suffered fear and insecurity. (6) Underdevelopment — loss of labour force slowed economic and social development in Africa.',
+    tags: ['slave-trade', 'Trans-Atlantic', 'social-effects', 'Section-B'], learningObjective: 'Explain social effects of the Trans-Atlantic Slave Trade on Africa' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Colonisation of Africa',
+    questionType: 'structured', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE factors that contributed to the Scramble and Partition of Africa.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Industrial Revolution — European nations needed raw materials (cotton, rubber, minerals) for their industries and new markets for manufactured goods. (2) Rivalry and competition between European powers — France, Britain, Germany, Portugal and Belgium competed for territories and prestige. (3) The Berlin Conference of 1884-85 — European powers agreed to divide Africa peacefully to avoid war among themselves. (4) Humanitarian motives — the desire to stop the Arab slave trade and spread Christianity. (5) Strategic interests — control of sea routes and river valleys important for trade and military advantage. (6) Advances in technology — the Maxim gun, quinine for malaria, steam-powered ships gave Europeans military advantage over Africans. (7) Weak and fragmented African political structures — lack of unity made resistance difficult.',
+    tags: ['Scramble-for-Africa', 'Partition', 'factors', 'Section-B'], learningObjective: 'Discuss factors that led to the Scramble and Partition of Africa' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'structured', difficulty: 'hard', marks: 10,
+    questionText: 'Describe FIVE causes of the Mau Mau Movement in Kenya.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Land alienation — the British settlers took fertile land from the Gikuyu and Maasai, especially in the White Highlands. (2) Taxation — heavy tax burdens (hut tax, poll tax) forced Africans into labour. (3) Kipande (pass laws) — Africans were forced to carry identification passes which restricted their movement. (4) Racial discrimination — Africans were denied equal rights and opportunities with whites. (5) Unemployment and low wages — African workers were poorly paid on settler farms and in towns. (6) Squatter evictions — African squatters were evicted from European-owned farms. (7) Desire for independence and self-governance — inspired by Indian independence (1947) and the growth of African nationalism.',
+    tags: ['Mau-Mau', 'causes', 'Kenya', 'independence', 'Section-B'], learningObjective: 'Describe causes of the Mau Mau Movement in Kenya' },
+
+  // ── SECTION C TYPE QUESTIONS ────────────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE contributions of Jomo Kenyatta to Kenya\'s independence and nation-building.',
+    answerGuide: 'Award 2 marks each for any five of: (1) He led the Kenya African Union (KAU) and advocated for African rights and independence. (2) He wrote "Facing Mount Kenya" (1938) which documented Gikuyu culture and challenged colonial rule. (3) He became the first Prime Minister (1963) and first President (1964) of independent Kenya, guiding the new nation. (4) He promoted national unity through his "harambee" (pulling together) philosophy. (5) He oversaw the writing of the first Kenyan constitution at independence. (6) He promoted economic development through encouraging foreign investment and private enterprise ("African Socialism"). (7) He suffered imprisonment (1952-1961) by the British but emerged as the undisputed leader of independence.',
+    tags: ['Jomo-Kenyatta', 'contributions', 'independence', 'nation-building', 'Section-C'], learningObjective: 'Discuss the contributions of Jomo Kenyatta to Kenyan independence' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Explain FIVE features of the Constitution of Kenya 2010.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Devolution — power shared between national and 47 county governments, bringing services closer to the people. (2) Bill of Rights (Chapter 4) — guarantees fundamental rights and freedoms to all citizens. (3) Separation of powers — Executive (President), Legislature (Parliament) and Judiciary are separate and independent. (4) Supremacy of the Constitution — it is the supreme law and any law inconsistent with it is void. (5) Multi-party democracy — guarantees freedom to form and participate in political parties. (6) Independent institutions — IEBC, EACC, NHRC ensure checks and balances. (7) Public participation — citizens must be involved in governance and legislative processes. (8) Land reforms — Article 67 established the National Land Commission to manage public land.',
+    tags: ['Constitution-2010', 'features', 'Kenya', 'devolution', 'Section-C'], learningObjective: 'Explain the features of the Constitution of Kenya 2010' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Explain FIVE ways through which citizens can participate in governance in Kenya.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Voting in elections — citizens elect their leaders including the President, Governors, MPs and MCAs. (2) Paying taxes — funding government services and development through individual and corporate taxes. (3) Public participation in law-making — contributing views during public debates on Bills in Parliament and County Assemblies. (4) Joining political parties — participating in politics by becoming members or leaders of political parties. (5) Community service — engaging in harambee and community development activities. (6) Civic education — educating others about their rights, responsibilities and the importance of governance. (7) Using petition mechanisms — petitioning Parliament or County Assemblies on matters of concern.',
+    tags: ['citizenship', 'participation', 'governance', 'Kenya', 'Section-C'], learningObjective: 'Explain ways citizens can participate in governance in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Human Developments in Africa',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Describe FIVE economic activities of early man in Africa.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Hunting — early man hunted wild animals using stone tools and arrows for food and clothing. (2) Gathering — collecting wild fruits, roots, berries, honey and plants for food. (3) Fishing — communities near rivers, lakes and coasts caught fish using traps, hooks and nets. (4) Pastoralism — during the Neolithic age, early man domesticated cattle, sheep and goats for milk, meat and hides. (5) Farming/Agriculture — the Neolithic revolution involved growing crops like millet, sorghum and vegetables. (6) Trading — exchanging surplus goods with neighbouring communities (barter trade). (7) Craft-making — making tools, pottery and clothing for use and trade.',
+    tags: ['early-man', 'economic-activities', 'Africa', 'Neolithic', 'Section-C'], learningObjective: 'Describe economic activities of early man in Africa' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Colonisation of Africa',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Explain FIVE factors that led to urbanisation in Africa during the colonial period.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Establishment of administrative centres — colonial capitals like Nairobi, Lagos and Accra grew as centres of colonial administration. (2) Construction of railways and roads — transport infrastructure opened up the interior and attracted settlement and commerce. (3) Mining activities — mining towns grew around mining sites e.g. Johannesburg in South Africa, Entebbe in Uganda. (4) Commercial activities — the development of markets and trade centres attracted migrants from rural areas. (5) Taxation — hut and poll tax forced Africans to seek employment in towns. (6) Missionary activities — mission stations attracted people seeking education and healthcare, growing into towns. (7) Port development — coastal towns like Mombasa and Dar es Salaam grew as colonial ports for export of raw materials.',
+    tags: ['urbanisation', 'Africa', 'colonial', 'factors', 'Section-C'], learningObjective: 'Explain factors that led to urbanisation in Africa during the colonial period' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Modern Nationalism in Africa',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE challenges facing democracy in Africa today.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Corruption — widespread corruption undermines democratic institutions, elections and service delivery. (2) Negative ethnicity/tribalism — leaders exploit ethnic divisions to win elections and distribute resources unfairly. (3) Post-election violence — disputed elections have led to violence in Kenya (2007-08), Zimbabwe and other countries. (4) Weak institutions — judiciary, electoral bodies and parliament lack full independence in many African countries. (5) Poverty and illiteracy — poor, uneducated voters are more susceptible to manipulation and vote-buying. (6) Military interference — some African governments have been overthrown by military coups e.g. Sudan, Mali, Burkina Faso. (7) External interference — foreign governments and corporations influence African politics for their own interests.',
+    tags: ['democracy', 'challenges', 'Africa', 'Section-C'], learningObjective: 'Discuss challenges facing democracy in Africa today' },
+
+  // ── AFRICAN HISTORY SECTION B TYPE ──────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'African Civilisations up to 19th Century',
+    questionType: 'structured', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE factors that led to the development of early African civilisations such as Ancient Egypt and the Mali Empire.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Favourable geography — the Nile River valley (Egypt) and Niger River (Mali) provided fertile land and water for agriculture. (2) Agriculture and food surplus — successful farming freed people from constant food production, allowing specialisation in trade, crafts and governance. (3) Trade — both Egypt and Mali were centres of long-distance trade (gold, salt, ivory) which generated wealth. (4) Strong leadership — powerful kings (Pharaohs in Egypt, Mansa Musa in Mali) provided stable governance. (5) Religion — religious beliefs and institutions provided social cohesion and motivated great architectural and cultural achievements. (6) Military strength — powerful armies enabled expansion and protection of trade routes. (7) Technology and innovation — developments in writing (hieroglyphics), mathematics and architecture sustained civilisations.',
+    tags: ['African-civilisations', 'Egypt', 'Mali', 'factors', 'Section-B'], learningObjective: 'Discuss factors that led to the development of early African civilisations' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'African Civilisations up to 19th Century',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE contributions of early African civilisations to the modern world.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Writing systems — Ancient Egypt developed hieroglyphics, one of the earliest writing systems, contributing to literacy and record-keeping. (2) Mathematics and science — Egyptians developed advanced mathematics, geometry and astronomy used in construction and navigation. (3) Architecture — the pyramids, Great Zimbabwe and Mali mosques demonstrate advanced construction knowledge still studied today. (4) Agriculture — early African farming techniques spread crop knowledge and practices globally. (5) Trade networks — established long-distance trade routes that became foundations for modern commerce. (6) Medical knowledge — Ancient Egyptian medical practices including surgery influenced early medicine worldwide.',
+    tags: ['African-civilisations', 'contributions', 'modern-world', 'Section-B'], learningObjective: 'Describe contributions of early African civilisations to the modern world' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Modern Nationalism in Africa',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE factors that gave rise to modern nationalism in Africa.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Racial discrimination — Africans were treated as second-class citizens under colonialism, fuelling resentment and a desire for self-rule. (2) Economic exploitation — Africans saw their resources taken without benefit and their labour poorly rewarded. (3) The role of education — educated Africans like Kwame Nkrumah and Jomo Kenyatta used their knowledge to demand independence. (4) The impact of World War II — African soldiers who fought for their colonial rulers returned expecting rights and self-determination. (5) The example of India\'s independence (1947) — inspired African leaders to push for freedom. (6) Pan-Africanism — the global movement uniting people of African descent in the demand for freedom and dignity.',
+    tags: ['nationalism', 'Africa', 'factors', 'Pan-Africanism', 'Section-B'], learningObjective: 'Explain factors that gave rise to modern nationalism in Africa' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Modern Nationalism in Africa',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE contributions of Kwame Nkrumah to the independence and development of Africa.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Led Ghana to independence in 1957 — Ghana became the first sub-Saharan African nation to gain independence from colonial rule. (2) Promoted Pan-Africanism — advocated for African unity through the Organisation of African Unity (OAU, 1963). (3) Economic development — promoted industrialisation and the Volta River Dam project. (4) Education — expanded access to education in Ghana and believed in African intellectualism. (5) Anti-imperialism — consistently criticised neo-colonialism — foreign economic control after formal independence. (6) Inspired other African nationalists — his success gave hope and a model to independence movements across the continent. (7) Wrote influential works including "Africa Must Unite" and "Neo-Colonialism: The Last Stage of Imperialism".',
+    tags: ['Kwame-Nkrumah', 'Pan-Africanism', 'Ghana', 'Africa', 'independence', 'Section-C'], learningObjective: 'Discuss contributions of Kwame Nkrumah to African independence and development' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Global Wars',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE effects of World War I and World War II on African societies.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Loss of life — thousands of African soldiers and civilians died fighting for colonial powers with no direct benefit to Africa. (2) Economic disruption — trade was disrupted and economies suffered during wartime. (3) Rise of nationalism — African soldiers who fought returned demanding rights, accelerating independence movements. (4) Growth of political consciousness — Africans realised their colonial rulers were not invincible, increasing confidence in independence struggles. (5) Labour exploitation — Africans were forced to work as porters, carrying supplies during the wars under harsh conditions. (6) Spread of diseases — the movement of troops spread diseases like influenza, causing widespread deaths.',
+    tags: ['World-Wars', 'Africa', 'effects', 'WWI', 'WWII', 'Section-B'], learningObjective: 'Describe effects of global wars on African societies' },
+
+  // ── WORLD HISTORY QUESTIONS ──────────────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in World History and Citizenship', subStrand: 'Enlightenment Ideas and the American Revolution',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE key ideas of the Enlightenment and their importance to modern governance.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Reason — Enlightenment thinkers argued that human reason, not tradition or religion, should guide political decisions, forming the basis of modern secular democracy. (2) Individual rights — thinkers like John Locke argued all people have natural rights (life, liberty, property) which governments must protect. (3) Social contract — Rousseau argued government is a contract between rulers and the ruled — if broken, citizens can remove their rulers. (4) Separation of powers — Montesquieu argued government should be divided into Executive, Legislature and Judiciary to prevent tyranny. (5) Religious tolerance — Voltaire promoted freedom of thought and religion, challenging state-sponsored persecution. (6) Popular sovereignty — the idea that political power comes from the people, not from God or kings.',
+    tags: ['Enlightenment', 'ideas', 'governance', 'Locke', 'Rousseau', 'Section-B'], learningObjective: 'Explain key Enlightenment ideas and their importance to modern governance' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in World History and Citizenship', subStrand: 'Enlightenment Ideas and the American Revolution',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE causes of the American Revolution (1775-1783).',
+    answerGuide: 'Award 2 marks each for any three of: (1) Taxation without representation — Britain imposed taxes (Stamp Act, Townshend Acts) on colonists who had no representation in British Parliament. (2) Economic restrictions — Britain prevented the colonies from trading freely, damaging colonial commerce. (3) Enlightenment ideas — the writings of Locke, Rousseau and others inspired colonists to demand liberty and self-governance. (4) The Boston Massacre (1770) — British soldiers shot and killed colonists, inflaming anti-British sentiment. (5) The Boston Tea Party (1773) — colonists dumped British tea in protest against unfair taxation. (6) British heavy-handedness — British attempt to disarm colonial militias at Lexington and Concord triggered open warfare.',
+    tags: ['American-Revolution', 'causes', 'USA', 'Section-B'], learningObjective: 'Explain causes of the American Revolution' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in World History and Citizenship', subStrand: 'Enlightenment Ideas and the American Revolution',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE effects of the American Revolution on democracy and human rights globally.',
+    answerGuide: 'Award 2 marks each for any five of: (1) The Declaration of Independence (1776) proclaimed that "all men are created equal" — a foundational statement of human rights. (2) The US Constitution (1787) established a model of representative democracy and separation of powers adopted by many countries. (3) The Bill of Rights — the first 10 amendments guaranteed fundamental freedoms (speech, religion, assembly, press). (4) Inspired the French Revolution (1789) — the American Revolution gave French reformers confidence to challenge their monarchy. (5) Inspired Latin American independence movements — leaders like Simon Bolivar were inspired by American ideals. (6) Promoted the idea of national self-determination — the right of peoples to govern themselves, later applied globally. (7) Contributed to the development of international human rights law — principles in the Declaration influenced the UN Declaration of Human Rights (1948).',
+    tags: ['American-Revolution', 'effects', 'democracy', 'human-rights', 'Section-C'], learningObjective: 'Discuss the global effects of the American Revolution on democracy and human rights' },
+
+  // ── CITIZENSHIP AND GOVERNANCE ──────────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'The Constitution of Kenya 2010',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Discuss FIVE challenges facing democracy in Kenya today.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Corruption — corruption in government institutions, elections and public service weakens democracy. (2) Negative ethnicity — politicians exploit tribal loyalties to mobilise voters, undermining national unity. (3) Electoral malpractice — rigging, vote-buying and violence undermine free and fair elections. (4) Weak institutions — the IEBC, judiciary and Parliament are sometimes perceived as partial or compromised. (5) Poverty — poor citizens are vulnerable to manipulation, unable to make independent political choices. (6) Illiteracy — lack of civic education limits citizens\' ability to participate meaningfully in democracy. (7) Youth unemployment — high youth unemployment creates frustration and makes young people susceptible to political manipulation.',
+    tags: ['democracy', 'challenges', 'Kenya', 'corruption', 'ethnicity', 'Section-C'], learningObjective: 'Discuss challenges facing democracy in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'long_answer', difficulty: 'hard', marks: 10,
+    questionText: 'Examine FIVE ways in which the Kenyan government has promoted human rights since independence.',
+    answerGuide: 'Award 2 marks each for any five of: (1) Constitution of Kenya 2010 — contains a comprehensive Bill of Rights (Chapter 4) guaranteeing fundamental rights. (2) Independent judiciary — courts protect citizens\' rights through judicial review and enforcement of the Bill of Rights. (3) Independent institutions — the Kenya National Human Rights Commission and EACC investigate rights violations. (4) Ratification of international treaties — Kenya has signed the African Charter on Human and Peoples\' Rights. (5) Free primary education — universal primary education gives children the right to education. (6) Universal healthcare — government programmes extending health services protect the right to health. (7) Devolution — county governments bring services and decision-making closer to citizens.',
+    tags: ['human-rights', 'Kenya', 'promotion', 'government', 'Section-C'], learningObjective: 'Examine how the Kenyan government has promoted human rights' },
+
+  // ── SOURCE/MAP BASED QUESTIONS ─────────────────────────────────
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'structured', difficulty: 'medium', marks: 8,
+    questionText: 'Study the map of Kenya showing the migration routes and settlement areas of linguistic groups. Use it to answer the following questions:\n(a) Identify the linguistic group that migrated into Kenya from the Congo Basin. (1 mark)\n(b) Name TWO settlement areas of the Bantu linguistic group in Kenya. (2 marks)\n(c) Explain THREE factors that influenced the settlement patterns of linguistic groups in Kenya. (6 marks)',
+    answerGuide: '(a) Bantu (1 mark). (b) Central Province/Mt Kenya region; Western Kenya/around Lake Victoria; Coastal region. Award 1 mark each for any two correct areas. (c) Award 2 marks each for any three factors: Availability of water and fertile land — groups settled near rivers, lakes and fertile areas e.g. Luo settled near Lake Victoria; Security — groups avoided areas prone to raids; Climate — groups preferred moderate climates suitable for farming or pastoralism; Presence of pasture — pastoral communities like Maasai settled on open grasslands.',
+    tags: ['map-work', 'linguistic-groups', 'settlement', 'source-based', 'Section-B'], learningObjective: 'Use map sources to answer questions on linguistic groups in Kenya' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Linguistic Groups in Kenya',
+    questionType: 'short_answer', difficulty: 'easy', marks: 2,
+    questionText: 'State TWO ways in which oral tradition is used as a source of historical information.',
+    answerGuide: 'Award 1 mark each for any two of: (1) Through folk stories, myths and legends that record past events. (2) Through proverbs and riddles that preserve cultural values and history. (3) Through songs and poetry that narrate historical events. (4) Through interviews with community elders who share knowledge of past events.',
+    tags: ['oral-tradition', 'sources', 'history', 'Section-A'], learningObjective: 'Explain how oral tradition is used as a historical source' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in Kenyan History and Citizenship', subStrand: 'Political Developments and Challenges',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE ways in which the Constitution of Kenya 2010 has promoted devolution and improved governance.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Creation of 47 counties with elected County Governors and County Assemblies — bringing governance closer to the people. (2) Equitable sharing of national revenue — at least 15% of national revenue shared with counties. (3) Promotion of local participation — county residents participate in planning and budgeting for local development. (4) Decentralisation of services — health, agriculture and local infrastructure managed at county level. (5) Creation of employment — devolution created thousands of jobs in county governments. (6) Promotion of regional equity — previously marginalised regions have received more resources and attention.',
+    tags: ['devolution', 'Constitution-2010', 'counties', 'governance', 'Section-B'], learningObjective: 'Explain how the Constitution of Kenya 2010 has promoted devolution' },
+
+  { grade: 'Grade 10', subject: 'History and Citizenship',
+    strand: 'Themes in African History and Citizenship', subStrand: 'Colonisation of Africa',
+    questionType: 'structured', difficulty: 'medium', marks: 6,
+    questionText: 'Explain THREE ways in which Africans resisted European colonisation.',
+    answerGuide: 'Award 2 marks each for any three of: (1) Armed resistance — communities used weapons to fight colonial forces e.g. Nandi resistance in Kenya (Koitalel arap Samoei), Maji Maji in Tanganyika, Chimurenga in Zimbabwe. (2) Collaboration/diplomacy — some leaders negotiated to protect their people\'s interests while appearing to cooperate with colonisers. (3) Mass protests and boycotts — Africans refused to work, pay taxes or buy colonial goods. (4) Formation of political organisations — educated Africans formed associations to demand rights e.g. East Africa Association (Harry Thuku, 1921). (5) Use of religion — prophetic movements used religious authority to inspire resistance e.g. Me Katilili wa Menza among the Giriama. (6) Cultural resistance — maintaining African customs, music and identity in defiance of missionary suppression.',
+    tags: ['African-resistance', 'colonisation', 'methods', 'Nandi', 'Me-Katilili', 'Section-B'], learningObjective: 'Explain methods used by Africans to resist European colonisation' },
+
+
 ];
 
 async function seed() {
