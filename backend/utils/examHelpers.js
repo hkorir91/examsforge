@@ -35,7 +35,9 @@ function getDuration(examType, marks) {
 // ── Subject classification ───────────────────────────────
 const SUBJECT_TYPES = {
   // Sciences — require calculations, experiments, diagrams
-  science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
+  science: ['Chemistry', 'Physics', 'General Science'],
+  // Biology — has its own 2-section structure (A: short answer, B: any two extended)
+  biology: ['Biology'],
   // Mathematics — require working shown, calculations, proofs
   mathematics: ['Mathematics', 'Essential Mathematics'],
   // English — has comprehensive 5-section CBC structure
@@ -77,16 +79,86 @@ function getSubjectInstructions(subject, examType, totalMarks) {
     science: `
 SCIENCE-SPECIFIC REQUIREMENTS — CRITICAL:
 - EVERY science question MUST contain specific, actual content — not vague descriptions
-- For Chemistry: write actual equations e.g. "Balance: Fe + O₂ → Fe₂O₃" not "balance an equation"
-- For Physics: write actual values e.g. "A car moves at 20m/s for 5 seconds, calculate distance" not "calculate distance for a moving car"
-- For Biology: write specific organism names, organs, processes — not "a certain organism"
-- Include at least ONE question requiring a labelled diagram or description of experimental apparatus
-- Include questions on safety precautions where relevant
-- For Chemistry: include at least one balanced equation or stoichiometry calculation
-- For Biology: include questions on structure and function with specific named structures
-- For Physics: include at least one calculation showing formula, substitution, and answer with units
-- Practical questions should ask learners to describe procedures step by step
+- For Chemistry: write actual equations e.g. "Balance: Fe + O₂ → Fe₂O₃"
+- For Physics: write actual values e.g. "A car moves at 20m/s for 5 seconds, calculate distance"
+- For Biology: write specific organism names, organelles, processes — not "a certain organism"
+- Include at least ONE question requiring a labelled diagram or experimental design
 - Use data/results tables where appropriate for analysis questions`,
+
+    biology: `
+BIOLOGY EXAM STRUCTURE — CBC GRADE 10 (KNEC Standard):
+
+━━━ EXAM TYPE AND MARKS ━━━
+CAT: 40 marks — short structured questions, answer ALL
+Midterm: 50 marks — Sections A and B, shorter versions
+End Term / Mock: 100 marks, 2 hours, TWO sections
+
+━━━ END TERM STRUCTURE (100 marks) ━━━
+
+SECTION A — SHORT ANSWER (60 marks, Answer ALL):
+- 15–17 questions, varying marks (2–10 marks each)
+- Mix of: define, list, explain, distinguish, calculate, label, complete table, describe
+- MUST include calculation questions (magnification, probability, enzyme rates)
+- MUST include at least ONE table completion question (biomolecules, comparisons)
+- Question types from real papers:
+  * "Define the term Biology." (2 marks)
+  * "List the seven characteristic processes of life." (7 marks)
+  * "Distinguish between diffusion and osmosis." (4 marks)
+  * "A cell was magnified 600 times, eyepiece ×20. Calculate objective lens magnification." (2 marks)
+  * "Complete the table on biological molecules." (8 marks)
+  * "Name the two main types of nucleic acids." (2 marks)
+  * "A plant is not watered for two weeks. Explain why its leaves wilt." (4 marks)
+  * "State TWO factors that affect enzyme activity." (2 marks)
+
+SECTION B — EXTENDED QUESTIONS (40 marks, Answer ANY TWO):
+- Provide 3 questions — learner answers ANY TWO
+- Each question = 20 marks with sub-parts (a)(b)(c)
+- Sub-parts use: "Draw and label", "Describe", "Explain", "Design an experiment"
+- MUST include at least ONE diagram/drawing question per Section B question
+- MUST include at least ONE practical/experiment design question
+- Question structure examples:
+  Q18. (a) Draw a labelled diagram of a plant cell (10 marks)
+       (b) Describe the function of FOUR labelled parts (8 marks)
+       (c) How does a plant cell differ from an animal cell? (2 marks)
+  Q19. (a) Define enzyme and describe its chemical nature (4 marks)
+       (b) Explain the lock and key model of enzyme action (8 marks)
+       (c) Design an experiment to investigate effect of temperature on catalase (8 marks)
+  Q20. (a) List the main parts of the alimentary canal in order (5 marks)
+       (b) Describe digestion in the stomach (8 marks)
+       (c) Explain how the small intestine is adapted for absorption (7 marks)
+
+━━━ STRAND COVERAGE ━━━
+Strand 1 — Cell Biology and Biodiversity:
+  1.1 Introduction to Biology: definition, branches, applications, careers
+  1.2 Specimen Collection and Preservation: apparatus, herbarium, preservatives, labelling
+  1.3 Cell Structure and Specialisation: organelles (plant/animal), microscopy, magnification calculation
+  1.4 Chemicals of Life: biomolecules (carbs, proteins, lipids, nucleic acids), enzymes, water
+
+Strand 2 — Anatomy and Physiology of Plants:
+  2.1 Nutrition: photosynthesis equation, light/dark reactions, factors affecting rate
+  2.2 Transport: osmosis, diffusion, active transport, transpiration, xylem/phloem
+  2.3 Gaseous Exchange and Respiration: stomata, aerobic/anaerobic respiration
+
+Strand 3 — Anatomy and Physiology of Animals:
+  3.1 Nutrition: alimentary canal, enzymes (amylase, pepsin, lipase), absorption
+  3.2 Transport: blood components, heart structure, blood groups
+  3.3 Gaseous Exchange: lungs, alveoli adaptations, breathing mechanism
+
+━━━ BIOLOGY-SPECIFIC RULES ━━━
+- Diagram questions: describe the diagram clearly in the question text and include diagram field
+- Always write specific names: amylase (not "an enzyme"), mitochondria (not "an organelle")
+- Calculations: always show formula → substitution → answer with units
+- Magnification formula: Total magnification = Eyepiece × Objective
+- Osmosis vs diffusion: always test the distinction — common exam question
+- Enzymes: always specify substrate and product (e.g. amylase breaks down starch to maltose)
+- Practical/experiment questions: must include hypothesis, apparatus, method, measurement
+- Use Kenyan context: Lake Victoria ecosystem, local plants/animals, Kenyan hospitals
+
+━━━ KENYAN CONTEXT ━━━
+- Ecosystems: Lake Victoria, Nairobi National Park, Mt Kenya forests, Indian Ocean coast
+- Local organisms: tilapia, acacia tree, maize plant, Nile perch, fever tree
+- Applications: malaria control, crop pest management, water treatment, HIV/AIDS awareness
+- Careers: doctor, pharmacist, agricultural officer, environmental scientist, lab technician`,
 
     mathematics: `
 MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
@@ -393,7 +465,7 @@ Strand 3 (World History): Enlightenment, American Revolution, Democracy
 - Section C must have 3 questions so learner can choose 2`,
   };
 
-  return base[type] || base[subject === 'English' ? 'english' : subject === 'CRE' || subject === 'IRE' || subject === 'HRE' ? 'cre' : subject === 'History and Citizenship' ? 'history' : 'humanities'];
+  return base[type] || base[subject === 'English' ? 'english' : subject === 'CRE' || subject === 'IRE' || subject === 'HRE' ? 'cre' : subject === 'History and Citizenship' ? 'history' : subject === 'Biology' ? 'biology' : 'humanities'];
 }
 
 // ── Subject-specific question format rules ───────────────
@@ -527,6 +599,40 @@ SECTION C (3 questions — Answer ANY TWO — 20 marks each):
   Q16. (a) Analyse FIVE [factors/reasons] that led to [historical event]. (10 marks)
        (b) Discuss FIVE [challenges/ways/effects] facing [group/institution] today. (10 marks)`,
 
+    biology: `
+BIOLOGY QUESTION FORMAT — verified from KNEC Grade 10 papers:
+
+SECTION A (15–17 questions, 60 marks — ALL):
+  Q1. "Define the term Biology." (2 marks)
+  Q2. "List the SEVEN characteristic processes of life." (7 marks)
+  Q3. "A student observed a cell with a cell wall, large central vacuole and chloroplasts.
+       (a) Is this a plant or animal cell? (1 mark)
+       (b) Give a reason based on the observations." (2 marks)
+  Q4. "(a) State the function of the mitochondria. (2 marks)
+       (b) Name the process that takes place in the mitochondria." (1 mark)
+  Q5. "Distinguish between diffusion and osmosis." (4 marks)
+  Q6. "A red blood cell is placed in distilled water.
+       (a) Describe what happens. (2 marks)
+       (b) Explain why this happens." (3 marks)
+  Q7. "Complete the table on biological molecules: [table with blanks for monomer, function, source]" (8 marks)
+  Q8. "A cell was magnified 600× using eyepiece ×20. Calculate the objective lens magnification." (2 marks)
+  Q9. "Name the enzyme in saliva and state what it breaks down." (2 marks)
+  Q10. "State TWO factors that affect the rate of enzyme activity." (2 marks)
+  Q11. "A plant is not watered for two weeks. Explain why leaves wilt using knowledge of water movement." (4 marks)
+  Q12. "Define homeostasis and give ONE example." (3 marks)
+
+SECTION B (3 questions — Answer ANY TWO, 20 marks each):
+  Q18. (a) Draw a large, well-labelled diagram of a plant cell (10 marks)
+       (b) Describe the function of FOUR labelled parts (8 marks)
+       (c) Explain how plant and animal cells differ (2 marks)
+  Q19. (a) Define enzyme and describe its chemical nature (4 marks)
+       (b) Explain the lock-and-key model using a specific example (8 marks)
+       (c) Design an experiment to investigate effect of temperature on catalase activity
+           [include: hypothesis, apparatus, method, measurement] (8 marks)
+  Q20. (a) List the main parts of the human alimentary canal in order (5 marks)
+       (b) Describe digestion in the stomach: food type, enzyme, role of HCl (8 marks)
+       (c) Explain how the small intestine is adapted for absorption (7 marks)`,
+
     cre: `
 CRE QUESTION FORMAT — Kenya CBC Grade 10 (KNEC Standard):
 
@@ -632,7 +738,7 @@ Section C (Extended — 10–15 marks):
   - Planning/choreography/composition question`,
   };
 
-  return formats[type] || formats[subject === 'History and Citizenship' ? 'history' : 'humanities'];
+  return formats[type] || formats[subject === 'History and Citizenship' ? 'history' : subject === 'Biology' ? 'biology' : 'humanities'];
 }
 
 // ── Validate exam params ─────────────────────────────────
