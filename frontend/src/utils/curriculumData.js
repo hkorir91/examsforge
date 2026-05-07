@@ -1079,18 +1079,23 @@ export const SUBSTRANDS = {
   'Sarufi na Matumizi ya Lugha': ['Sarufi ya Kiswahili', 'Msamiati', 'Alama za Uakifishaji', 'Rejista na Mtindo'],
   'Fasihi': ['Ushairi', 'Hadithi Fupi', 'Riwaya', 'Tamthilia', 'Vipengele vya Fasihi'],
 
-  // Biology
-  'Cell Biology': ['Cell Structure and Function', 'Cell Division (Mitosis and Meiosis)', 'Cell Transport', 'Biochemical Reactions'],
-  'Cell Biology and Biochemistry': ['Biomolecules', 'Enzyme Action', 'ATP and Energy', 'Metabolic Pathways'],
-  'Genetics and Heredity': ['Mendelian Genetics', 'Dihybrid Cross', 'Linkage and Sex-Linked Traits', 'Genetic Disorders'],
-  'Reproduction': ['Sexual Reproduction in Humans', 'Reproduction in Plants', 'Fertilisation and Development', 'Reproductive Health'],
-  'Regulation and Coordination': ['Nervous System', 'Endocrine System', 'Homeostasis', 'Receptors and Effectors'],
-  'Ecology': ['Ecosystems and Biomes', 'Food Webs and Energy Flow', 'Population Ecology', 'Conservation Biology'],
-  'Molecular Biology and Biotechnology': ['DNA Structure and Replication', 'Protein Synthesis', 'Genetic Engineering', 'Biotechnology Applications'],
-  'Nutrition': ['Types of Nutrients', 'Digestion and Absorption', 'Malnutrition and Deficiency Diseases', 'Balanced Diet'],
-  'Gaseous Exchange': ['Structure of Respiratory System', 'Mechanism of Breathing', 'Gas Exchange in Plants', 'Respiratory Diseases'],
-  'Transport and Excretion': ['Blood and Blood Groups', 'Heart and Circulation', 'Excretory Organs', 'Kidney Function'],
-
+  // Biology — Official KICD Grade 10 Strands and Sub-strands
+  'Cell Biology and Biodiversity': [
+    'Introduction to Biology',
+    'Specimen Collection and Preservation',
+    'Cell Structure and Specialisation',
+    'Chemicals of Life',
+  ],
+  'Anatomy and Physiology of Plants': [
+    'Nutrition in Plants (Photosynthesis)',
+    'Transport in Plants',
+    'Gaseous Exchange and Respiration in Plants',
+  ],
+  'Anatomy and Physiology of Animals': [
+    'Nutrition in Animals (Digestion)',
+    'Transport in Animals',
+    'Gaseous Exchange and Respiration in Animals',
+  ],
   // Chemistry
   'Atomic Structure and Periodic Table': ['Atomic Models', 'Electronic Configuration', 'Periodic Trends', 'Chemical Families'],
   'Acids, Bases and Salts': ['pH and Indicators', 'Titration and Neutralisation', 'Salt Formation', 'Buffer Solutions'],
@@ -1283,7 +1288,7 @@ const SUBJECT_EXAM_MARKS = {
   'Essential Mathematics': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'English': { 'CAT': 30, 'Midterm': 50, 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'Kiswahili': { 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
-  'Biology': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
+  'Biology': { 'CAT': 40, 'Midterm': 50, 'End Term': 100, 'End Year': 100, 'Mock': 100, 'Pre-Mock': 100, 'Series': 100 },
   'Chemistry': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Physics': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
   'Geography': { 'End Term': 80, 'End Year': 80, 'Mock': 80, 'Pre-Mock': 80, 'Series': 80 },
