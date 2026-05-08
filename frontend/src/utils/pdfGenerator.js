@@ -121,7 +121,10 @@ export async function generateExamPDF(exam, meta) {
   // ── Helpers ────────────────────────────────────────
   const checkPage = (needed = 20) => {
     if (y + needed > doc.internal.pageSize.getHeight() - margin) {
-      doc.addPage()
+      // Stamp footer on current page before moving to next
+      addFooter(doc.internal.getNumberOfPages())
+      addFooter(doc.internal.getNumberOfPages())
+  doc.addPage()
       y = margin
     }
   }
@@ -134,14 +137,32 @@ export async function generateExamPDF(exam, meta) {
   }
 
   // BUG 1 FIX: meta.strands is an array — join it for display
+  // (kept for use in footer only — NOT shown on cover page per design spec)
   const strandsDisplay = Array.isArray(meta.strands)
     ? meta.strands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
     : (meta.strand || '')
-  const substrandsDisplay = Array.isArray(meta.substrands)
-    ? meta.substrands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
-    : (meta.substrand || 'General')
+
+  // ── FOOTER HELPER ───────────────────────────────────
+  // Called after every new page — stamps SmartSchool Digital watermark
+  const addFooter = (pageNum) => {
+    const footerY = doc.internal.pageSize.getHeight() - 8
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7)
+    doc.setTextColor(...colors.gray)
+    doc.text(
+      `SmartSchool Digital  |  ${meta.school || 'Kenya Public School'}  |  ${meta.subject}  |  ${meta.grade}  |  ${meta.examType} ${meta.term} ${meta.year}`,
+      pageW / 2, footerY, { align: 'center' }
+    )
+    doc.setDrawColor(...colors.lightGray)
+    doc.setLineWidth(0.2)
+    doc.line(margin, footerY - 3, pageW - margin, footerY - 3)
+    // Page number on right
+    doc.setTextColor(...colors.gray)
+    doc.text(`Page ${pageNum}`, pageW - margin, footerY, { align: 'right' })
+  }
 
   // ── COVER PAGE ─────────────────────────────────────
+
   // Kenya flag stripe at top
   const stripeH = 4
   const stripeW = contentW / 5
@@ -150,62 +171,73 @@ export async function generateExamPDF(exam, meta) {
     doc.setFillColor(...c)
     doc.rect(margin + i * stripeW, y, stripeW, stripeH, 'F')
   })
-  y += stripeH + 8
+  y += stripeH + 7
 
-  // School name
+  // ── School name ────────────────────────────────────
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(16)
+  doc.setFontSize(15)
   doc.setTextColor(...colors.black)
   doc.text((meta.school || 'Kenya Public School').toUpperCase(), pageW / 2, y, { align: 'center' })
   y += 6
 
   doc.setFont('helvetica', 'italic')
-  doc.setFontSize(9)
+  doc.setFontSize(8.5)
   doc.setTextColor(...colors.gray)
   doc.text('Excellence in Education', pageW / 2, y, { align: 'center' })
-  y += 10
+  y += 6
 
-  drawLine(colors.blue)
+  // ── KCBE Header ────────────────────────────────────
+  doc.setDrawColor(...colors.blue)
+  doc.setLineWidth(0.5)
+  doc.line(margin, y, pageW - margin, y)
+  y += 5
 
-  // Exam title
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(14)
+  doc.setFontSize(9.5)
+  doc.setTextColor(...colors.blue)
+  doc.text('KENYA CERTIFICATE OF BASIC EDUCATION (K.C.B.E)', pageW / 2, y, { align: 'center' })
+  y += 5
+
+  doc.setDrawColor(...colors.blue)
+  doc.line(margin, y, pageW - margin, y)
+  y += 6
+
+  // ── Exam title ────────────────────────────────────
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(13)
   doc.setTextColor(...colors.blue)
   const title = exam.title || `${meta.grade} ${meta.subject} ${meta.examType} Examination`
   doc.text(title, pageW / 2, y, { align: 'center' })
-  y += 7
+  y += 6
 
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(10)
+  doc.setFontSize(9.5)
   doc.setTextColor(...colors.gray)
   doc.text(`${meta.term} ${meta.year} Examination`, pageW / 2, y, { align: 'center' })
-  y += 10
+  y += 8
 
-  // Info grid — wraps long values (fixes Sub-Strand truncation)
-  const colW = contentW / 2 - 12  // max width per column value
+  // ── Info grid — Grade, Subject, Duration, Marks, Term, Year (NO strand/substrand) ──
+  const colW = contentW / 2 - 12
   const infoRows = [
     [`Grade / Class: ${meta.grade}`, `Subject: ${meta.subject}`],
-    [`Strand: ${strandsDisplay || 'General'}`, `Sub-Strand: ${substrandsDisplay || 'General'}`],
-    [`Duration: ${exam.time || exam.duration || '1 hour 30 minutes'}`, `Total Marks: ${meta.totalMarks}`],
+    [`Duration: ${exam.time || exam.duration || '2 hours'}`, `Total Marks: ${meta.totalMarks}`],
     [`Term: ${meta.term}`, `Year: ${meta.year}`],
   ]
 
-  // Pre-calculate row heights accounting for text wrap
   doc.setFontSize(9)
   const rowHeights = infoRows.map(row => {
     const lines0 = doc.splitTextToSize(row[0], colW)
     const lines1 = doc.splitTextToSize(row[1], colW)
     return Math.max(lines0.length, lines1.length) * 5.5 + 3
   })
-  const gridH = rowHeights.reduce((s, h) => s + h, 0) + 10
+  const gridH = rowHeights.reduce((s, h) => s + h, 0) + 8
 
   doc.setFillColor(...colors.lightGray)
   doc.roundedRect(margin, y, contentW, gridH, 3, 3, 'F')
 
   const col1 = margin + 6
   const col2 = pageW / 2 + 6
-
-  let rowY = y + 7
+  let rowY = y + 6
   infoRows.forEach((row, i) => {
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...colors.black)
@@ -218,9 +250,44 @@ export async function generateExamPDF(exam, meta) {
   })
   y += gridH + 6
 
-  // Instructions box — dynamic height based on content
+  // ── Learner's Details Box ─────────────────────────
+  const detailsBoxH = 32
+  doc.setDrawColor(...colors.blue)
+  doc.setLineWidth(0.5)
+  doc.roundedRect(margin, y, contentW, detailsBoxH, 3, 3, 'S')
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(9)
+  doc.setTextColor(...colors.blue)
+  doc.text("LEARNER'S DETAILS", margin + 5, y + 7)
+
+  // Row 1: Name + Admission Number
+  const detY1 = y + 15
+  const detY2 = y + 26
+  const midX = pageW / 2
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(8.5)
+  doc.setTextColor(...colors.black)
+  doc.text('Name:', margin + 5, detY1)
+  doc.setLineWidth(0.3)
+  doc.setDrawColor(...colors.gray)
+  doc.line(margin + 20, detY1, midX - 8, detY1)  // name line
+
+  doc.text('Adm No:', midX - 2, detY1)
+  doc.line(midX + 16, detY1, pageW - margin - 3, detY1)  // adm no line
+
+  // Row 2: Date + Signature
+  doc.text('Date:', margin + 5, detY2)
+  doc.line(margin + 18, detY2, midX - 8, detY2)  // date line
+
+  doc.text('Signature:', midX - 2, detY2)
+  doc.line(midX + 20, detY2, pageW - margin - 3, detY2)  // signature line
+
+  y += detailsBoxH + 6
+
+  // ── Instructions box ──────────────────────────────
   const instructions = exam.instructions || []
-  // Pre-calculate height needed
   let instrLines = []
   instructions.forEach((inst, i) => {
     const txt = `${i + 1}. ${inst}`
@@ -238,16 +305,57 @@ export async function generateExamPDF(exam, meta) {
   doc.text('INSTRUCTIONS TO CANDIDATES', margin + 5, y + 7)
 
   doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8.5)
   doc.setTextColor(...colors.black)
-  let instrY = y + 14
-  instructions.forEach((inst, i) => {
-    const txt = `${i + 1}. ${inst}`
-    const lines = doc.splitTextToSize(txt, contentW - 10)
-    doc.text(lines, margin + 5, instrY)
-    instrY += lines.length * 5
+  let instrY = y + 13
+  instrLines.forEach(line => {
+    doc.text(line, margin + 5, instrY)
+    instrY += 5
   })
   y += instrBoxH + 6
 
+  // ── Score Grid ────────────────────────────────────
+  // Collect all questions across sections to build Q# → Marks mapping
+  const allQuestions = [
+    ...(exam.sectionA?.questions || []),
+    ...(exam.sectionB?.questions || []),
+    ...(exam.sectionC?.questions || []),
+  ]
+
+  if (allQuestions.length > 0) {
+    const scoreHeaders = ['Question', ...allQuestions.map(q => `Q${q.num}`), 'Total']
+    const scoreMarks   = ['Marks',   ...allQuestions.map(q => q.marks ?? ''),  meta.totalMarks]
+    const scoreBlank   = ["Learner's Score", ...allQuestions.map(() => ''), '']
+
+    autoTable(doc, {
+      startY: y,
+      head: [scoreHeaders],
+      body: [scoreMarks, scoreBlank],
+      margin: { left: margin, right: margin },
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+        halign: 'center',
+        lineColor: [180, 180, 180],
+        lineWidth: 0.3,
+      },
+      headStyles: {
+        fillColor: colors.blue,
+        textColor: colors.white,
+        fontStyle: 'bold',
+        fontSize: 7,
+      },
+      columnStyles: {
+        0: { halign: 'left', fontStyle: 'bold', fillColor: colors.lightGray },
+      },
+      alternateRowStyles: { fillColor: [255, 255, 255] },
+      theme: 'grid',
+    })
+    y = doc.lastAutoTable.finalY + 8
+  }
+
+  // ── Footer on page 1 ──────────────────────────────
+  addFooter(1)
   // ── Diagram rendering helper ────────────────────────────
   // If diagram.svg exists: convert to PNG and embed (real AI diagram).
   // Otherwise: draw a clean labelled placeholder box.
@@ -438,7 +546,8 @@ export async function generateExamPDF(exam, meta) {
   // ── SECTION B ──────────────────────────────────────
   if (exam.sectionB?.questions?.length) {
     checkPage(20)
-    doc.addPage()
+    addFooter(doc.internal.getNumberOfPages())
+  doc.addPage()
     y = margin
 
     doc.setFillColor(...colors.blue)
@@ -515,7 +624,8 @@ export async function generateExamPDF(exam, meta) {
   // ── SECTION C ──────────────────────────────────────
   if (exam.sectionC?.questions?.length) {
     checkPage(20)
-    doc.addPage()
+    addFooter(doc.internal.getNumberOfPages())
+  doc.addPage()
     y = margin
 
     doc.setFillColor(...colors.blue)
@@ -588,6 +698,7 @@ export async function generateExamPDF(exam, meta) {
   }
 
   // ── MARKING SCHEME ─────────────────────────────────
+  addFooter(doc.internal.getNumberOfPages())
   doc.addPage()
   y = margin
 
@@ -668,18 +779,27 @@ export async function generateExamPDF(exam, meta) {
   renderSchemeSection(exam.sectionB, 'SECTION B — Structured Questions')
   renderSchemeSection(exam.sectionC, 'SECTION C — Extended Questions')
 
-  // Footer on all pages
+  // ── Stamp footer on every page (overwrite with final page count) ───────────
   const totalPages = doc.internal.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i)
+    const footerY = doc.internal.pageSize.getHeight() - 8
+    // Clear the area first
+    doc.setFillColor(255, 255, 255)
+    doc.rect(margin - 2, footerY - 6, contentW + 4, 10, 'F')
+    // Separator line
+    doc.setDrawColor(...colors.lightGray)
+    doc.setLineWidth(0.2)
+    doc.line(margin, footerY - 3, pageW - margin, footerY - 3)
+    // SmartSchool Digital watermark text
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7.5)
+    doc.setFontSize(7)
     doc.setTextColor(...colors.gray)
     doc.text(
-      `SmartSchool Digital — ${meta.school} — ${meta.grade} ${meta.subject} ${meta.examType} ${meta.term} ${meta.year}`,
-      margin, doc.internal.pageSize.getHeight() - 8
+      `SmartSchool Digital  |  ${meta.school || 'Kenya Public School'}  |  ${meta.subject}  |  ${meta.grade}  |  ${meta.examType} ${meta.term} ${meta.year}`,
+      pageW / 2, footerY, { align: 'center' }
     )
-    doc.text(`Page ${i} of ${totalPages}`, pageW - margin, doc.internal.pageSize.getHeight() - 8, { align: 'right' })
+    doc.text(`Page ${i} of ${totalPages}`, pageW - margin, footerY, { align: 'right' })
   }
 
   const filename = `${meta.school}_${meta.grade}_${meta.subject}_${meta.examType}_${meta.term}_${meta.year}.pdf`
