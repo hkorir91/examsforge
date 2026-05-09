@@ -55,16 +55,18 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
     ? meta.substrands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
     : (meta.substrand && meta.substrand !== 'undefined' && meta.substrand !== 'General' ? meta.substrand : '')
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!user?.isPremium) {
       toast.error('PDF download requires Premium. Upgrade now!')
       return
     }
     try {
-      const filename = generateExamPDF(exam, meta)
+      toast('Generating PDF...')
+      const filename = await generateExamPDF(exam, meta)
       toast.success(`Downloaded: ${filename}`)
       if (examId) api.post(`/exams/${examId}/download`).catch(() => {})
     } catch (err) {
+      console.error('PDF error:', err)
       toast.error('PDF generation failed. Please try again.')
     }
   }
@@ -76,6 +78,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
 
   const saveEdit = async () => {
     if (!editingQ || !exam) return
+    // Update question text in local exam state
     const { section, qNum } = editingQ
     const updatedSection = {
       ...exam[section],
@@ -83,6 +86,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
         q.num === qNum ? { ...q, text: editText } : q
       ),
     }
+    // Persist to backend if we have an examId
     if (examId) {
       try {
         await api.patch(`/exams/${examId}`, { [section]: updatedSection })
@@ -101,8 +105,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
       await api.patch('/exams/' + examId, {})
       toast.success('Exam saved to My Exams')
     } catch {
-      // BUG 7 FIX: use neutral toast, not success, when the API call fails
-      toast('Exam saved locally — sync will retry automatically.', { icon: '💾' })
+      toast.success('Exam saved locally')
     } finally {
       setSaving(false)
     }
@@ -290,7 +293,6 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
             <h2 className="font-serif text-2xl text-brand-blue-dark mb-1.5">{exam.title}</h2>
             <p className="text-sm text-gray-400 mb-6">{meta.term} {meta.year} Examination</p>
 
-            {/* BUG 4 FIX: filter out null entries before mapping to prevent TypeError */}
             <div className="grid grid-cols-2 gap-2 text-left bg-gray-50 rounded-xl p-4 mb-5">
               {[
                 ['Grade / Class', meta.grade],
@@ -301,7 +303,7 @@ export default function ExamPreview({ exam, meta, examId, onRegenerate }) {
                   ['Strand', strandsDisplay],
                   substrandsDisplay ? ['Sub-Strand', substrandsDisplay] : null,
                 ] : []),
-              ].filter(Boolean).map(([label, value]) => (
+              ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">{label}</p>
                   <p className="text-sm font-semibold text-gray-800">{value}</p>
