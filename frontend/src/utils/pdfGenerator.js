@@ -119,12 +119,27 @@ export async function generateExamPDF(exam, meta) {
   }
 
   // ── Helpers ────────────────────────────────────────
+
+  // FOOTER — defined first so checkPage can call it
+  const addFooter = (pageNum) => {
+    const footerY = doc.internal.pageSize.getHeight() - 8
+    doc.setDrawColor(...colors.lightGray)
+    doc.setLineWidth(0.2)
+    doc.line(margin, footerY - 3, pageW - margin, footerY - 3)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(7)
+    doc.setTextColor(...colors.gray)
+    doc.text(
+      `SmartSchool Digital  |  ${meta.school || 'Kenya Public School'}  |  ${meta.subject}  |  ${meta.grade}  |  ${meta.examType} ${meta.term} ${meta.year}`,
+      pageW / 2, footerY, { align: 'center' }
+    )
+    doc.text(`Page ${pageNum}`, pageW - margin, footerY, { align: 'right' })
+  }
+
   const checkPage = (needed = 20) => {
     if (y + needed > doc.internal.pageSize.getHeight() - margin) {
-      // Stamp footer on current page before moving to next
       addFooter(doc.internal.getNumberOfPages())
-      addFooter(doc.internal.getNumberOfPages())
-  doc.addPage()
+      doc.addPage()
       y = margin
     }
   }
@@ -136,32 +151,11 @@ export async function generateExamPDF(exam, meta) {
     y += 4
   }
 
-  // BUG 1 FIX: meta.strands is an array — join it for display
-  // (kept for use in footer only — NOT shown on cover page per design spec)
+  // ── COVER PAGE ─────────────────────────────────────
+  // (strandsDisplay kept for footer only — not shown on cover per design spec)
   const strandsDisplay = Array.isArray(meta.strands)
     ? meta.strands.filter(s => s && s !== 'undefined' && s !== 'General').join(', ')
     : (meta.strand || '')
-
-  // ── FOOTER HELPER ───────────────────────────────────
-  // Called after every new page — stamps SmartSchool Digital watermark
-  const addFooter = (pageNum) => {
-    const footerY = doc.internal.pageSize.getHeight() - 8
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7)
-    doc.setTextColor(...colors.gray)
-    doc.text(
-      `SmartSchool Digital  |  ${meta.school || 'Kenya Public School'}  |  ${meta.subject}  |  ${meta.grade}  |  ${meta.examType} ${meta.term} ${meta.year}`,
-      pageW / 2, footerY, { align: 'center' }
-    )
-    doc.setDrawColor(...colors.lightGray)
-    doc.setLineWidth(0.2)
-    doc.line(margin, footerY - 3, pageW - margin, footerY - 3)
-    // Page number on right
-    doc.setTextColor(...colors.gray)
-    doc.text(`Page ${pageNum}`, pageW - margin, footerY, { align: 'right' })
-  }
-
-  // ── COVER PAGE ─────────────────────────────────────
 
   // Kenya flag stripe at top
   const stripeH = 4
