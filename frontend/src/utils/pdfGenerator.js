@@ -460,11 +460,15 @@ export async function generateExamPDF(exam, meta) {
     doc.text(`SECTION A — SHORT ANSWER  (${exam.sectionA.marks} marks)`, margin + 5, y + 5.5)
     y += 12
 
-    doc.setFont('helvetica', 'italic')
-    doc.setFontSize(8.5)
-    doc.setTextColor(...colors.gray)
-    doc.text(exam.sectionA.instruction || '', margin, y)
-    y += 7
+    // Render section instruction — wraps long text and handles full passage for English
+    if (exam.sectionA.instruction) {
+      doc.setFont('helvetica', 'italic')
+      doc.setFontSize(8.5)
+      doc.setTextColor(...colors.gray)
+      const instrLines = doc.splitTextToSize(exam.sectionA.instruction, contentW)
+      doc.text(instrLines, margin, y)
+      y += instrLines.length * 5 + 4
+    }
 
     for (const q of exam.sectionA.questions) {
       checkPage(30)
@@ -488,7 +492,6 @@ export async function generateExamPDF(exam, meta) {
       doc.setFontSize(9.5)
       doc.setTextColor(...colors.black)
       renderQuestionText(q.text, margin + 6)
-      y += qLines.length * 5 + 2
 
       if (q.diagram) await drawDiagram(q.diagram)
 
@@ -553,11 +556,14 @@ export async function generateExamPDF(exam, meta) {
     doc.text(`SECTION B — STRUCTURED QUESTIONS  (${exam.sectionB.marks} marks)`, margin + 5, y + 5.5)
     y += 12
 
-    doc.setFont('helvetica', 'italic')
-    doc.setFontSize(8.5)
-    doc.setTextColor(...colors.gray)
-    doc.text(exam.sectionB.instruction || '', margin, y)
-    y += 7
+    if (exam.sectionB.instruction) {
+      doc.setFont('helvetica', 'italic')
+      doc.setFontSize(8.5)
+      doc.setTextColor(...colors.gray)
+      const bInstrLines = doc.splitTextToSize(exam.sectionB.instruction, contentW)
+      doc.text(bInstrLines, margin, y)
+      y += bInstrLines.length * 5 + 4
+    }
 
     for (const q of exam.sectionB.questions) {
       checkPage(35)
