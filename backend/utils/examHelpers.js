@@ -164,18 +164,26 @@ Strand 3 — Anatomy and Physiology of Animals:
 MATHEMATICS-SPECIFIC REQUIREMENTS — CRITICAL:
 - EVERY mathematics question MUST contain ACTUAL numbers, expressions, equations or values
 - DO NOT write "Wanjiku encounters expressions to simplify" without giving the actual expression
-- ALWAYS write the full mathematical content: e.g. "Simplify: (2³ × 2⁵) ÷ 2⁴" not "simplify an expression"
-- ALWAYS write actual equations: e.g. "Solve: x² – 5x – 6 = 0" not "solve a quadratic equation"
-- ALWAYS include specific measurements: e.g. "A rectangle has length (x+5)cm and width (x-2)cm" not "a rectangle"
-- For logarithms: write "Evaluate: log₁₀ 1000" not "evaluate a logarithm"
-- For geometry: write actual coordinates, angles, lengths — e.g. "Triangle ABC where A(1,2) B(3,4) C(5,2)"
-- For bearings: write actual bearing values — e.g. "on a bearing of 070°" not "on some bearing"
-- ALL calculation questions must show: state formula → substitute values → solve → state answer with units
-- Include questions from Number/Algebra, Geometry, Statistics — balanced coverage
-- Section C must include multi-step problems requiring 3+ calculation steps
-- Answers must show complete working — method marks awarded even if final answer is wrong
-- Include at least one geometry/construction question with measurements
-- SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with marks`,
+- ALWAYS write the full mathematical content: e.g. "Simplify: (2³ × 2⁵) ÷ 2⁴"
+- ALWAYS write actual equations: e.g. "Solve: x² – 5x – 6 = 0"
+- For geometry: write actual coordinates, angles, lengths
+- For bearings: write actual bearing values — e.g. "on a bearing of 070°"
+- ALL calculation questions must show: state formula → substitute values → solve → answer with units
+- NEVER use Greek letter π in question text — always write "(pi)" or "22/7" or "3.14" instead
+- NEVER use θ as a symbol — write "angle theta" or "angle x" instead
+- Use Kenyan context: matatu, shamba, market prices in Ksh, Kenyan towns
+
+MARK ALLOCATION — VARY marks per question, do NOT give all questions the same marks:
+- Section A (Short Answer): mix of 2-mark and 3-mark questions
+  * Simple calculations (evaluate, simplify, convert) → 2 marks
+  * Multi-step calculations (profit/loss, ratios, percentages) → 3 marks
+  * Geometry/trigonometry calculations → 2-3 marks
+- Section B (Structured): 4-8 marks per question with sub-parts
+  * Each sub-part: 2-4 marks depending on complexity
+- Section C (Extended): 10-15 marks per question
+  * Multi-step problems with full working required
+
+SCORE GRID: Always include a score grid in instructions listing Q1, Q2... with individual marks`,
 
     english: `
 ENGLISH EXAM STRUCTURE — CBC GRADE 10 (VERIFIED FROM ACTUAL KNEC PAPER):
@@ -1207,12 +1215,12 @@ Return ONLY a valid JSON object. No explanation, no markdown, no text outside th
   ],
   "sectionA": {
     "marks": ${saMarks},
-    "instruction": "Answer ALL ${saCount} questions in this section. Write your answers concisely in the spaces provided.",
+    "instruction": "Read the following passage carefully and then answer ALL the questions that follow.\\n\\n[WRITE THE COMPLETE 300-400 WORD PASSAGE HERE — full prose, Kenyan setting, literary style]\\n\\nAnswer all questions based on the passage above.",
     "questions": [
       {
         "num": 1,
         "text": "[COMPLETE question text here — Kenyan scenario + actual question with specific content]",
-        "marks": ${saPerQ},
+        "marks": 2,
         "questionType": "short_answer",
         "subParts": [
           {"label": "a", "text": "a) [Complete sub-question] (1 mark)", "marks": 1, "answer": "[Model answer — 1 mark]"},
