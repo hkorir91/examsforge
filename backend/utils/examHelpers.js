@@ -955,21 +955,6 @@ OUTPUT FORMAT — Return ONLY a valid JSON object. No explanation, no markdown, 
 Transform ALL ${totalQuestions} seed questions now. Ensure JSON is complete and valid.`;
 }
 
-// ── Param validation ──────────────────────────────────────
-function validateExamParams(params) {
-  const { grade, subject, strands, examType, term, year, totalMarks, totalQuestions, school } = params;
-  if (!grade) return 'Grade is required.';
-  if (!subject) return 'Subject is required.';
-  if (!strands || strands.length === 0) return 'At least one strand must be selected.';
-  if (!examType) return 'Exam type is required.';
-  if (!term) return 'Term is required.';
-  if (!year || isNaN(year)) return 'A valid year is required.';
-  if (!totalMarks || totalMarks < 10) return 'Total marks must be at least 10.';
-  if (!totalQuestions || totalQuestions < 2) return 'At least 2 questions are required.';
-  if (!school || !school.trim()) return 'School name is required.';
-  return null;
-}
-
 // ── Diagram instructions by subject ─────────────────────
 // Tells the AI which diagram types are available, when to use them,
 // and strictly forbids bracket descriptions like [Diagram shows...].
